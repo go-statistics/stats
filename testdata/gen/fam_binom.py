@@ -40,6 +40,11 @@ def cdfsf(k, n, p):
     return ic, i
 
 
+def ratio(j, n, p):
+    n, p = int(n), mpf(p)
+    return (n - j) * p / ((j + 1) * (1 - p))
+
+
 def support(n, p):
     return 0, int(n)
 
@@ -163,6 +168,6 @@ def b_pcases(name, fn):
 
 FIXTURES = {}
 FIXTURES.update(discfix.make("binom", dict(dist=st.binom, logpmf=logpmf, cdfsf=cdfsf, support=support,
-                                           xcases=xcases, pcases=pcases)))
+                                           xcases=xcases, pcases=pcases, ratio=ratio)))
 FIXTURES.update(discfix.make("bernoulli", dict(dist=st.bernoulli, logpmf=b_logpmf, cdfsf=b_cdfsf,
                                                support=b_support, xcases=b_xcases, pcases=b_pcases)))

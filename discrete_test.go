@@ -5,6 +5,7 @@ import (
 	"math"
 	"testing"
 
+	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
 	"github.com/go-statistics/stats/internal/dd"
 )
@@ -130,8 +131,17 @@ func TestDiscreteDegenerate(t *testing.T) {
 	if h := (Bernoulli{P: 0}).Entropy(); h != 0 {
 		t.Errorf("Bernoulli(0) entropy %v", h)
 	}
-	if h := (Hypergeometric{Total: 10, Good: 10, Draws: 4}).Entropy(); h != 0 {
-		t.Errorf("degenerate hypergeometric entropy %v", h)
+	// SciPy's logpmf is -8.9e-16 there, its third and fourth moments NaN
+	hg := Hypergeometric{Total: 10, Good: 10, Draws: 4}
+	if hg.Entropy() != 0 || hg.PMF(4) != 1 || hg.LogPMF(4) != 0 || hg.Moment(3) != 64 {
+		t.Errorf("degenerate hypergeometric: entropy %v pmf %v logpmf %v moment(3) %v", hg.Entropy(), hg.PMF(4), hg.LogPMF(4), hg.Moment(3))
+	}
+	zipfStd{}.momentsFromMunp()
+	// shiftDraws converts non-integer draws (none of the generators used
+	// here returns them, but the helper accepts any array)
+	fl, _ := ndarray.FromData([]float64{1, 2.5}, 2)
+	if v, _ := ndarray.Data[int64](shiftDraws(fl, 1)); v[0] != 2 || v[1] != 3 {
+		t.Errorf("shiftDraws = %v", v)
 	}
 	g := Geometric{P: 1}
 	if g.CDF(3) != 1 || g.SF(3) != 0 || g.PPF(0.5) != 1 || g.ISF(0.5) != 1 {

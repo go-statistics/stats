@@ -32,6 +32,11 @@ def cdfsf(k, n, p):
     return ib_I_Ic(mpf(n), mpf(k + 1), mpf(p))
 
 
+def ratio(j, n, p):
+    n, p = mpf(n), mpf(p)
+    return (n + j) * (1 - p) / (j + 1)
+
+
 def support(n, p):
     return 0, math.inf
 
@@ -105,4 +110,4 @@ def pcases(name, fn):
 
 
 FIXTURES = discfix.make("nbinom", dict(dist=st.nbinom, logpmf=logpmf, cdfsf=cdfsf, support=support,
-                                       xcases=xcases, pcases=pcases))
+                                       xcases=xcases, pcases=pcases, ratio=ratio))

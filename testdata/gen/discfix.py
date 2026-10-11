@@ -57,6 +57,26 @@ def _bisect(bad, good, ok):
     return good
 
 
+def _tailsum(logpmf, ratio, k, step, end):
+    """Σ of the masses from k in direction step to end (inclusive), from the
+    first mass by ratio(j) = pmf(j+step)/pmf(j), to 2^-(prec+20)."""
+    t = mpf(1)
+    s = mpf(1)
+    eps = mpf(2) ** (-mpmath.mp.prec - 20)
+    j = k
+    for _ in range(10 ** 7):
+        if j == end:
+            break
+        t *= ratio(j)
+        s += t
+        j += step
+        if t < eps * s:
+            break
+    else:
+        raise ValueError("tail sum too slow")
+    return mpmath.exp(logpmf(k)) * s
+
+
 def _logpair(v, w):
     """log v for a probability v whose complement w is also exact: through
     log1p(-w) when v > 1/2, where v itself may have been rounded at the
@@ -82,6 +102,10 @@ def make(name, d):
          support   (*shapes) -> (lo, hi) ints (hi may be math.inf)
          xcases    (fixture name, fn) -> [(region, (k, *shapes))]
          pcases    (fixture name, fn) -> [(region, (p, *shapes))]
+         ratio     optional (j, *shapes) -> pmf(j+1)/pmf(j) as mpf: when the
+                   cdf/sf oracle returns an exact 0 for a tail (the incomplete
+                   gamma/beta quadrature gives up below e^-3000), that tail
+                   is summed from its first mass instead
          spfns     optional {fn: callable} replacing SciPy's method for the
                    SciPy column (and the quantile oracle's starting guess),
                    e.g. to skip arguments where SciPy cannot finish
@@ -106,19 +130,29 @@ def make(name, d):
             return k >= hi or float(d["cdfsf"](k, *sh)[1]) <= q
         return mpf(smallest_k(ok, _scipy(spf["isf"], q, sh), lo, hi))
 
+    def cdfsf(k, *sh):
+        c, s = d["cdfsf"](k, *sh)
+        if "ratio" in d and (c == 0 or s == 0):
+            lo, hi = d["support"](*sh)
+            if c == 0:
+                c = _tailsum(lambda j: logpmf(j, *sh), lambda j: 1 / d["ratio"](j - 1, *sh), k, -1, lo)
+            if s == 0:
+                s = _tailsum(lambda j: logpmf(j, *sh), lambda j: d["ratio"](j, *sh), k + 1, 1, hi)
+        return c, s
+
     def cdf(k, *sh):
-        return d["cdfsf"](int(k), *sh)[0]
+        return cdfsf(int(k), *sh)[0]
 
     def sf(k, *sh):
-        return d["cdfsf"](int(k), *sh)[1]
+        return cdfsf(int(k), *sh)[1]
 
     mp_of = {
         "pmf": lambda *a: mpmath.exp(logpmf(*a)),
         "logpmf": logpmf,
         "cdf": cdf,
         "sf": sf,
-        "logcdf": lambda *a: _logpair(*d["cdfsf"](int(a[0]), *a[1:])),
-        "logsf": lambda *a: _logpair(*reversed(d["cdfsf"](int(a[0]), *a[1:]))),
+        "logcdf": lambda *a: _logpair(*cdfsf(int(a[0]), *a[1:])),
+        "logsf": lambda *a: _logpair(*reversed(cdfsf(int(a[0]), *a[1:]))),
         "ppf": ppf,
         "isf": isf,
     }

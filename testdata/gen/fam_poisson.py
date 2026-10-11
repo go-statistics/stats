@@ -32,6 +32,10 @@ def cdfsf(k, mu):
     return q, p
 
 
+def ratio(j, mu):
+    return mpf(mu) / (j + 1)
+
+
 def support(mu):
     return 0, math.inf
 
@@ -98,4 +102,4 @@ def pcases(name, fn):
 
 
 FIXTURES = discfix.make("poisson", dict(dist=st.poisson, logpmf=logpmf, cdfsf=cdfsf, support=support,
-                                        xcases=xcases, pcases=pcases))
+                                        xcases=xcases, pcases=pcases, ratio=ratio))
