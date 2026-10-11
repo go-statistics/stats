@@ -12,28 +12,28 @@ import (
 
 type kdeFixture struct {
 	Cases []struct {
-		Name       string   `json:"name"`
-		Weights    mvFloats `json:"weights"`
-		BW         string   `json:"bw"`
-		BWValue    *float64 `json:"bw_value"`
-		Dataset    mvFloats `json:"dataset"`
-		D, N, M    int
-		Factor     mvFloat    `json:"factor"`
-		Neff       mvFloat    `json:"neff"`
-		Covariance mvFloats   `json:"covariance"`
-		ChoCov     mvFloats   `json:"cho_cov"`
-		InvCov     mvFloats   `json:"inv_cov"`
-		LogDet     mvFloat    `json:"log_det"`
-		Scotts     mvFloat    `json:"scotts"`
-		Silverman  mvFloat    `json:"silverman"`
-		Points     mvFloats   `json:"points"`
-		PDF        mvFloats   `json:"pdf"`
-		LogPDF     mvFloats   `json:"logpdf"`
-		IGMean     mvFloats   `json:"ig_mean"`
-		IGCov      mvFloats   `json:"ig_cov"`
-		IG         mvFloat    `json:"integrate_gaussian"`
-		Box1D      []mvFloats `json:"box1d"`
-		Box        *struct {
+		Name               string   `json:"name"`
+		Weights            mvFloats `json:"weights"`
+		BW                 string   `json:"bw"`
+		BWValue            *float64 `json:"bw_value"`
+		Dataset            mvFloats `json:"dataset"`
+		D, N, M            int
+		Factor             mvFloat    `json:"factor"`
+		Neff               mvFloat    `json:"neff"`
+		Covariance         mvFloats   `json:"covariance"`
+		ChoCov             mvFloats   `json:"cho_cov"`
+		InvCov             mvFloats   `json:"inv_cov"`
+		LogDet             mvFloat    `json:"log_det"`
+		Scotts             mvFloat    `json:"scotts"`
+		BandwidthSilverman mvFloat    `json:"silverman"`
+		Points             mvFloats   `json:"points"`
+		PDF                mvFloats   `json:"pdf"`
+		LogPDF             mvFloats   `json:"logpdf"`
+		IGMean             mvFloats   `json:"ig_mean"`
+		IGCov              mvFloats   `json:"ig_cov"`
+		IG                 mvFloat    `json:"integrate_gaussian"`
+		Box1D              []mvFloats `json:"box1d"`
+		Box                *struct {
 			Lo, Hi mvFloats
 			Value  mvFloat
 		} `json:"box"`
@@ -64,7 +64,7 @@ type kdeFixture struct {
 func kdeBandwidth(bw string, v *float64) KDEBandwidth {
 	switch bw {
 	case "silverman":
-		return KDEBandwidth{Rule: Silverman}
+		return KDEBandwidth{Rule: BandwidthSilverman}
 	case "scalar":
 		return KDEBandwidth{Factor: *v}
 	case "half_scott":
@@ -108,7 +108,7 @@ func TestGaussianKDEParity(t *testing.T) {
 		inv, _ := ndarray.Data[float64](k.InvCov())
 		for _, p := range [][2][]float64{{cov, c.Covariance.f()}, {cho, c.ChoCov.f()}, {inv, c.InvCov.f()},
 			{{k.Factor(), k.Neff(), k.LogDet(), k.ScottsFactor(), k.SilvermanFactor()},
-				{float64(c.Factor), float64(c.Neff), float64(c.LogDet), float64(c.Scotts), float64(c.Silverman)}}} {
+				{float64(c.Factor), float64(c.Neff), float64(c.LogDet), float64(c.Scotts), float64(c.BandwidthSilverman)}}} {
 			for i := range p[1] {
 				attr.add(mvRel(p[0][i], p[1][i]), w)
 			}
@@ -369,7 +369,7 @@ func TestGaussianKDEEdges(t *testing.T) {
 		}
 	}
 	// SetBandwidth keeps the estimate consistent.
-	if err := k.SetBandwidth(KDEBandwidth{Rule: Silverman}); err != nil || k.Factor() != k.SilvermanFactor() {
+	if err := k.SetBandwidth(KDEBandwidth{Rule: BandwidthSilverman}); err != nil || k.Factor() != k.SilvermanFactor() {
 		t.Error(err, k.Factor())
 	}
 }

@@ -18,11 +18,11 @@ import (
 type BandwidthRule int
 
 const (
-	// Scott is Scott's rule, neff^(-1/(d+4)) (bw_method="scott").
-	Scott BandwidthRule = iota
-	// Silverman is Silverman's rule, (neff·(d+2)/4)^(-1/(d+4))
+	// BandwidthScott is Scott's rule, neff^(-1/(d+4)) (bw_method="scott").
+	BandwidthScott BandwidthRule = iota
+	// BandwidthSilverman is Silverman's rule, (neff·(d+2)/4)^(-1/(d+4))
 	// (bw_method="silverman").
-	Silverman
+	BandwidthSilverman
 )
 
 // KDEBandwidth selects the bandwidth factor of a GaussianKDE, SciPy's
@@ -191,9 +191,9 @@ func (k *GaussianKDE) SetBandwidth(b KDEBandwidth) error {
 		f = b.Func(k)
 	case b.Factor != 0:
 		f = b.Factor
-	case b.Rule == Scott:
+	case b.Rule == BandwidthScott:
 		f = k.ScottsFactor()
-	case b.Rule == Silverman:
+	case b.Rule == BandwidthSilverman:
 		f = k.SilvermanFactor()
 	default:
 		return fmt.Errorf("%w: unknown bandwidth rule %d", ErrParam, b.Rule)

@@ -12,26 +12,28 @@ import (
 )
 
 // BootstrapMethod is the kind of bootstrap confidence interval. The zero
-// value is BCa, SciPy's default.
+// value is BootstrapBCa, SciPy's default.
 type BootstrapMethod int
 
 const (
-	// BCa is the bias-corrected and accelerated interval (method="BCa").
-	BCa BootstrapMethod = iota
-	// Percentile is the percentile interval (method="percentile").
-	Percentile
-	// Basic is the basic (reverse percentile) interval (method="basic").
-	Basic
+	// BootstrapBCa is the bias-corrected and accelerated interval
+	// (method="BCa").
+	BootstrapBCa BootstrapMethod = iota
+	// BootstrapPercentile is the percentile interval (method="percentile").
+	BootstrapPercentile
+	// BootstrapBasic is the basic (reverse percentile) interval
+	// (method="basic").
+	BootstrapBasic
 )
 
 // String returns SciPy's name for the method.
 func (m BootstrapMethod) String() string {
 	switch m {
-	case BCa:
+	case BootstrapBCa:
 		return "BCa"
-	case Percentile:
+	case BootstrapPercentile:
 		return "percentile"
-	case Basic:
+	case BootstrapBasic:
 		return "basic"
 	}
 	return "invalid"
@@ -109,7 +111,7 @@ func Bootstrap[D Data](samples []D, statistic func(samples ...[]float64) float64
 		return res, fmt.Errorf("%w: Batch must be nonnegative", ErrParam)
 	case !(cl > 0 && cl < 1):
 		return res, fmt.Errorf("%w: ConfidenceLevel must lie in (0, 1)", ErrParam)
-	case o.Method < BCa || o.Method > Basic:
+	case o.Method < BootstrapBCa || o.Method > BootstrapBasic:
 		return res, fmt.Errorf("%w: unknown bootstrap method %d", ErrParam, o.Method)
 	case o.Alternative < TwoSided || o.Alternative > Greater:
 		return res, fmt.Errorf("%w: unknown alternative %d", ErrParam, o.Alternative)
@@ -141,7 +143,7 @@ func Bootstrap[D Data](samples []D, statistic func(samples ...[]float64) float64
 		alpha = (1 - cl) / 2
 	}
 	pl, ph := alpha, 1-alpha
-	if o.Method == BCa {
+	if o.Method == BootstrapBCa {
 		pl, ph = b.bcaLevels(theta, alpha)
 	}
 	sorted := append([]float64(nil), theta...)
@@ -151,7 +153,7 @@ func Bootstrap[D Data](samples []D, statistic func(samples ...[]float64) float64
 		nan = nan || math.IsNaN(t)
 	}
 	lo, hi := quantileLinear(sorted, pl, nan), quantileLinear(sorted, ph, nan)
-	if o.Method == Basic {
+	if o.Method == BootstrapBasic {
 		t := b.full()
 		lo, hi = 2*t-hi, 2*t-lo
 	}

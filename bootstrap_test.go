@@ -32,7 +32,7 @@ type bootstrapFixture struct {
 	} `json:"cases"`
 }
 
-func medianOf(x []float64) float64 {
+func mvMedian(x []float64) float64 {
 	s := append([]float64(nil), x...)
 	sort.Float64s(s)
 	n := len(s)
@@ -45,10 +45,10 @@ func medianOf(x []float64) float64 {
 var bootstrapStats = map[string]func(...[]float64) float64{
 	"mean":   func(s ...[]float64) float64 { return mean(s[0]) },
 	"diff":   func(s ...[]float64) float64 { return mean(s[0]) - mean(s[1]) },
-	"median": func(s ...[]float64) float64 { return medianOf(s[0]) },
+	"median": func(s ...[]float64) float64 { return mvMedian(s[0]) },
 }
 
-var bootstrapMethods = map[string]BootstrapMethod{"BCa": BCa, "percentile": Percentile, "basic": Basic}
+var bootstrapMethods = map[string]BootstrapMethod{"BCa": BootstrapBCa, "percentile": BootstrapPercentile, "basic": BootstrapBasic}
 var bootstrapAlts = map[string]Alternative{"two-sided": TwoSided, "less": Less, "greater": Greater}
 
 // TestBootstrapParity checks that the resamples, the bootstrap
@@ -110,7 +110,7 @@ func TestBootstrapParity(t *testing.T) {
 	// ULP or two (special.Ndtri(0.025000000000000022) is correctly
 	// rounded, SciPy's is not): a few ULP in the interval.
 	if nDiff > 0 || ci.v > 0 || se.v > 0 || ciBCa.v > 16 {
-		t.Errorf("not SciPy's: %d values differ, interval %g ULP (BCa %g), standard error %g ULP", nDiff, ci.v, ciBCa.v, se.v)
+		t.Errorf("not SciPy's: %d values differ, interval %g ULP (BootstrapBCa %g), standard error %g ULP", nDiff, ci.v, ciBCa.v, se.v)
 	}
 }
 
@@ -142,11 +142,11 @@ func TestBootstrapErrors(t *testing.T) {
 	if err != nil || len(r.BootstrapDistribution) != 9999 {
 		t.Error(err, len(r.BootstrapDistribution))
 	}
-	r, _ = Bootstrap([][]float64{{1, math.NaN(), 3}}, st, g, &BootstrapOptions{NResamples: 50, Method: Percentile})
+	r, _ = Bootstrap([][]float64{{1, math.NaN(), 3}}, st, g, &BootstrapOptions{NResamples: 50, Method: BootstrapPercentile})
 	if !math.IsNaN(r.ConfidenceInterval.Low) || !math.IsNaN(r.ConfidenceInterval.High) {
 		t.Error(r.ConfidenceInterval)
 	}
-	for m, s := range map[BootstrapMethod]string{BCa: "BCa", Percentile: "percentile", Basic: "basic", 7: "invalid"} {
+	for m, s := range map[BootstrapMethod]string{BootstrapBCa: "BCa", BootstrapPercentile: "percentile", BootstrapBasic: "basic", 7: "invalid"} {
 		if m.String() != s {
 			t.Errorf("%d: %q", m, m.String())
 		}
