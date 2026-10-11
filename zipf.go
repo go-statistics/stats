@@ -66,23 +66,38 @@ func (s zipfStd) pmf(k float64) float64 {
 
 func (s zipfStd) logpmf(k float64) float64 { return dd.Sub(s.mlog(k), s.lz()).Float() }
 
-// sf is (k+1)^-a R / ζ(a), R = zetaTailScaled, rounded once (also where
-// it is subnormal).
+// sfDD is SF = (k+1)^-a R / ζ(a), R = zetaTailScaled, as a double-double
+// (for SF in the normal range).
+func (s zipfStd) sfDD(k float64) dd.DD {
+	q := k + 1
+	return dd.Mul(expDD2(dd.MulF(dd.Log(q), -s.a)), dd.Div(zetaTailScaled(s.a, q), s.z))
+}
+
+// sf is SF rounded once (also where it is subnormal).
 func (s zipfStd) sf(k float64) float64 {
 	q := k + 1
 	return expScaled(dd.MulF(dd.Log(q), -s.a), dd.Div(zetaTailScaled(s.a, q), s.z))
 }
 
+// cdf is 1 - SF in double-double where SF < 1/2 (so that it is rounded
+// once: the quantile search, which compares it with p, then agrees with the
+// exact distribution function), the partial sum above.
 func (s zipfStd) cdf(k float64) float64 {
-	if sf := s.sf(k); sf < 0.5 {
-		return 1 - sf
+	if sf := s.sfDD(k); sf.Hi < 0.5 {
+		return dd.AddF(dd.Neg(sf), 1).Float()
 	}
 	return dd.Div(zetaPartial(s.a, k), s.z).Float()
 }
 
+// logcdf is log1p(-SF) where SF < 1/2, -SF itself (rounded once, also
+// subnormal) where SF < 2^-60, the log of the partial sum above.
 func (s zipfStd) logcdf(k float64) float64 {
-	if sf := s.sf(k); sf < 0.5 {
-		return math.Log1p(-sf)
+	sf := s.sfDD(k)
+	if sf.Hi < 0x1p-60 {
+		return -s.sf(k)
+	}
+	if sf.Hi < 0.5 {
+		return log1pDD(dd.Neg(sf)).Float()
 	}
 	return dd.Sub(logDD(zetaPartial(s.a, k)), s.lz()).Float()
 }
