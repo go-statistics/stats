@@ -99,7 +99,7 @@ func init() {
 	}}
 }
 
-func median(v []float64) float64 {
+func medianOf(v []float64) float64 {
 	s := append([]float64(nil), v...)
 	sort.Float64s(s)
 	return s[len(s)/2]
@@ -162,10 +162,10 @@ func TestPerfReport(t *testing.T) {
 			}
 			tp = append(tp, timeIt(par))
 		}
-		ms, mp := median(ts)*1e3, median(tp)*1e3
+		ms, mp := medianOf(ts)*1e3, medianOf(tp)*1e3
 		one, oneUp := "—", "—"
 		if serial != nil {
-			mg := median(tg) * 1e3
+			mg := medianOf(tg) * 1e3
 			one, oneUp = fmt.Sprintf("%.2f", mg), fmt.Sprintf("%.2fx", ms/mg)
 		}
 		fmt.Fprintf(&b, "| %s | %d | %.2f | %s | %.2f | %s | %.2fx |\n", name, c.n, ms, one, mp, oneUp, ms/mp)
