@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
-	"github.com/go-numerics/optimize"
 	"github.com/go-numerics/special"
 	"github.com/go-statistics/stats/internal/dd"
 )
@@ -228,20 +227,21 @@ func FitWeibull[D Data](x D, o *FitOptions) (Weibull, error) {
 	}
 	mk := func(sh []float64) contStd { return weibullStd{c: sh[0]} }
 	sk := skewOf(v)
-	fc, haveC := fx["C"]
-	if !haveC && sk < weibullSkew(1e4) {
+	// C matching the sample skewness (decreasing in C), unless fixed; below
+	// the skewness of C = 1e4 (or for constant data) SciPy falls back on
+	// its generic start, as when no root is found (NaN)
+	c, haveC := fx["C"]
+	if !haveC {
+		c = math.NaN()
+		if sk >= weibullSkew(1e4) {
+			c, _ = brentRoot(func(c float64) float64 { return weibullSkew(c) - sk }, 0.02, 1e4)
+		}
+	}
+	if math.IsNaN(c) {
 		// SciPy's generic start covers the data: it has a likelihood
 		sh, loc, scale, _ := fitContinuous(v, fx, []string{"C"}, []bool{true}, []float64{1}, mk)
 		d := Weibull{C: sh[0], Loc: loc, Scale: scale}
 		return d, d.Validate()
-	}
-	c := fc
-	if !haveC {
-		r, err := optimize.Bisect(func(c float64) float64 { return weibullSkew(c) - sk }, 0.02, 1e4, nil)
-		if err != nil {
-			return Weibull{}, err
-		}
-		c = r.Root
 	}
 	scale, ok := fx["Scale"]
 	if !ok {

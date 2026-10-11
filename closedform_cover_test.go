@@ -5,6 +5,7 @@ import (
 	"math"
 	"testing"
 
+	"github.com/go-numerics/special"
 	"github.com/go-statistics/stats/internal/dd"
 )
 
@@ -168,10 +169,27 @@ func TestClosedFormFitPaths(t *testing.T) {
 		{"lognorm positive slope", func() (Continuous, error) {
 			return FitLogNormal([]float64{1, 1.0001, 1.0002, 5, 50, 500}, nil)
 		}},
+		{"lognorm constant", func() (Continuous, error) {
+			return FitLogNormal([]float64{2, 2, 2, 2.0000001}, nil)
+		}},
+		{"logistic outlier", func() (Continuous, error) {
+			x := []float64{100}
+			for i := 0; i < 50; i++ {
+				x = append(x, float64(i%7)*1e-3)
+			}
+			return FitLogistic(x, nil)
+		}},
+		{"weibull start above the minimum", func() (Continuous, error) {
+			return FitWeibull([]float64{0.0786489500736487, 0.5599598032573047, -2.414012293904884, 0.2719371550174548,
+				0.2823445865414955, 0.9645738602915266, 0.2367669275839951, 0.5364345041162009, 7.679876045795538}, nil)
+		}},
 		{"lognorm fixed scale", func() (Continuous, error) {
 			return FitLogNormal([]float64{1, 2, 3, 4, 8}, &FitOptions{Fixed: map[string]float64{"Scale": 0.01}})
 		}},
 	}
+	// constant data with Loc fixed: the closed form gives S = 0, and the
+	// generic fit takes over (whatever it returns)
+	_, _ = FitLogNormal([]float64{2, 2, 2}, &FitOptions{Fixed: map[string]float64{"Loc": 0}})
 	for _, c := range cases {
 		d, err := c.fit()
 		if err != nil {
@@ -180,6 +198,63 @@ func TestClosedFormFitPaths(t *testing.T) {
 		}
 		if !finite(d.LogPDF(d.Median())) {
 			t.Errorf("%s: %+v", c.name, d)
+		}
+	}
+}
+
+func TestVonMisesEdges(t *testing.T) {
+	d := VonMises{Kappa: 2, Scale: 1}
+	s := d.std()
+	if v := s.lowerTail(dd.F(-4)); v.Hi != 0 {
+		t.Errorf("lowerTail(-4) = %v", v)
+	}
+	if v := s.logLowerTail(dd.F(-4)); !math.IsInf(v, -1) {
+		t.Errorf("logLowerTail(-4) = %v", v)
+	}
+	// the CDF counts the turns, as SciPy's
+	if got, want := d.CDF(7), 1+d.CDF(7-2*math.Pi); math.Abs(got-want) > 1e-15 {
+		t.Errorf("CDF(7) = %v, want %v", got, want)
+	}
+	if got := d.LogCDF(-7); !math.IsNaN(got) {
+		t.Errorf("LogCDF(-7) = %v, want NaN", got)
+	}
+	for _, z := range []float64{3 * math.Pi, -3 * math.Pi, 5 * math.Pi, -5 * math.Pi, math.Pi, -math.Pi} {
+		r, n := vmReduce(z)
+		if math.Abs(r.Hi) > math.Pi+1e-15 || math.Abs(r.Hi+2*math.Pi*n-z) > 1e-14 {
+			t.Errorf("vmReduce(%v) = %v, %v", z, r, n)
+		}
+	}
+	if npMod(0, 2*math.Pi) != 0 || npMod(-1, 2*math.Pi) != 2*math.Pi-1 {
+		t.Error("npMod")
+	}
+	// the sixth moment by quadrature, against the uniform's π⁶/7 at k = 0
+	if got, want := (VonMises{Kappa: 0, Scale: 1}).Moment(6), math.Pow(math.Pi, 6)/7; math.Abs(got-want) > 1e-13*want {
+		t.Errorf("Moment(6) = %v, want %v", got, want)
+	}
+	if got := (VonMises{Kappa: 400, Scale: 1}).Moment(6); !(got > 0 && got < 1e-6) {
+		t.Errorf("Moment(6) at kappa 400 = %v", got)
+	}
+	for _, c := range []struct{ r, want float64 }{{1, 1e16}, {-0.1, 0x1p-1022}, {0, 0x1p-1022}} {
+		if got := vmKappa(c.r); got != c.want {
+			t.Errorf("vmKappa(%v) = %v, want %v", c.r, got, c.want)
+		}
+	}
+	for _, r := range []float64{1e-10, 1 - 1e-9, 0.5} {
+		k := vmKappa(r)
+		if got := special.I1e(k) / special.I0e(k); math.Abs(got-r) > 1e-12 {
+			t.Errorf("vmKappa(%v) = %v: ratio %v", r, k, got)
+		}
+	}
+	// quantiles far in the tails, where Newton's first steps leave the
+	// bracket; below the probability of [-π, -π + ulp] (2e-17 at small
+	// Kappa), the quantile is -π itself, the closest float
+	for _, k := range []float64{0.01, 3, 1e4} {
+		d := VonMises{Kappa: k, Scale: 1}
+		for _, p := range []float64{1e-300, 1e-30, 0.4999999} {
+			x := d.PPF(p)
+			if c := d.CDF(x); math.Abs(c-p) > 1e-6*p && x != -math.Pi {
+				t.Errorf("kappa %v: CDF(PPF(%v)) = %v", k, p, c)
+			}
 		}
 	}
 }

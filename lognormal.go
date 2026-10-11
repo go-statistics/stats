@@ -226,11 +226,9 @@ func FitLogNormal[D Data](x D, o *FitOptions) (LogNormal, error) {
 		return contLogLik(v, lognormStd{s: shape}, loc, scale)
 	}
 	fallback := func() (LogNormal, error) {
-		sh, loc, scale, err := fitContinuous(v, fx, []string{"S"}, []bool{true}, []float64{1},
+		// SciPy's generic start covers the data: it has a likelihood
+		sh, loc, scale, _ := fitContinuous(v, fx, []string{"S"}, []bool{true}, []float64{1},
 			func(s []float64) contStd { return lognormStd{s: s[0]} })
-		if err != nil {
-			return LogNormal{}, err
-		}
 		d := LogNormal{S: sh[0], Loc: loc, Scale: scale}
 		return d, d.Validate()
 	}
@@ -250,9 +248,6 @@ func FitLogNormal[D Data](x D, o *FitOptions) (LogNormal, error) {
 			dr = dl(rb)
 			delta *= 2
 		}
-		if !finite(rb) || !finite(dr) {
-			return fallback()
-		}
 		lb := math.Min(math.Nextafter(rb, math.Inf(-1)), rb-1)
 		dlb := dl(lb)
 		delta = 2 * (rb - lb)
@@ -261,11 +256,10 @@ func FitLogNormal[D Data](x D, o *FitOptions) (LogNormal, error) {
 			dlb = dl(lb)
 			delta *= 2
 		}
-		if !finite(lb) || !finite(dlb) {
-			return fallback()
-		}
+		// SciPy falls back on its generic fit when no bracket is found
+		// or the root search fails
 		root, ok := brentRoot(dl, lb, rb)
-		if !ok {
+		if !finite(rb) || !finite(dr) || !finite(lb) || !finite(dlb) || !ok {
 			return fallback()
 		}
 		loc = lo - spacing

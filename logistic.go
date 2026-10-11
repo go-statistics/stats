@@ -145,14 +145,15 @@ func FitLogistic[D Data](x D, o *FitOptions) (Logistic, error) {
 		}
 		s0 := math.Sqrt(variance(v, 0) / (math.Pi * math.Pi / 3))
 		f := func(s float64) float64 { return dlScale(locFor(s), s) }
+		// f decreases from +∞ (Scale → 0) to -n; at 2 s0 it is negative
+		// (c tanh(c/2) <= c²/2 bounds the sum by n π²/24 (1 + d²/v) with
+		// d the distance of Loc to the mean, v the variance), so only the
+		// lower end of the bracket needs searching.
 		a, b := s0/2, s0*2
 		for f(a) < 0 {
 			a /= 2
 		}
-		for f(b) > 0 {
-			b *= 2
-		}
-		scale, _ = brentRoot(f, a, b)
+		scale, _ = brentRoot(f, a, b) // NaN (rejected by Validate) without a root
 	}
 	d := Logistic{Loc: locFor(scale), Scale: scale}
 	return d, d.Validate()
