@@ -21,6 +21,17 @@ func init() {
 	// thousand (2 ulp after the shift of an instance with Loc).
 	rvsULP["Weibull"] = 2
 	rvsULP["Pareto"] = 1 // pow(1-U, -1/b), the C library's pow misrounding
+	// expm1(-log1p(-U)/c) with SciPy's own log1p and expm1 reproduced
+	// exactly; beyond |x| = 1/2 its expm1 is exp(x) - 1, where the C
+	// library's exp misrounds a few in a thousand and the subtraction
+	// magnifies that last bit up to 4 ulp of the result.
+	rvsULP["Lomax"] = 4
+
+	// SciPy's lomax ISF is q^(-1/c) - 1, which cancels for q near 1 (the
+	// ULP fixture lomax_isf measures it at 8.9e15 ulp in its upper region,
+	// 6204 in the core): at c = 50, q = 0.999999 it is off by 5e-10
+	// relative.
+	parityPointTol["Lomax"] = 1e-8
 	// SciPy's Cauchy draws are Boost's -1/tan(π·U) with the C library's
 	// tan, which on the reference build is its sin/cos ratio and misrounds
 	// a third of its results by up to 3 ulp; ours rounds the same formula

@@ -74,7 +74,7 @@ func cephesLog1p(x float64) float64 {
 	if z < math.Sqrt2/2 || z > math.Sqrt2 {
 		return crLog(z)
 	}
-	z = x * x
+	z = float64(x * x)
 	z = float64(-0.5*z) + float64(x*float64(z*polevl(x, cephesLP)/p1evl(x, cephesLQ)))
 	return x + z
 }
@@ -85,8 +85,10 @@ func cephesExpm1(x float64) float64 {
 	if x < -0.5 || x > 0.5 || x != x {
 		return crExp(x) - 1
 	}
-	xx := x * x
-	r := x * polevl(xx, cephesEP)
+	// The explicit conversions keep Go from fusing a product with the
+	// following subtraction (it may, across statements, on FMA hardware).
+	xx := float64(x * x)
+	r := float64(x * polevl(xx, cephesEP))
 	r = r / (polevl(xx, cephesEQ) - r)
 	return r + r
 }
