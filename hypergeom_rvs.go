@@ -64,24 +64,16 @@ func hypergeometricSample(bg random.BitGenerator, good, bad, sample int64) int64
 }
 
 // randomInterval is numpy's random_interval: a uniform integer in [0, max]
-// by masked rejection, from 32-bit draws when max fits in them.
+// by masked rejection of 32-bit draws. (numpy switches to 64-bit draws
+// above 2^32 - 1, which the population limit of 2·10^9 never reaches, and
+// returns 0 for max = 0, which hypergeometricSample never asks.)
 func randomInterval(bg random.BitGenerator, max uint64) uint64 {
-	if max == 0 {
-		return 0
-	}
 	mask := max
 	for s := 1; s <= 32; s *= 2 {
 		mask |= mask >> s
 	}
-	if max <= 0xffffffff {
-		for {
-			if v := uint64(bg.Uint32()) & mask; v <= max {
-				return v
-			}
-		}
-	}
 	for {
-		if v := bg.Uint64() & mask; v <= max {
+		if v := uint64(bg.Uint32()) & mask; v <= max {
 			return v
 		}
 	}

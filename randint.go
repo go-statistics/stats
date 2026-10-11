@@ -37,8 +37,19 @@ func (s randintStd) logpmf(float64) float64 { return -dd.Log(s.d).Float() }
 func (s randintStd) cdf(k float64) float64 { return (k - s.lo + 1) / s.d }
 func (s randintStd) sf(k float64) float64  { return (s.hi - 1 - k) / s.d }
 
-func (s randintStd) logcdf(k float64) float64 { return dd.Sub(dd.Log(k-s.lo+1), dd.Log(s.d)).Float() }
-func (s randintStd) logsf(k float64) float64  { return dd.Sub(dd.Log(s.hi-1-k), dd.Log(s.d)).Float() }
+// logcdf and logsf are log(c/d) for the count c, as a difference of
+// double-double logarithms, or, where c/d > 1/2, as log1p of the
+// complementary count over d (the difference would cancel).
+func (s randintStd) logcdf(k float64) float64 { return logRatio(k-s.lo+1, s.hi-1-k, s.d) }
+func (s randintStd) logsf(k float64) float64  { return logRatio(s.hi-1-k, k-s.lo+1, s.d) }
+
+// logRatio returns log(c/d) for counts c + c' = d.
+func logRatio(c, cc, d float64) float64 {
+	if c > cc {
+		return log1pDD(dd.Neg(dd.Div(dd.F(cc), dd.F(d)))).Float()
+	}
+	return dd.Sub(dd.Log(c), dd.Log(d)).Float()
+}
 
 func (s randintStd) ppf(p float64) float64 {
 	return smallestK(s.lo+math.Ceil(p*s.d)-1, s.lo, s.hi-1, func(k float64) bool {

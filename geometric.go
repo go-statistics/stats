@@ -46,7 +46,7 @@ func (s geomStd) klq(k float64) dd.DD {
 }
 
 func (s geomStd) pmf(k float64) float64    { return expScaled(s.klq(k-1), dd.F(s.p)) }
-func (s geomStd) logpmf(k float64) float64 { return dd.Add(s.klq(k-1), dd.Log(s.p)).Float() }
+func (s geomStd) logpmf(k float64) float64 { return logMassOf(s.klq(k-1), dd.F(s.p)) }
 
 func (s geomStd) cdf(k float64) float64 { return dd.Neg(expm1DD(s.klq(k))).Float() }
 func (s geomStd) sf(k float64) float64  { return dd.Exp(s.klq(k)) }

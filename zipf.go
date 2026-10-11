@@ -14,7 +14,10 @@ import (
 // Zipf is the zeta distribution: mass k^-A / ζ(A) on k = 1, 2, ..., for
 // A > 1: scipy.stats.zipf(a, loc).
 //
-// SF is ζ(A, k+1)/ζ(A) (special.HurwitzZeta). CDF is 1 - SF where SF is
+// SF is ζ(A, k+1)/ζ(A), the tail summed term by term while the terms
+// matter and by Euler-Maclaurin beyond (zetaTail; special.HurwitzZeta
+// would do, but allocates for small k), and ζ(A) = 1 + ζ(A, 2) by the same
+// sum, so that log ζ(A) is log1p of it for large A. CDF is 1 - SF where SF is
 // below 1/2 and otherwise the partial sum Σ_{j<=k} j^-A / ζ(A), by
 // Euler-Maclaurin summation beyond j = 20 (the difference ζ(A) - ζ(A, k+1)
 // would cancel: SciPy sums the masses one by one). Entropy is
@@ -31,17 +34,22 @@ type Zipf struct {
 }
 
 func (d Zipf) std() zipfStd {
-	eta := special.HurwitzZeta(d.A, 2)
-	return zipfStd{a: d.A, z: special.Zeta(d.A), lz: log1pDD(dd.F(eta)), eta: eta}
+	if !(d.A > 1) || math.IsInf(d.A, 1) {
+		return zipfStd{a: d.A}
+	}
+	eta := zetaTail(d.A, 2)
+	return zipfStd{a: d.A, z: dd.AddF(eta, 1), eta: eta}
 }
 
-// zipfStd holds a, ζ(a), log ζ(a) and η(a) = ζ(a) - 1 = ζ(a, 2) (the
-// last two accurate also where ζ(a) rounds to about 1).
+// zipfStd holds a, ζ(a) and η(a) = ζ(a) - 1 = ζ(a, 2) (the latter accurate
+// also where ζ(a) rounds to about 1).
 type zipfStd struct {
-	a, z float64
-	lz   dd.DD
-	eta  float64
+	a      float64
+	z, eta dd.DD
 }
+
+// lz is log ζ(a), log1p(η) in double-double.
+func (s zipfStd) lz() dd.DD { return log1pDD(s.eta) }
 
 // momentsFromMunp: SciPy's zipf has no _stats, its moment(n) is _munp(n).
 func (s zipfStd) momentsFromMunp() {}
@@ -53,25 +61,25 @@ func (s zipfStd) support() (lo, hi float64) { return 1, math.Inf(1) }
 func (s zipfStd) mlog(k float64) dd.DD { return dd.MulF(dd.Log(k), -s.a) }
 
 func (s zipfStd) pmf(k float64) float64 {
-	return expScaled(s.mlog(k), dd.Div(dd.F(1), dd.F(s.z)))
+	return expScaled(s.mlog(k), dd.Div(dd.F(1), s.z))
 }
 
-func (s zipfStd) logpmf(k float64) float64 { return dd.Sub(s.mlog(k), s.lz).Float() }
+func (s zipfStd) logpmf(k float64) float64 { return dd.Sub(s.mlog(k), s.lz()).Float() }
 
-func (s zipfStd) sf(k float64) float64 { return special.HurwitzZeta(s.a, k+1) / s.z }
+func (s zipfStd) sf(k float64) float64 { return dd.Div(zetaTail(s.a, k+1), s.z).Float() }
 
 func (s zipfStd) cdf(k float64) float64 {
 	if sf := s.sf(k); sf < 0.5 {
 		return 1 - sf
 	}
-	return zetaPartial(s.a, k).Float() / s.z
+	return dd.Div(zetaPartial(s.a, k), s.z).Float()
 }
 
 func (s zipfStd) logcdf(k float64) float64 {
 	if sf := s.sf(k); sf < 0.5 {
 		return math.Log1p(-sf)
 	}
-	return dd.Sub(logDD(zetaPartial(s.a, k)), s.lz).Float()
+	return dd.Sub(logDD(zetaPartial(s.a, k)), s.lz()).Float()
 }
 
 // logsf is log SF, and below the normal range -a log(k+1) - log ζ(a) plus
@@ -88,7 +96,7 @@ func (s zipfStd) logsf(k float64) float64 {
 
 // guess inverts SF(k) ≈ k^(1-a) / ((a-1) ζ(a)) at q, within [1, 2^62].
 func (s zipfStd) guess(q float64) float64 {
-	g := math.Pow((s.a-1)*s.z*q, -1/(s.a-1))
+	g := math.Pow((s.a-1)*s.z.Hi*q, -1/(s.a-1))
 	return math.Min(g, 0x1p62)
 }
 
@@ -103,7 +111,7 @@ func (s zipfStd) isf(q float64) float64 {
 // munp is SciPy's: ζ(a-n)/ζ(a) for a > n+1, else +Inf.
 func (s zipfStd) munp(n int) float64 {
 	if s.a > float64(n+1) {
-		return special.Zeta(s.a-float64(n)) / s.z
+		return special.Zeta(s.a-float64(n)) / s.z.Hi
 	}
 	return math.Inf(1)
 }
@@ -116,7 +124,7 @@ func (s zipfStd) ey(r int) float64 {
 	for j := 0; j <= r; j++ {
 		if j > 0 {
 			c = c * float64(r-j+1) / float64(j)
-			d := (special.HurwitzZeta(s.a-float64(j), 2) - s.eta) / s.z
+			d := dd.Div(dd.Sub(zetaTail(s.a-float64(j), 2), s.eta), s.z).Float()
 			if (r-j)%2 == 1 {
 				d = -d
 			}
@@ -171,7 +179,7 @@ func (s zipfStd) kurtosis() float64 {
 
 // entropy is log ζ(a) + a S/ζ(a), S = Σ log j / j^a.
 func (s zipfStd) entropy() float64 {
-	return dd.AddF(s.lz, s.a*zetaLogSum(s.a)/s.z).Float()
+	return dd.AddF(s.lz(), s.a*zetaLogSum(s.a)/s.z.Hi).Float()
 }
 
 func (s zipfStd) rvs(g *random.Generator, size []int) (*ndarray.Array, error) {
@@ -221,6 +229,39 @@ func zetaPartial(a, k float64) dd.DD {
 		corr += w * (dk - dm)
 	}
 	return dd.AddF(dd.Add(s, integral), corr)
+}
+
+// zetaTail returns ζ(a, q) = Σ_{j>=q} j^-a for a > 1 and an integer q >= 1,
+// as a double-double, without allocating: the terms one by one until they
+// fall below 2^-64 of the sum (for large a, a few) or j reaches
+// max(20, 4(a+11)), then Euler-Maclaurin from there, where the first
+// omitted correction (B_12 f^(11)) is below 2^-55 of the tail.
+func zetaTail(a, q float64) dd.DD {
+	jm := math.Max(emStart, 4*(a+11))
+	s := dd.F(0)
+	j := q
+	for ; j < jm; j++ {
+		t := expDD2(dd.MulF(dd.Log(j), -a))
+		s = dd.Add(s, t)
+		if t.Hi < s.Hi*0x1p-64 {
+			return s
+		}
+	}
+	// ∫_j^∞ x^-a dx + f(j)/2 - Σ B_2i/(2i)! f^(2i-1)(j)
+	fj := expDD2(dd.MulF(dd.Log(j), -a))
+	tail := dd.Add(dd.DivF(dd.MulF(fj, j), a-1), dd.MulF(fj, 0.5))
+	corr := 0.0
+	d := fj.Hi
+	for i, w := range bernoulliEM {
+		r := float64(2*i + 1)
+		if i == 0 {
+			d *= -a / j
+		} else {
+			d *= (a + r - 2) * (a + r - 1) / (j * j)
+		}
+		corr -= w * d
+	}
+	return dd.Add(s, dd.AddF(tail, corr))
 }
 
 // zetaLogSum returns Σ_{j>=2} log j / j^a = -ζ'(a): the first terms one by

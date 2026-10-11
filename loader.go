@@ -67,15 +67,39 @@ func stirlingSeries(x float64) float64 {
 // bd0 returns D(x, M) = x log(x/M) + M - x for x >= 0 and M > 0 (a
 // double-double, so that the caller's np need not be rounded), as
 // M·g(u) with u = (x-M)/M and g(u) = (1+u) log(1+u) - u = u² - (1+u)·h(u),
-// h(u) = u - log(1+u) from log1pmxNeg (accurate also for small u).
+// h(u) = u - log(1+u) from log1pmx (accurate also for small u); for
+// x > 2M directly.
 func bd0(x float64, m dd.DD) dd.DD {
 	if x == 0 {
 		return m
 	}
 	u := dd.Div(dd.AddF(dd.Neg(m), x), m)
-	h := log1pmxNeg(u)
+	if u.Hi > 1 {
+		// x > 2M: the direct form, without cancellation there (and without
+		// the overflow of u² for x/M beyond 1e154)
+		t := dd.Mul(dd.F(x), dd.Sub(dd.Log(x), logDD(m)))
+		return dd.AddF(dd.Add(t, m), -x)
+	}
+	h := log1pmx(u)
 	g := dd.Sub(dd.Mul(u, u), dd.Mul(dd.AddF(u, 1), h))
 	return dd.Mul(m, g)
+}
+
+// log1pmx returns h(u) = u - log(1+u) >= 0 for a double-double u > -1 to
+// about 2^-67 relative: for |u| < 1/64 the series u²/2 - u³/3 + u⁴/4 - ...
+// with its first two terms in double-double (log1pmxNeg keeps only the
+// first, which limits it to 2^-53·|u|, 2^-59 at u = 1/64: six ulps of a
+// Poisson mass at 28 standard deviations), above as u - log1p(u).
+func log1pmx(u dd.DD) dd.DD {
+	if math.Abs(u.Hi) >= 1.0/64 {
+		return dd.Sub(u, log1pDD(u))
+	}
+	x := u.Hi
+	sq := dd.Mul(u, u)
+	h := dd.Sub(dd.MulF(sq, 0.5), dd.DivF(dd.Mul(sq, u), 3))
+	x2 := x * x
+	tail := x2 * x2 * (1.0/4 + x*(-1.0/5+x*(1.0/6+x*(-1.0/7+x*(1.0/8+x*(-1.0/9+x*(1.0/10+x*(-1.0/11+x*(1.0/12+x*(-1.0/13))))))))))
+	return dd.AddF(h, tail)
 }
 
 // binomTerm returns E and c with C(n,k) p^k q^(n-k) = c·exp(E), for real
