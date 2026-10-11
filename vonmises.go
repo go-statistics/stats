@@ -255,48 +255,76 @@ func (s vonmisesStd) logF0(r dd.DD, n float64) float64 {
 	return log1pDD(dd.Neg(s.lowerTail(dd.Neg(r)))).Float()
 }
 
-// solveLower returns x in [-π, 0] with lowerTail(x) = p, 0 < p <= 1/2, by
-// a safeguarded Newton iteration on log lowerTail from the normal
-// approximation (large Kappa) or the uniform one.
+// solveLower returns x in [-π, 0] with lowerTail(x) = p, 0 < p <= 1/2:
+// below 1/4 by Newton's method on log lowerTail from the normal
+// approximation (large Kappa) or the uniform one; above, as minus the
+// point y with ∫_0^y f = 1/2 - p (exact), so that a quantile near 0 keeps
+// its relative accuracy.
 func (s vonmisesStd) solveLower(p float64) float64 {
-	if p == 0.5 {
-		return 0
+	if p >= 0.25 {
+		return -s.solveCentral(0.5 - p)
 	}
-	lo, hi := -math.Pi, 0.0
 	x := -math.Pi + 2*math.Pi*p
 	if s.k >= 2 {
 		if v := special.Ndtri(p) * s.i0e() / sqrt2OverPi.Hi; v > -1 {
 			x = 2 * math.Asin(v)
 		}
 	}
-	lp := math.Log(p)
-	g := func(x float64) (float64, float64) {
-		lf := s.logLowerTail(dd.F(x))
-		return lf - lp, lf
+	return newtonLog(func(x float64) float64 { return s.logLowerTail(dd.F(x)) }, s.logpdf, math.Log(p), -math.Pi, 0, x)
+}
+
+// centralLog returns log ∫_0^y f for 0 < y <= π.
+func (s vonmisesStd) centralLog(y float64) float64 {
+	if y == 0 {
+		return math.Inf(-1)
 	}
+	k := s.k
+	j := y
+	if k > 0 {
+		j = expIntegral(func(t float64) float64 {
+			sn := math.Sin(t / 2)
+			return 2 * k * sn * sn
+		}, y)
+	}
+	return dd.Sub(dd.Log(j), dd.Add(log2PiDD, dd.Log(s.i0e()))).Float()
+}
+
+// solveCentral returns y in [0, π] with ∫_0^y f = q, 0 < q <= 1/4.
+func (s vonmisesStd) solveCentral(q float64) float64 {
+	if q == 0 {
+		return 0
+	}
+	y := math.Min(q*2*math.Pi*s.i0e(), math.Pi/2) // f(0) = 1/(2π I0e(k))
+	return newtonLog(s.centralLog, s.logpdf, math.Log(q), 0, math.Pi, y)
+}
+
+// newtonLog solves logF(x) = lp for an increasing F on [lo, hi] by a
+// safeguarded Newton iteration on the logarithm (the step is
+// (logF - lp)·F/f, F/f = exp(logF - logf)), then steps to the
+// neighbouring float while that is closer.
+func newtonLog(logF, logf func(float64) float64, lp, lo, hi, x float64) float64 {
 	for i := 0; i < 100; i++ {
-		gx, lf := g(x)
+		lf := logF(x)
+		gx := lf - lp
 		if gx > 0 {
 			hi = x
 		} else {
 			lo = x
 		}
-		// Newton on log F: the step is g·F/f, F/f = exp(log F - log f)
-		nx := x - gx*math.Exp(lf-s.logpdf(x))
+		nx := x - gx*math.Exp(lf-logf(x))
+		if !(nx >= lo && nx <= hi) {
+			nx = lo + (hi-lo)/2
+		}
 		if math.Abs(nx-x) <= 4*0x1p-52*math.Abs(x) {
 			x = nx
 			break
 		}
-		if !(nx > lo && nx < hi) {
-			nx = lo + (hi-lo)/2
-		}
 		x = nx
 	}
-	// polish: step to the neighbouring float while it is closer
-	gx, _ := g(x)
+	gx := logF(x) - lp
 	for i := 0; i < 8 && gx != 0; i++ {
 		y := math.Nextafter(x, math.Copysign(math.Inf(1), -gx))
-		gy, _ := g(y)
+		gy := logF(y) - lp
 		if !(math.Abs(gy) < math.Abs(gx)) {
 			break
 		}

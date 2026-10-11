@@ -208,6 +208,9 @@ func TestVonMisesEdges(t *testing.T) {
 	if v := s.lowerTail(dd.F(-4)); v.Hi != 0 {
 		t.Errorf("lowerTail(-4) = %v", v)
 	}
+	if v := s.centralLog(0); !math.IsInf(v, -1) {
+		t.Errorf("centralLog(0) = %v", v)
+	}
 	if v := s.logLowerTail(dd.F(-4)); !math.IsInf(v, -1) {
 		t.Errorf("logLowerTail(-4) = %v", v)
 	}
