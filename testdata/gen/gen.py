@@ -9,6 +9,16 @@ Each fam_*.py module exposes FIXTURES = {name: builder}; a builder returns
 fixture is regenerated; fixtures run in parallel worker processes. Sampling is
 seeded by the fixture name, so a rerun with the same library versions
 reproduces the files byte for byte.
+
+The mpmath evaluations are slow under emulation, so the fixtures are made
+in two passes: first natively (mpmath, and a provisional SciPy column),
+then the SciPy column is recomputed with the x86_64 interpreter, the
+reference build (NumPy and SciPy's macOS arm64 wheels round some libm calls
+differently):
+
+    uv run --with ... python testdata/gen/gen.py NAMES...
+    uv run --python cpython-3.12-macos-x86_64-none --with ... \
+        python testdata/gen/gen.py --scipy-column NAMES...
 """
 
 import glob
@@ -36,22 +46,28 @@ def registry():
 
 
 def run(job):
-    modname, name = job
+    modname, name, scipy_only = job
     sys.path.insert(0, HERE)
     import common
     mod = importlib.import_module(modname)
     nargs, cases, mpfn, spfn, doc = mod.FIXTURES[name]()
-    common.write(name, nargs, cases, mpfn, spfn, doc)
+    if scipy_only:
+        common.rewrite_scipy(name, spfn)
+    else:
+        common.write(name, nargs, cases, mpfn, spfn, doc)
     return name
 
 
 def main():
     reg = registry()
-    want = sys.argv[1:] or sorted(reg)
+    args = sys.argv[1:]
+    scipy_only = "--scipy-column" in args
+    args = [a for a in args if a != "--scipy-column"]
+    want = args or sorted(reg)
     for w in want:
         if w not in reg:
             sys.exit("unknown fixture %r; known: %s" % (w, ", ".join(sorted(reg))))
-    jobs = [(reg[w], w) for w in want]
+    jobs = [(reg[w], w, scipy_only) for w in want]
     workers = int(os.environ.get("GEN_WORKERS", "8"))
     with multiprocessing.Pool(workers) as pool:
         for _ in pool.imap_unordered(run, jobs):
