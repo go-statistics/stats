@@ -1,10 +1,10 @@
-small_lo 1
+small_lo 2.2
 small_mid 1.5
 small_hi 1
-mid_lo 1
+mid_lo 2
 mid_mid 3.4000000000000004
 mid_hi 1
-large_lo 1.2000000000000002
+large_lo 2.3
 large_mid 1.9000000000000001
 large_hi 1
 huge_lo 1
