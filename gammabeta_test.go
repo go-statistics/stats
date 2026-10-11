@@ -53,7 +53,7 @@ func TestDensityExtremes(t *testing.T) {
 	if got := (Gamma{A: a, Scale: 1}).PDF(0.5); math.Abs(got/(a*math.Exp(-0.5)/0.5)-1) > 1e-12 {
 		t.Errorf("gamma pdf at tiny a = %v", got)
 	}
-	if got := (Gamma{A: a, Scale: 1}).LogPDF(0.5); math.Abs(got-(math.Log(a)-0.5-math.Log(0.5))) > 1e-12*math.Abs(got) {
+	if got := (Gamma{A: a, Scale: 1}).LogPDF(0.5); math.Abs(got-(math.Log(a*0x1p100)-100*math.Ln2-0.5-math.Log(0.5))) > 1e-12*math.Abs(got) {
 		t.Errorf("gamma logpdf at tiny a = %v", got)
 	}
 	// B(a, b) far below the normal range: the log form
