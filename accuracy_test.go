@@ -48,6 +48,7 @@ var (
 	accuracyTable   = flag.String("accuracy.table", "", "write the ULP comparison table (markdown) to this file")
 	accuracyBudgets = flag.Bool("accuracy.budgets", false, "write testdata/budgets/<fixture>.txt (1.5x the measured max, at least 1 ulp) for the cases registered without explicit budgets")
 	accuracyOnly    = flag.String("accuracy.only", "", "with -accuracy.budgets: only fixtures whose name has this prefix")
+	accuracyMerge   = flag.Bool("accuracy.merge", false, "with -accuracy.budgets: keep the larger of the existing and the new budget per region (run once per GOARCH)")
 )
 
 type fixtureRow struct {
@@ -390,6 +391,9 @@ func TestAccuracyBudgets(t *testing.T) {
 			if math.IsInf(v, 0) {
 				t.Errorf("%s/%s: infinite error cannot be budgeted", c.name, r.region)
 				continue
+			}
+			if old, ok := measuredBudget(c.name, r.region); ok && *accuracyMerge && old > v {
+				v = old
 			}
 			fmt.Fprintf(&b, "%s %g\n", r.region, v)
 		}
