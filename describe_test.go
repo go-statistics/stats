@@ -3,6 +3,8 @@ package stats
 import (
 	"errors"
 	"math"
+	"math/rand/v2"
+	"slices"
 	"testing"
 
 	"github.com/go-ndarray/ndarray"
@@ -221,4 +223,45 @@ func TestDescribeCorners(t *testing.T) {
 		t.Errorf("HistogramBinEdges: %v", e)
 	}
 	eq("Median array", v(Median(a, nil)), 2.5)
+}
+
+// TestSelection checks the order statistics the selection leaves in place
+// against a sort, on random, tied, sorted, reversed and organ-pipe data,
+// and the sorting fallback of floydRivest.
+func TestSelection(t *testing.T) {
+	r := rand.New(rand.NewPCG(1, 2))
+	for _, n := range []int{17, 100, 601, 1000, 5000, 20000} {
+		gens := map[string]func(i int) float64{
+			"random":   func(int) float64 { return r.NormFloat64() },
+			"ties":     func(int) float64 { return float64(r.IntN(3)) },
+			"sorted":   func(i int) float64 { return float64(i) },
+			"reversed": func(i int) float64 { return float64(n - i) },
+			"pipe":     func(i int) float64 { return float64(min(i, n-i)) },
+		}
+		for name, g := range gens {
+			v := make([]float64, n)
+			for i := range v {
+				v[i] = g(i)
+			}
+			s := slices.Clone(v)
+			slices.Sort(s)
+			ks := uniqueSorted([]int{0, 1, n / 3, n / 2, n/2 + 1, n - 2, n - 1, r.IntN(n)})
+			a := orderStats(v, ks)
+			for _, k := range ks {
+				if a[k] != s[k] {
+					t.Fatalf("%s n=%d: order statistic %d = %v, want %v", name, n, k, a[k], s[k])
+				}
+				for i := range a {
+					if (i < k && a[i] > a[k]) || (i > k && a[i] < a[k]) {
+						t.Fatalf("%s n=%d: not partitioned around %d", name, n, k)
+					}
+				}
+			}
+		}
+	}
+	a := []float64{3, 1, 2, 5, 4}
+	floydRivest(a, 0, 4, 2, 0)
+	if !slices.IsSorted(a) {
+		t.Errorf("floydRivest without budget: %v", a)
+	}
 }
