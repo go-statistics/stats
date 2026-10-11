@@ -30,12 +30,6 @@ type triangStd struct{ c float64 }
 func (s triangStd) valid() bool               { return s.c >= 0 && s.c <= 1 }
 func (s triangStd) support() (lo, hi float64) { return 0, 1 }
 
-// oneMinus returns 1 - x exactly.
-func oneMinus(x float64) dd.DD {
-	h, l := dd.TwoSum(1, -x)
-	return dd.DD{Hi: h, Lo: l}
-}
-
 func (s triangStd) pdfD(x float64) dd.DD {
 	switch {
 	case x < s.c:

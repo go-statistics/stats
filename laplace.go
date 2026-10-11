@@ -122,7 +122,7 @@ func FitLaplace[D Data](x D, o *FitOptions) (Laplace, error) {
 	}
 	loc, ok := fx["Loc"]
 	if !ok {
-		loc = medianOf(v)
+		loc = npMedian(v)
 	}
 	scale, ok := fx["Scale"]
 	if !ok {
@@ -136,9 +136,9 @@ func FitLaplace[D Data](x D, o *FitOptions) (Laplace, error) {
 	return d, d.Validate()
 }
 
-// medianOf is np.median: the middle value, or the mean of the two middle
+// npMedian is np.median: the middle value, or the mean of the two middle
 // values.
-func medianOf(v []float64) float64 {
+func npMedian(v []float64) float64 {
 	s := sortedCopy(v)
 	n := len(s)
 	if n%2 == 1 {
