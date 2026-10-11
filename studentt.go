@@ -115,7 +115,7 @@ func (s tStd) lowerQuantile(p float64) float64 {
 		x = special.BetaIncCInv(0.5, nu/2, 2*p)
 		z = 1 - x
 	}
-	return -math.Sqrt(nu * x / z)
+	return -dd.Sqrt(dd.Div(dd.MulFF(nu, x), dd.F(z))).Float() // one rounding
 }
 
 func (s tStd) ppf(p float64) float64 {

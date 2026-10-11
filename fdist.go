@@ -98,7 +98,9 @@ func (s fStd) logcdf(x float64) float64 { return logPQ(s.cdf(x), s.sf(x)) }
 func (s fStd) logsf(x float64) float64  { return logPQ(s.sf(x), s.cdf(x)) }
 
 // fromBeta returns x with z = v/(n+v) and w = 1-z: x = n·z/(m·w).
-func (s fStd) fromBeta(z, w float64) float64 { return s.n * z / (s.m * w) }
+func (s fStd) fromBeta(z, w float64) float64 {
+	return dd.Div(dd.MulFF(s.n, z), dd.MulFF(s.m, w)).Float() // one rounding
+}
 
 func (s fStd) ppf(p float64) float64 {
 	z := special.BetaIncInv(s.m/2, s.n/2, p)

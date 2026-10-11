@@ -15,6 +15,7 @@ func init() {
 		{"beta", func(a []float64) Continuous { return Beta{A: a[0], B: a[1], Scale: 1} }},
 		{"t", func(a []float64) Continuous { return StudentT{Df: a[0], Scale: 1} }},
 		{"f", func(a []float64) Continuous { return F{Dfn: a[0], Dfd: a[1], Scale: 1} }},
+		{"ncx2", func(a []float64) Continuous { return NoncentralChiSquared{Df: a[0], Nc: a[1], Scale: 1} }},
 	}
 	for _, f := range fams {
 		registerContinuous(f.name, f.mk)

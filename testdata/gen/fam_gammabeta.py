@@ -137,3 +137,44 @@ FAMILIES = [
 FIXTURES = {}
 for fam in FAMILIES:
     FIXTURES.update(contfam.build(fam))
+
+
+def _ncx2_sum(df, nc, x, upper):
+    df, nc, x = mpf(df), mpf(nc), mpf(x)
+    mu = nc / 2
+    y = x / 2
+    j0 = int(mu)
+    total = mpf(0)
+    # from the Poisson mode outwards, until the terms stop mattering
+    for direction in (range(j0, -1, -1), range(j0 + 1, 10 ** 7)):
+        prev = None
+        for j in direction:
+            w = mpmath.exp(-mu + j * mpmath.log(mu) - mpmath.loggamma(j + 1))
+            pq = gam_P_Q(df / 2 + j, y)
+            t = w * (pq[1] if upper else pq[0])
+            total += t
+            if prev is not None and t < prev and t < total * mpf(2) ** (-mpmath.mp.prec - 10) \
+                    and abs(j - mu) > 10 * mpmath.sqrt(mu + 1):
+                break
+            prev = t
+    return total
+
+
+def ncx2_pdf(df, nc, x):
+    df, nc, x = mpf(df), mpf(nc), mpf(x)
+    k = df / 2 - 1
+    return mpmath.exp(-(x + nc) / 2) * (x / nc) ** (k / 2) * mpmath.besseli(k, mpmath.sqrt(nc * x)) / 2
+
+
+FAMILIES.append(
+    dict(name="ncx2", dist=st.ncx2,
+         shapes={
+             "small": lambda r: (lu(r, 0.5, 4.0), lu(r, 0.1, 10.0)),
+             "mid": lambda r: (lu(r, 4.0, 50.0), lu(r, 1.0, 100.0)),
+             "large": lambda r: (lu(r, 1.0, 50.0), lu(r, 100.0, 2000.0)),
+         },
+         counts={"small": 30, "mid": 30, "large": 10},
+         pdf=ncx2_pdf, cdf=lambda df, nc, x: _ncx2_sum(df, nc, x, False),
+         sf=lambda df, nc, x: _ncx2_sum(df, nc, x, True),
+         support=lambda df, nc: (mpf(0), inf)))
+FIXTURES.update(contfam.build(FAMILIES[-1]))
