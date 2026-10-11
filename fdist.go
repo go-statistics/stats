@@ -32,12 +32,32 @@ func (s fStd) valid() bool {
 }
 func (s fStd) support() (lo, hi float64) { return 0, math.Inf(1) }
 
-// args returns z = v/(n+v) and w = n/(n+v) = 1-z for v = m·x, each as a
-// quotient of exact-ish terms (no 1-z).
-func (s fStd) args(x float64) (z, w float64) {
-	v := s.m * x
-	den := s.n + v
-	return v / den, s.n / den
+// args returns z = v/(n+v) and w = n/(n+v) = 1-z for v = m·x, as
+// double-doubles (v exact through TwoProd), so that the distribution
+// functions can correct the rounding of their float64 argument.
+func (s fStd) args(x float64) (z, w dd.DD) {
+	vh, vl := dd.TwoProd(s.m, x)
+	v := dd.DD{Hi: vh, Lo: vl}
+	den := dd.AddF(v, s.n)
+	return dd.Div(v, den), dd.Div(dd.F(s.n), den)
+}
+
+// ibeta returns I_x(a, b) (or its complement when upper) at the
+// double-double x, y = 1-x: the incomplete function at x.Hi plus the first
+// order correction density·x.Lo.
+func ibeta(a, b float64, x, y dd.DD, upper bool) float64 {
+	if upper {
+		p := special.BetaIncC(a, b, x.Hi)
+		if x.Lo != 0 {
+			p -= betaDensity(a, b, x.Hi, y.Hi, dd.F(x.Lo))
+		}
+		return p
+	}
+	p := special.BetaInc(a, b, x.Hi)
+	if x.Lo != 0 {
+		p += betaDensity(a, b, x.Hi, y.Hi, dd.F(x.Lo))
+	}
+	return p
 }
 
 func (s fStd) pdf(x float64) float64 {
@@ -46,7 +66,7 @@ func (s fStd) pdf(x float64) float64 {
 	}
 	z, w := s.args(x)
 	// f(x) = beta_pdf(z; m/2, n/2) · dz/dx, dz/dx = m·n/(n+v)² = z·w/x.
-	return betaDensity(s.m/2, s.n/2, z, w, dd.Div(dd.MulFF(z, w), dd.F(x)))
+	return betaDensity(s.m/2, s.n/2, z.Hi, w.Hi, dd.Div(dd.Mul(z, w), dd.F(x)))
 }
 
 func (s fStd) logpdf(x float64) float64 {
@@ -54,24 +74,24 @@ func (s fStd) logpdf(x float64) float64 {
 		return math.Log(s.pdf(0))
 	}
 	z, w := s.args(x)
-	l := betaLogDensity(s.m/2, s.n/2, z, w)
-	return dd.Add(l, dd.Sub(dd.Add(dd.Log(z), dd.Log(w)), dd.Log(x))).Float()
+	l := betaLogDensity(s.m/2, s.n/2, z.Hi, w.Hi)
+	return dd.Add(l, dd.Sub(dd.Add(logDD(z), logDD(w)), dd.Log(x))).Float()
 }
 
 func (s fStd) cdf(x float64) float64 {
 	z, w := s.args(x)
-	if s.m*x > s.n {
-		return special.BetaIncC(s.n/2, s.m/2, w)
+	if z.Hi > 0.5 {
+		return ibeta(s.n/2, s.m/2, w, z, true)
 	}
-	return special.BetaInc(s.m/2, s.n/2, z)
+	return ibeta(s.m/2, s.n/2, z, w, false)
 }
 
 func (s fStd) sf(x float64) float64 {
 	z, w := s.args(x)
-	if s.m*x > s.n {
-		return special.BetaInc(s.n/2, s.m/2, w)
+	if z.Hi > 0.5 {
+		return ibeta(s.n/2, s.m/2, w, z, false)
 	}
-	return special.BetaIncC(s.m/2, s.n/2, z)
+	return ibeta(s.m/2, s.n/2, z, w, true)
 }
 
 func (s fStd) logcdf(x float64) float64 { return logPQ(s.cdf(x), s.sf(x)) }

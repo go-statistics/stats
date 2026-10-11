@@ -78,10 +78,12 @@ def build(fam):
         return mpmath.log(pdf(*a))
 
     def logcdf(*a):
-        return mpmath.log(cdf(*a))
+        c = cdf(*a)
+        return mpmath.log1p(-sf(*a)) if c > 0.5 else mpmath.log(c)
 
     def logsf(*a):
-        return mpmath.log(sf(*a))
+        s = sf(*a)
+        return mpmath.log1p(-cdf(*a)) if s > 0.5 else mpmath.log(s)
 
     def ppf(*a):
         sh, p = a[:-1], a[-1]

@@ -58,16 +58,28 @@ func (s tStd) logpdf(t float64) float64 {
 	return dd.Add(tLogKernel(t, s.df), logDD(tConst(s.df))).Float()
 }
 
-// tail returns P(T < -|t|) (Boost's students_t cdf).
+// tail returns P(T < -|t|) (Boost's students_t cdf): with z = t²/(ν+t²),
+// ½·I^c_z(1/2, ν/2) when ν > 2t², else ½·I_{1-z}(ν/2, 1/2). The argument
+// is formed in double-double and the rounding of its float64 value is
+// corrected to first order with the beta density (dI_x/dx), which matters
+// in the tails where the result is ν/2 times as sensitive to x as x is
+// rounded.
 func (s tStd) tail(t float64) float64 {
 	nu := s.df
-	t2 := t * t
-	if nu > 2*t2 {
-		z := t2 / (nu + t2)
-		return special.BetaIncC(0.5, nu/2, z) / 2
+	h, l := dd.TwoProd(t, t)
+	t2 := dd.DD{Hi: h, Lo: l}
+	den := dd.AddF(t2, nu)
+	z := dd.Div(t2, den)       // t²/(ν+t²)
+	w := dd.Div(dd.F(nu), den) // ν/(ν+t²)
+	if nu > 2*h {
+		p := special.BetaIncC(0.5, nu/2, z.Hi)
+		if z.Lo != 0 {
+			p -= betaDensity(0.5, nu/2, z.Hi, w.Hi, dd.F(z.Lo))
+		}
+		return p / 2
 	}
-	z := nu / (nu + t2)
-	return special.BetaInc(nu/2, 0.5, z) / 2
+	p := special.BetaInc(nu/2, 0.5, w.Hi)
+	return (p + betaDensity(nu/2, 0.5, w.Hi, z.Hi, dd.F(w.Lo))) / 2
 }
 
 func (s tStd) cdf(t float64) float64 {
