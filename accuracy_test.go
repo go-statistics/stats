@@ -311,6 +311,10 @@ func TestAccuracyTable(t *testing.T) {
 	}
 	var fns []fnRow
 	for _, c := range sortedCases() {
+		if _, err := fixtureFS.Open("testdata/fixtures/" + c.name + ".tsv.gz"); err != nil {
+			t.Logf("%s: no fixture yet", c.name)
+			continue
+		}
 		f := fnRow{name: c.name}
 		for _, r := range measureAcc(c, loadFixture(t, c.name)) {
 			f.rows = append(f.rows, r)

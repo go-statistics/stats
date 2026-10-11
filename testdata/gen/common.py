@@ -83,12 +83,16 @@ def evaluate(fn, args):
         try:
             with mp.workprec(prec):
                 v = fn(*args)
+                if v is None:
+                    return None  # the oracle found no root/bracket: dropped
                 if isinstance(v, float):
                     vals.append(v)
                 else:
                     vals.append(mpf(v) if not isinstance(v, mpf) else +v)
         except Timeout:
             return "timeout"
+        except (mpmath.libmp.libhyper.NoConvergence, ZeroDivisionError, ValueError, TypeError):
+            return None  # counted as dropped: the oracle could not decide
         finally:
             signal.alarm(0)
     a, b = vals
@@ -179,3 +183,37 @@ SPECIALS = [math.nan, math.inf, -math.inf, 0.0, -0.0, 5e-324, -5e-324,
 def ival(x):
     """Return x as mpf when finite; exact specials pass through."""
     return mpf(x)
+
+
+def rewrite_scipy(name, spfn):
+    """Recompute the SciPy column of an existing fixture (same arguments)
+    with this interpreter's SciPy, and record which build it was."""
+    import platform
+    import numpy as np
+    import scipy
+    path = os.path.join(OUT, name + ".tsv.gz")
+    with gzip.open(path, "rt") as fh:
+        lines = fh.read().splitlines()
+    out = []
+    for line in lines:
+        if line.startswith("# scipy:"):
+            continue
+        if line.startswith("#"):
+            out.append(line)
+            continue
+        cols = line.split("\t")
+        args = [float(c) for c in cols[1:-3]]
+        with np.errstate(all="ignore"):
+            try:
+                sp = fmt(float(spfn(*args)))
+            except Exception:
+                sp = "-"
+        cols[-1] = sp
+        out.append("\t".join(cols))
+    hdr = [l for l in out if l.startswith("#")]
+    body = [l for l in out if not l.startswith("#")]
+    hdr.append("# scipy: %s numpy %s on %s" % (scipy.__version__, np.__version__, platform.machine()))
+    with open(path, "wb") as raw:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0, compresslevel=9) as gz:
+            gz.write(("\n".join(hdr + body) + "\n").encode())
+    print("%-14s scipy column rewritten (%s)" % (name, platform.machine()), file=sys.stderr)

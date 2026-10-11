@@ -223,3 +223,21 @@ func skewOf(v []float64) float64 {
 	m2, m3 := mean(d2), mean(d3)
 	return m3 / math.Pow(m2, 1.5)
 }
+
+// igamma returns P(a, x) (or Q(a, x) when upper) at the double-double x:
+// the incomplete function at x.Hi plus the first-order correction
+// density·x.Lo (the gamma density being dP/dx).
+func igamma(a float64, x dd.DD, upper bool) float64 {
+	if upper {
+		q := special.GammaQ(a, x.Hi)
+		if x.Lo != 0 {
+			q -= gammaDensity(a, dd.F(x.Hi), dd.F(x.Lo))
+		}
+		return q
+	}
+	p := special.GammaP(a, x.Hi)
+	if x.Lo != 0 {
+		p += gammaDensity(a, dd.F(x.Hi), dd.F(x.Lo))
+	}
+	return p
+}

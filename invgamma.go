@@ -29,8 +29,11 @@ func (s invGammaStd) pdf(x float64) float64 {
 	if x == 0 {
 		return 0
 	}
-	// g(1/x)/x², 1/x and 1/x² in double-double
-	return gammaDensity(s.a, dd.Div(dd.F(1), dd.F(x)), dd.Div(dd.F(1), dd.MulFF(x, x)))
+	// g(y)·y² with y = 1/x in double-double, the factor y² taken into the
+	// exponent (it underflows long before the density does)
+	y := dd.Div(dd.F(1), dd.F(x))
+	e, c := gammaExponent(s.a, y)
+	return expScaled(dd.Sub(e, dd.MulF(dd.Log(x), 2)), c)
 }
 
 func (s invGammaStd) logpdf(x float64) float64 {
@@ -40,13 +43,15 @@ func (s invGammaStd) logpdf(x float64) float64 {
 	return dd.Sub(gammaLogDensity(s.a, dd.Div(dd.F(1), dd.F(x))), dd.MulF(dd.Log(x), 2)).Float()
 }
 
-func (s invGammaStd) cdf(x float64) float64 { return special.GammaQ(s.a, 1/x) }
-func (s invGammaStd) sf(x float64) float64  { return special.GammaP(s.a, 1/x) }
+// The distribution functions are the gamma(a) ones at 1/x, the reciprocal
+// carried in double-double and its rounding corrected (igamma).
+func (s invGammaStd) cdf(x float64) float64 { return igamma(s.a, dd.Div(dd.F(1), dd.F(x)), true) }
+func (s invGammaStd) sf(x float64) float64  { return igamma(s.a, dd.Div(dd.F(1), dd.F(x)), false) }
 func (s invGammaStd) logcdf(x float64) float64 {
-	return logPQ(special.GammaQ(s.a, 1/x), special.GammaP(s.a, 1/x))
+	return logPQ(s.cdf(x), s.sf(x))
 }
 func (s invGammaStd) logsf(x float64) float64 {
-	return logPQ(special.GammaP(s.a, 1/x), special.GammaQ(s.a, 1/x))
+	return logPQ(s.sf(x), s.cdf(x))
 }
 func (s invGammaStd) ppf(p float64) float64 { return 1 / special.GammaQInv(s.a, p) }
 func (s invGammaStd) isf(q float64) float64 { return 1 / special.GammaPInv(s.a, q) }
