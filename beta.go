@@ -52,7 +52,7 @@ func (s betaStd) pdf(x float64) float64 {
 	case 1:
 		return betaEdge(s.b, s.a)
 	}
-	return betaDensity(s.a, s.b, x, 1-x, dd.F(1))
+	return betaDensity(s.a, s.b, dd.F(x), oneMinus(x), dd.F(1))
 }
 
 func (s betaStd) logpdf(x float64) float64 {
@@ -62,7 +62,7 @@ func (s betaStd) logpdf(x float64) float64 {
 	case 1:
 		return math.Log(betaEdge(s.b, s.a))
 	}
-	return betaLogDensity(s.a, s.b, x, 1-x).Float()
+	return betaLogDensity(s.a, s.b, dd.F(x), oneMinus(x)).Float()
 }
 
 func (s betaStd) cdf(x float64) float64 { return special.BetaInc(s.a, s.b, x) }
