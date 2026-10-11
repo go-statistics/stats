@@ -199,17 +199,26 @@ func (s bernoulliStd) binom() binomStd   { return binomStd{n: 1, p: s.p, q: s.q}
 func (s bernoulliStd) mean() float64     { return s.p }
 func (s bernoulliStd) variance() float64 { return s.binom().variance() }
 func (s bernoulliStd) skew() float64     { return s.binom().skew() }
-func (s bernoulliStd) kurtosis() float64 { return s.binom().kurtosis() }
-func (s bernoulliStd) munp(int) float64  { return s.p }
-func (s bernoulliStd) entropy() float64  { return entr(s.p) + entr(s.q.Float()) }
-func (s bernoulliStd) rvs(g *random.Generator, size []int) (*ndarray.Array, error) {
-	return g.Binomial(1, s.p, size...)
-}
 
-// entr is -x log x, 0 at x = 0 (scipy.special.entr).
-func entr(x float64) float64 {
-	if x == 0 {
+// kurtosis is NaN where pq = 0: SciPy derives it from the raw moments
+// there (0/0), unlike the binomial's 1/(npq) - 6/n.
+func (s bernoulliStd) kurtosis() float64 {
+	if s.binom().pq() == 0 {
+		return math.NaN()
+	}
+	return s.binom().kurtosis()
+}
+func (s bernoulliStd) munp(int) float64 { return s.p }
+
+// entropy is -p log p - q log1p(-p), the second term from the exact q (SciPy's
+// entr(1-p) rounds 1-p first).
+func (s bernoulliStd) entropy() float64 {
+	if s.p == 0 || s.p == 1 {
 		return 0
 	}
-	return -x * math.Log(x)
+	h := dd.Add(dd.MulF(dd.Log(s.p), s.p), dd.Mul(log1pDD(dd.F(-s.p)), s.q))
+	return -h.Float()
+}
+func (s bernoulliStd) rvs(g *random.Generator, size []int) (*ndarray.Array, error) {
+	return g.Binomial(1, s.p, size...)
 }

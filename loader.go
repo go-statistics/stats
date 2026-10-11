@@ -108,9 +108,15 @@ func poissonTerm(k, mu float64) (e, c dd.DD) {
 	return e, c
 }
 
-// massOf rounds c·exp(e) once; logMassOf returns e + log c rounded once.
-func massOf(e, c dd.DD) float64    { return expScaled(e, c) }
-func logMassOf(e, c dd.DD) float64 { return dd.Add(e, logDD(c)).Float() }
+// massOf rounds c·exp(e) once; logMassOf returns e + log c rounded once
+// (-Inf for a zero mass, e = -Inf).
+func massOf(e, c dd.DD) float64 { return expScaled(e, c) }
+func logMassOf(e, c dd.DD) float64 {
+	if math.IsInf(e.Hi, -1) {
+		return e.Hi
+	}
+	return dd.Add(e, logDD(c)).Float()
+}
 
 // oneMinus returns 1 - p as an exact double-double.
 func oneMinus(p float64) dd.DD {
@@ -191,6 +197,9 @@ func logCDFFrom(p, q float64, tail func() (logm float64, s dd.DD, ok bool)) floa
 		return math.Log(p)
 	}
 	if lm, s, ok := tail(); ok {
+		if math.IsInf(lm, -1) { // a degenerate distribution: no mass there
+			return lm
+		}
 		return dd.AddF(logDD(s), lm).Float()
 	}
 	return math.Log(p)

@@ -20,18 +20,31 @@ import (
 // would cancel: SciPy sums the masses one by one). Entropy is
 // log ζ(A) - A ζ'(A)/ζ(A), with -ζ'(A) = Σ log j / j^A by the same
 // summation (SciPy sums at most 1000 masses, which for small A misses much
-// of the tail). The moments are SciPy's: raw moments ζ(A-n)/ζ(A) where
-// A > n+1, +Inf otherwise, and the variance, skewness and kurtosis formed
-// from them as SciPy's generic rv_discrete.stats does.
+// of the tail). The raw moments are SciPy's ζ(A-n)/ζ(A) where A > n+1,
+// +Inf otherwise; the variance, skewness and kurtosis are +Inf or NaN
+// where SciPy's generic rv_discrete.stats makes them so, and otherwise
+// come from the moments of X-1, Σ_(k>=2) (k-1)^r k^-A / ζ(A), formed from
+// the differences ζ(A-j, 2) - ζ(A, 2) without the cancellation of
+// SciPy's raw-moment differences (which loses six digits at A = 20).
 type Zipf struct {
 	A, Loc float64
 }
 
 func (d Zipf) std() zipfStd {
-	return zipfStd{a: d.A, z: special.Zeta(d.A)}
+	eta := special.HurwitzZeta(d.A, 2)
+	return zipfStd{a: d.A, z: special.Zeta(d.A), lz: log1pDD(dd.F(eta)), eta: eta}
 }
 
-type zipfStd struct{ a, z float64 }
+// zipfStd holds a, ζ(a), log ζ(a) and η(a) = ζ(a) - 1 = ζ(a, 2) (the
+// last two accurate also where ζ(a) rounds to about 1).
+type zipfStd struct {
+	a, z float64
+	lz   dd.DD
+	eta  float64
+}
+
+// momentsFromMunp: SciPy's zipf has no _stats, its moment(n) is _munp(n).
+func (s zipfStd) momentsFromMunp() {}
 
 func (s zipfStd) valid() bool               { return s.a > 1 && !math.IsInf(s.a, 1) }
 func (s zipfStd) support() (lo, hi float64) { return 1, math.Inf(1) }
@@ -43,7 +56,7 @@ func (s zipfStd) pmf(k float64) float64 {
 	return expScaled(s.mlog(k), dd.Div(dd.F(1), dd.F(s.z)))
 }
 
-func (s zipfStd) logpmf(k float64) float64 { return dd.Sub(s.mlog(k), dd.Log(s.z)).Float() }
+func (s zipfStd) logpmf(k float64) float64 { return dd.Sub(s.mlog(k), s.lz).Float() }
 
 func (s zipfStd) sf(k float64) float64 { return special.HurwitzZeta(s.a, k+1) / s.z }
 
@@ -58,7 +71,7 @@ func (s zipfStd) logcdf(k float64) float64 {
 	if sf := s.sf(k); sf < 0.5 {
 		return math.Log1p(-sf)
 	}
-	return dd.Sub(logDD(zetaPartial(s.a, k)), dd.Log(s.z)).Float()
+	return dd.Sub(logDD(zetaPartial(s.a, k)), s.lz).Float()
 }
 
 // logsf is log SF, and below the normal range -a log(k+1) - log ζ(a) plus
@@ -95,35 +108,70 @@ func (s zipfStd) munp(n int) float64 {
 	return math.Inf(1)
 }
 
-// mean, variance, skew and kurtosis follow SciPy's rv_discrete.stats from
-// the raw moments, operation for operation.
-func (s zipfStd) mean() float64 { return s.munp(1) }
+// ey returns E[(X-1)^r] = Σ_j C(r,j) (-1)^(r-j) δ_j, δ_j = m_j - 1 =
+// (ζ(a-j, 2) - ζ(a, 2))/ζ(a) (the constant terms cancel exactly), for
+// a > r+1.
+func (s zipfStd) ey(r int) float64 {
+	t, c := 0.0, 1.0 // c = C(r, j)
+	for j := 0; j <= r; j++ {
+		if j > 0 {
+			c = c * float64(r-j+1) / float64(j)
+			d := (special.HurwitzZeta(s.a-float64(j), 2) - s.eta) / s.z
+			if (r-j)%2 == 1 {
+				d = -d
+			}
+			t += c * d
+		}
+	}
+	return t
+}
 
-func (s zipfStd) variance() float64 {
-	mu := s.munp(1)
-	if math.IsInf(mu, 0) {
+// The moments are +Inf or NaN where SciPy's rv_discrete.stats makes them
+// so from infinite raw moments: the mean is +Inf for a <= 2, the variance
+// for a <= 3; the skewness is NaN for a <= 3 and +Inf for a <= 4, the
+// kurtosis NaN for a <= 4 and +Inf for a <= 5.
+func (s zipfStd) mean() float64 {
+	if s.a <= 2 {
 		return math.Inf(1)
 	}
-	return s.munp(2) - mu*mu
+	return 1 + s.ey(1)
+}
+
+func (s zipfStd) variance() float64 {
+	if s.a <= 3 {
+		return math.Inf(1)
+	}
+	m := s.ey(1)
+	return s.ey(2) - m*m
 }
 
 func (s zipfStd) skew() float64 {
-	mu, mu2 := s.munp(1), s.variance()
-	mu3 := (-mu*mu-3*mu2)*mu + s.munp(3)
-	return mu3 / math.Pow(mu2, 1.5)
+	switch {
+	case s.a <= 3:
+		return math.NaN()
+	case s.a <= 4:
+		return math.Inf(1)
+	}
+	m, m2 := s.ey(1), s.ey(2)
+	v := m2 - m*m
+	return (s.ey(3) - 3*m*m2 + 2*m*m*m) / math.Pow(v, 1.5)
 }
 
 func (s zipfStd) kurtosis() float64 {
-	mu, mu2 := s.munp(1), s.variance()
-	mu3 := s.skew() * math.Pow(mu2, 1.5)
-	mu4 := ((-mu*mu-6*mu2)*mu-4*mu3)*mu + s.munp(4)
-	return mu4/(mu2*mu2) - 3
+	switch {
+	case s.a <= 4:
+		return math.NaN()
+	case s.a <= 5:
+		return math.Inf(1)
+	}
+	m, m2, m3 := s.ey(1), s.ey(2), s.ey(3)
+	v := m2 - m*m
+	return (s.ey(4)-4*m*m3+6*m*m*m2-3*m*m*m*m)/(v*v) - 3
 }
 
 // entropy is log ζ(a) + a S/ζ(a), S = Σ log j / j^a.
 func (s zipfStd) entropy() float64 {
-	sum := zetaLogSum(s.a)
-	return math.Log(s.z) + s.a*sum/s.z
+	return dd.AddF(s.lz, s.a*zetaLogSum(s.a)/s.z).Float()
 }
 
 func (s zipfStd) rvs(g *random.Generator, size []int) (*ndarray.Array, error) {

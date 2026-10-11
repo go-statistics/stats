@@ -158,14 +158,20 @@ func (s hypergeomStd) guess(z float64) float64 {
 func (s hypergeomStd) ppf(p float64) float64 {
 	lo, hi := s.support()
 	return smallestK(s.guess(special.Ndtri(p)), lo, hi, func(k float64) bool {
-		return k >= hi || s.cdf(k) >= p
+		if k >= hi {
+			return true
+		}
+		return s.cdf(k) >= p
 	})
 }
 
 func (s hypergeomStd) isf(q float64) float64 {
 	lo, hi := s.support()
 	return smallestK(s.guess(-special.Ndtri(q)), lo, hi, func(k float64) bool {
-		return k >= hi || s.sf(k) <= q
+		if k >= hi {
+			return true
+		}
+		return s.sf(k) <= q
 	})
 }
 
