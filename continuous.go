@@ -136,13 +136,19 @@ type stdMoments interface {
 	munp(n int) float64
 }
 
-// rawMoment is E[Y^n] for n >= 1: munp(n) when it is finite, and otherwise,
-// for n <= 4, the value SciPy's _moment_from_stats derives from the mean,
-// variance, skewness and kurtosis, so that a moment that does not exist is
-// +Inf or NaN exactly where SciPy says so.
+// munpMoments marks a standard form whose SciPy distribution defines no
+// _stats (scipy.stats.zipf): SciPy's moment(n) is then _munp(n) for every
+// n, +Inf included, never derived from the skewness or kurtosis.
+type munpMoments interface{ momentsFromMunp() }
+
+// rawMoment is E[Y^n] for n >= 1: munp(n) when it is finite (or when the
+// standard form is a munpMoments), and otherwise, for n <= 4, the value
+// SciPy's _moment_from_stats derives from the mean, variance, skewness and
+// kurtosis, so that a moment that does not exist is +Inf or NaN exactly
+// where SciPy says so.
 func rawMoment(s stdMoments, n int) float64 {
 	v := s.munp(n)
-	if finite(v) || n > 4 {
+	if _, ok := s.(munpMoments); ok || finite(v) || n > 4 {
 		return v
 	}
 	mu, mu2 := s.mean(), s.variance()
