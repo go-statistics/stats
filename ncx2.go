@@ -167,6 +167,10 @@ func (s ncx2Std) cdf(x float64) float64 {
 	if x < ncx2Tiny {
 		return expDD(s.logCDFTiny(x))
 	}
+	if x > s.mean() {
+		// the upper tail is the small one: 1 - sf rounds once
+		return 1 - s.sf(x)
+	}
 	return math.Min(1, s.tailSum(x/2, false))
 }
 
@@ -183,11 +187,15 @@ func (s ncx2Std) sf(x float64) float64 {
 	if s.mu == 0 {
 		return s.central().sf(x)
 	}
+	if x <= s.mean() {
+		// the lower tail is the small one
+		return 1 - s.cdf(x)
+	}
 	v := s.tailSum(x/2, true)
 	if !(v >= 1e-280) {
 		return expDD(s.logSFDeep(x / 2))
 	}
-	return math.Min(1, v)
+	return v
 }
 
 func (s ncx2Std) logcdf(x float64) float64 { return logPQ(s.cdf(x), s.sf(x)) }

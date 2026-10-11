@@ -118,14 +118,14 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | **lomax_pdf** | 750 | 3 | 0.50 | 1.1e+08 | 3/3 |
 | **lomax_ppf** | 745 | 3 | 0.50 | 312 | 3/3 |
 | **lomax_sf** | 750 | 3 | 0.50 | 410 | 3/3 |
-| ncx2_cdf | 208 | 9 | 2.9e+13 | 7.1e+15 | 7/9 |
-| **ncx2_isf** | 144 | 7 | 3.46 | 1.9e+14 | 7/7 |
+| **ncx2_cdf** | 208 | 9 | 116 | 7.1e+15 | 9/9 |
+| **ncx2_isf** | 144 | 7 | 4.06 | 1.9e+14 | 7/7 |
 | **ncx2_logcdf** | 207 | 9 | 271 | wrong | 9/9 |
 | **ncx2_logpdf** | 210 | 9 | 4.44 | 87 | 9/9 |
 | **ncx2_logsf** | 204 | 9 | 27 | wrong | 9/9 |
 | **ncx2_pdf** | 210 | 9 | 9.77 | 8.9e+15 | 9/9 |
-| ncx2_ppf | 187 | 8 | 5.8e+260 | 1.2e+66 | 6/8 |
-| ncx2_sf | 204 | 9 | 151 | 8.5e+15 | 6/9 |
+| **ncx2_ppf** | 187 | 8 | 4.26 | 1.2e+66 | 8/8 |
+| **ncx2_sf** | 204 | 9 | 151 | 8.5e+15 | 9/9 |
 | **norm_cdf** | 900 | 3 | 0.52 | 2.8e+12 | 3/3 |
 | **norm_isf** | 882 | 3 | 0.52 | 2.48 | 3/3 |
 | **norm_logcdf** | 1200 | 4 | 0.53 | 101 | 4/4 |
@@ -1009,24 +1009,24 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | lomax_sf | tiny | 250 | **0.46** | 0.46 | 0.46 | 0.46 |
 | lomax_sf | core | 250 | **0.50** | 0.50 | 2.92 | 2.92 |
 | lomax_sf | tail | 250 | **0.50** | 0.50 | 410 | 410 |
-| ncx2_cdf | small_lo | 29 | **2.9e+13** | 2.9e+13 | 2.9e+13 | 2.9e+13 |
+| ncx2_cdf | small_lo | 29 | **1.37** | 1.37 | 2.9e+13 | 2.9e+13 |
 | ncx2_cdf | small_mid | 30 | **3.05** | 3.05 | 4.53 | 4.53 |
-| ncx2_cdf | small_hi | 30 | 1.50 | 1.50 | 0.00 | 0.00 |
+| ncx2_cdf | small_hi | 30 | **0.00** | 0.00 | 0.00 | 0.00 |
 | ncx2_cdf | mid_lo | 30 | **1.57** | 1.57 | 1.7e+14 | 1.7e+14 |
 | ncx2_cdf | mid_mid | 30 | **4.00** | 4.00 | 12 | 12 |
-| ncx2_cdf | mid_hi | 30 | 2.50 | 2.50 | 0.00 | 0.00 |
+| ncx2_cdf | mid_hi | 30 | **0.00** | 0.00 | 0.00 | 0.00 |
 | ncx2_cdf | large_lo | 10 | **116** | 116 | 7.1e+15 | 7.1e+15 |
-| ncx2_cdf | large_mid | 10 | **9.46** | 9.46 | 38 | 38 |
-| ncx2_cdf | large_hi | 9 | **2.00** | 2.00 | 3.05 | 3.05 |
+| ncx2_cdf | large_mid | 10 | **7.46** | 7.46 | 38 | 38 |
+| ncx2_cdf | large_hi | 9 | **0.05** | 0.05 | 3.05 | 3.05 |
 | ncx2_isf | small_lower | 18 | **1.00** | 1.00 | 3.90 | 3.90 |
-| ncx2_isf | small_core | 29 | **3.46** | 3.46 | 2356 | 2356 |
+| ncx2_isf | small_core | 29 | **4.06** | 4.06 | 2356 | 2356 |
 | ncx2_isf | small_upper | 30 | **3.07** | 3.07 | 1.3e+09 | 1.3e+09 |
 | ncx2_isf | mid_lower | 14 | **0.98** | 0.98 | 5.98 | 5.98 |
 | ncx2_isf | mid_core | 20 | **1.31** | 1.31 | 3.20 | 3.20 |
 | ncx2_isf | mid_upper | 30 | **1.70** | 1.70 | 1.1e+13 | 1.1e+13 |
 | ncx2_isf | large_upper | 3 | **0.26** | 0.26 | 1.9e+14 | 1.9e+14 |
 | ncx2_logcdf | small_lo | 30 | **0.51** | 0.51 | 241979 | 241979 |
-| ncx2_logcdf | small_mid | 30 | **2.51** | 2.51 | 8.83 | 8.83 |
+| ncx2_logcdf | small_mid | 30 | **2.37** | 2.37 | 8.83 | 8.83 |
 | ncx2_logcdf | small_hi | 30 | **34** | 34 | 582 | 582 |
 | ncx2_logcdf | mid_lo | 30 | **0.51** | 0.51 | 2.1e+08 | 2.1e+08 |
 | ncx2_logcdf | mid_mid | 30 | **5.00** | 5.00 | 28 | 28 |
@@ -1044,7 +1044,7 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | ncx2_logpdf | large_mid | 10 | **1.41** | 1.41 | 4.99 | 4.99 |
 | ncx2_logpdf | large_hi | 10 | **0.46** | 0.46 | 1.46 | 1.46 |
 | ncx2_logsf | small_lo | 29 | **1.35** | 1.35 | 971205 | 971205 |
-| ncx2_logsf | small_mid | 30 | **4.30** | 4.30 | 5.21 | 5.21 |
+| ncx2_logsf | small_mid | 30 | **5.03** | 5.03 | 5.21 | 5.21 |
 | ncx2_logsf | small_hi | 30 | **0.51** | 0.51 | 0.83 | 0.83 |
 | ncx2_logsf | mid_lo | 30 | **1.67** | 1.67 | 24481 | 24481 |
 | ncx2_logsf | mid_mid | 30 | **3.51** | 3.51 | 13 | 13 |
@@ -1061,22 +1061,22 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | ncx2_pdf | large_lo | 10 | **4.37** | 4.37 | 5.8e+15 | 5.8e+15 |
 | ncx2_pdf | large_mid | 10 | **9.77** | 9.77 | 15 | 15 |
 | ncx2_pdf | large_hi | 10 | **6.55** | 6.55 | 7.2e+15 | 7.2e+15 |
-| ncx2_ppf | small_lower | 30 | 5.8e+260 | 5.8e+260 | 1.1e+15 | 1.1e+15 |
+| ncx2_ppf | small_lower | 30 | **2.17** | 2.17 | 1.1e+15 | 1.1e+15 |
 | ncx2_ppf | small_core | 30 | **4.26** | 4.26 | 18 | 18 |
 | ncx2_ppf | small_upper | 28 | **1.90** | 1.90 | 1.2e+14 | 1.2e+14 |
-| ncx2_ppf | mid_lower | 30 | 7.2e+59 | 7.2e+59 | 2.7e+14 | 2.7e+14 |
+| ncx2_ppf | mid_lower | 30 | **1.62** | 1.62 | 2.7e+14 | 2.7e+14 |
 | ncx2_ppf | mid_core | 25 | **2.50** | 2.50 | 74 | 74 |
 | ncx2_ppf | mid_upper | 29 | **1.06** | 1.06 | 6.2e+13 | 6.2e+13 |
-| ncx2_ppf | large_lower | 7 | **8.9e+62** | 8.9e+62 | 1.2e+66 | 1.2e+66 |
+| ncx2_ppf | large_lower | 7 | **1.11** | 1.11 | 1.2e+66 | 1.2e+66 |
 | ncx2_ppf | large_upper | 8 | **1.19** | 1.19 | 1.7e+13 | 1.7e+13 |
-| ncx2_sf | small_lo | 29 | 1.28 | 1.28 | 0.28 | 0.28 |
-| ncx2_sf | small_mid | 30 | **3.16** | 3.16 | 5.11 | 5.11 |
+| ncx2_sf | small_lo | 29 | **0.28** | 0.28 | 0.28 | 0.28 |
+| ncx2_sf | small_mid | 30 | **1.98** | 1.98 | 5.11 | 5.11 |
 | ncx2_sf | small_hi | 30 | **51** | 51 | 416807 | 416807 |
-| ncx2_sf | mid_lo | 30 | 4.00 | 4.00 | 0.00 | 0.00 |
-| ncx2_sf | mid_mid | 30 | **4.87** | 4.87 | 28 | 28 |
+| ncx2_sf | mid_lo | 30 | **0.00** | 0.00 | 0.00 | 0.00 |
+| ncx2_sf | mid_mid | 30 | **3.20** | 3.20 | 28 | 28 |
 | ncx2_sf | mid_hi | 30 | **135** | 135 | 9.5e+14 | 9.5e+14 |
-| ncx2_sf | large_lo | 10 | 5.50 | 5.50 | 0.02 | 0.02 |
-| ncx2_sf | large_mid | 8 | **12** | 12 | 30 | 30 |
+| ncx2_sf | large_lo | 10 | **0.02** | 0.02 | 0.02 | 0.02 |
+| ncx2_sf | large_mid | 8 | **10** | 10 | 30 | 30 |
 | ncx2_sf | large_hi | 7 | **151** | 151 | 8.5e+15 | 8.5e+15 |
 | norm_cdf | core | 300 | **0.50** | 0.50 | 12 | 12 |
 | norm_cdf | left | 300 | **0.52** | 0.52 | 2.8e+12 | 2.8e+12 |
