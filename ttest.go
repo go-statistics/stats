@@ -199,10 +199,9 @@ func trimmedStats(a []float64, trim float64) (v, m, n float64) {
 		}
 		v = varDdof(w, float64(2*g+1))
 	}
-	// trim_mean: int(trim·n) cut from each end of the partitioned data;
-	// the mean of the middle (order of the middle does not change the
-	// pairwise sum of NumPy's partition only up to rounding).
-	cut := int(trim * float64(len(s)))
-	m = mean(s[cut : len(s)-cut])
+	// trim_mean: g values cut from each end, the mean of the middle
+	// (SciPy sums the middle in np.partition's order, which differs from
+	// the sorted one only in rounding).
+	m = mean(s[g : len(s)-g])
 	return v, m, float64(len(s) - 2*g)
 }
