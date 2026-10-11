@@ -106,13 +106,24 @@ const tsK = 56
 
 var tsNode, tsWeight [2*tsK + 1]float64
 
+// tsNode2 and tsWeight2 are the same rule with step 1/64, for the
+// moments, where the kurtosis needs the integrals to well below 2^-53.
+var tsNode2, tsWeight2 [8*tsK + 1]float64
+
 func init() {
-	for j := -tsK; j <= tsK; j++ {
-		u := float64(j) / 16
+	tsRule(tsNode[:], tsWeight[:], 16)
+	tsRule(tsNode2[:], tsWeight2[:], 64)
+}
+
+// tsRule fills the tanh-sinh nodes and weights on [0, 1] with step 1/m.
+func tsRule(node, weight []float64, m float64) {
+	k := len(node) / 2
+	for j := -k; j <= k; j++ {
+		u := float64(j) / m
 		sh := math.Pi / 2 * math.Sinh(u)
 		ch := math.Cosh(sh)
-		tsNode[j+tsK] = 1 / (1 + math.Exp(-2*sh))
-		tsWeight[j+tsK] = (math.Pi / 2 * math.Cosh(u)) / (2 * ch * ch) / 16
+		node[j+k] = 1 / (1 + math.Exp(-2*sh))
+		weight[j+k] = (math.Pi / 2 * math.Cosh(u)) / (2 * ch * ch) / m
 	}
 }
 
@@ -153,14 +164,33 @@ func expIntegral(delta func(t float64) float64, l float64) float64 {
 	return tanhSinh(f, 0, hi, 1) + tanhSinh(f, hi, l-hi, 4)
 }
 
-// lowerTail returns P(X <= x) within the period, for x in [-π, 0].
+// lowerTail returns P(X <= x) within the period, for x in [-π, 0], and
+// logLowerTail its logarithm (exact also where P underflows).
 func (s vonmisesStd) lowerTail(x dd.DD) dd.DD {
-	l := dd.Add(x, piDD)
-	if !(l.Hi > 0) {
+	e, j := s.lowerParts(x)
+	if j == 0 {
 		return dd.DD{}
 	}
+	return dd.MulF(dd.Mul(expD(e), s.c0()), j)
+}
+
+func (s vonmisesStd) logLowerTail(x dd.DD) float64 {
+	e, j := s.lowerParts(x)
+	if j == 0 {
+		return math.Inf(-1)
+	}
+	return dd.Sub(dd.Add(e, dd.Log(j)), dd.Add(log2PiDD, dd.Log(s.i0e()))).Float()
+}
+
+// lowerParts returns E and J with P(X <= x) = c0·exp(E)·J: E = k(cos x - 1)
+// and J = ∫_0^{x+π} exp(-Δ(τ)) dτ.
+func (s vonmisesStd) lowerParts(x dd.DD) (dd.DD, float64) {
+	l := dd.Add(x, piDD)
+	if !(l.Hi > 0) {
+		return dd.DD{}, 0
+	}
 	if s.k == 0 {
-		return dd.Div(l, twoPiDD)
+		return dd.DD{}, l.Float()
 	}
 	// sin(τ/2 - x) = sin(τ/2) cos x - cos(τ/2) sin x, with sin x and cos x
 	// from x + π where x is near -π (exact there in double-double)
@@ -176,7 +206,7 @@ func (s vonmisesStd) lowerTail(x dd.DD) dd.DD {
 		st, ct := math.Sincos(t / 2)
 		return 2 * k * st * (st*cx - ct*sx)
 	}, l.Float())
-	return dd.MulF(dd.Mul(expD(dd.MulF(vmCosm1(x), k)), s.c0()), j)
+	return dd.MulF(vmCosm1(x), k), j
 }
 
 // f0 returns the CDF within the period, for r in [-π, π].
@@ -200,16 +230,29 @@ func (s vonmisesStd) sfD(z float64) dd.DD {
 func (s vonmisesStd) cdf(z float64) float64 { return s.cdfD(z).Float() }
 func (s vonmisesStd) sf(z float64) float64  { return s.sfD(z).Float() }
 
-// logcdf and logsf: within the first period through logPair; elsewhere
+// logcdf and logsf: within the first period, the logarithm of the
+// smaller tail in log space (it underflows long before its logarithm
+// does at large Kappa) and log1p of minus it for the larger; elsewhere
 // the logarithm of a value beyond [0, 1] (NaN below 0, as SciPy).
-func (s vonmisesStd) logcdf(z float64) float64 { return s.logOf(s.cdfD(z), s.sfD(z)) }
-func (s vonmisesStd) logsf(z float64) float64  { return s.logOf(s.sfD(z), s.cdfD(z)) }
+func (s vonmisesStd) logcdf(z float64) float64 {
+	r, n := vmReduce(z)
+	return s.logF0(r, n)
+}
 
-func (s vonmisesStd) logOf(p, q dd.DD) float64 {
-	if p.Hi < 0 || q.Hi < 0 {
-		return math.Log(p.Float())
+func (s vonmisesStd) logsf(z float64) float64 {
+	r, n := vmReduce(z)
+	return s.logF0(dd.Neg(r), -n)
+}
+
+// logF0 returns log(F0(r) + n).
+func (s vonmisesStd) logF0(r dd.DD, n float64) float64 {
+	switch {
+	case n != 0:
+		return math.Log(dd.AddF(s.f0(r), n).Float())
+	case r.Hi <= 0:
+		return s.logLowerTail(r)
 	}
-	return logPair(p, q)
+	return log1pDD(dd.Neg(s.lowerTail(dd.Neg(r)))).Float()
 }
 
 // solveLower returns x in [-π, 0] with lowerTail(x) = p, 0 < p <= 1/2, by
@@ -228,17 +271,18 @@ func (s vonmisesStd) solveLower(p float64) float64 {
 	}
 	lp := math.Log(p)
 	g := func(x float64) (float64, float64) {
-		f := s.lowerTail(dd.F(x))
-		return logD(f).Float() - lp, f.Float()
+		lf := s.logLowerTail(dd.F(x))
+		return lf - lp, lf
 	}
 	for i := 0; i < 100; i++ {
-		gx, f := g(x)
+		gx, lf := g(x)
 		if gx > 0 {
 			hi = x
 		} else {
 			lo = x
 		}
-		nx := x - gx*f/s.pdf(x)
+		// Newton on log F: the step is g·F/f, F/f = exp(log F - log f)
+		nx := x - gx*math.Exp(lf-s.logpdf(x))
 		if math.Abs(nx-x) <= 4*0x1p-52*math.Abs(x) {
 			x = nx
 			break
@@ -278,11 +322,11 @@ func (s vonmisesStd) isf(q float64) float64 { return -s.ppf(q) }
 func (s vonmisesStd) moments() (m0, m2, m4, c dd.DD) {
 	k := s.k
 	add := func(lo, w float64, stride int) {
-		for i := 0; i < len(tsNode); i += stride {
-			t := lo + w*tsNode[i]
+		for i := 0; i < len(tsNode2); i += stride {
+			t := lo + w*tsNode2[i]
 			sn, _ := sincosD(dd.F(t / 2))
 			om := dd.MulF(dd.Mul(sn, sn), 2) // 1 - cos t
-			f := dd.MulF(expD(dd.MulF(om, -k)), tsWeight[i]*w*float64(stride))
+			f := dd.MulF(expD(dd.MulF(om, -k)), tsWeight2[i]*w*float64(stride))
 			t2 := dd.MulFF(t, t)
 			m0 = dd.Add(m0, f)
 			f2 := dd.Mul(f, t2)

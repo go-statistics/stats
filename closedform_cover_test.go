@@ -140,10 +140,16 @@ func TestClosedFormFitPaths(t *testing.T) {
 		name string
 		fit  func() (Continuous, error)
 	}{
-		{"cauchy one point", func() (Continuous, error) { return FitCauchy([]float64{2}, &FitOptions{Fixed: map[string]float64{"Scale": 1}}) }},
+		{"cauchy one point", func() (Continuous, error) {
+			return FitCauchy([]float64{2}, &FitOptions{Fixed: map[string]float64{"Scale": 1}})
+		}},
 		{"cauchy ties", func() (Continuous, error) { return FitCauchy([]float64{1, 1, 1, 1, 5}, nil) }},
-		{"weibull left skew", func() (Continuous, error) { return FitWeibull(skewLeft, nil) }},
-		{"weibull low outlier", func() (Continuous, error) { return FitWeibull([]float64{0.9, 1, 1.1, 1.05, 0.95, 1.02, 0.98, 0.1}, nil) }},
+		{"weibull left skew", func() (Continuous, error) {
+			return FitWeibull(skewLeft, &FitOptions{Fixed: map[string]float64{"Loc": -5}})
+		}},
+		{"weibull low outlier", func() (Continuous, error) {
+			return FitWeibull([]float64{0.9, 1, 1.1, 1.05, 0.95, 1.02, 0.98, 0.1}, nil)
+		}},
 		{"logistic wide", func() (Continuous, error) {
 			return FitLogistic([]float64{-1000, 1000, -999, 999, 0}, nil)
 		}},
