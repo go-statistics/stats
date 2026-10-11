@@ -142,3 +142,39 @@ func brentRoot(f func(float64) float64, a, b float64) (float64, bool) {
 	}
 	return r.Root, true
 }
+
+// ldexpRound returns (m.Hi + m.Lo)·2^k rounded once, also where the
+// result is subnormal (math.Ldexp(m.Hi+m.Lo, k) rounds twice there: to 53
+// bits, then to the subnormal grid).
+func ldexpRound(m dd.DD, k int) float64 {
+	r := math.Ldexp(m.Hi+m.Lo, k)
+	if math.Abs(r) >= 0x1p-1022 || r != r {
+		return r
+	}
+	// In units of the smallest subnormal: hs exact, the rounding of the
+	// sum to an integer decided on the exact remainder.
+	hs := math.Ldexp(m.Hi, k+1074)
+	ls := math.Ldexp(m.Lo, k+1074)
+	n := math.RoundToEven(hs)
+	f := (hs - n) + ls
+	switch {
+	case f > 0.5:
+		n++
+	case f < -0.5:
+		n--
+	}
+	return math.Ldexp(n, -1074)
+}
+
+// expR returns exp(a) rounded once (dd.Exp, correct also when subnormal).
+func expR(a dd.DD) float64 {
+	m, k := dd.ExpMant(a)
+	return ldexpRound(m, k)
+}
+
+// expScaledR returns c·exp(a) rounded once (expScaled, correct also when
+// subnormal).
+func expScaledR(a, c dd.DD) float64 {
+	m, k := dd.ExpMant(a)
+	return ldexpRound(dd.Mul(m, c), k)
+}

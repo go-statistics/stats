@@ -12,6 +12,15 @@ func init() {
 	// scale and shift of an instance with Scale < 1).
 	rvsULP["Reciprocal"] = 1
 	rvsULP["LogNormal"] = 2
+	// go-ndarray's Laplace sampler takes Go's log where NumPy takes the C
+	// library's (1 draw in 9000 differs, by 1 ulp).
+	rvsULP["Laplace"] = 1
+	// SciPy's Cauchy draws are Boost's -1/tan(π·U) with the C library's
+	// tan, which on the reference build is its sin/cos ratio and misrounds
+	// a third of its results by up to 3 ulp; ours rounds the same formula
+	// correctly. A quantile near 0 then shifted by Loc magnifies the
+	// difference in units of the result's ulp (measured: 256).
+	rvsULP["Cauchy"] = 256
 }
 
 // exactFits holds the fits of a fixture whose fixed parameters satisfy

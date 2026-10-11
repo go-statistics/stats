@@ -50,7 +50,7 @@ func (s lognormStd) pdf(x float64) float64 {
 		return 0
 	}
 	e := dd.Sub(dd.MulF(dd.Mul(z, z), -0.5), l)
-	return expScaled(e, dd.DivF(invSqrt2Pi, s.s))
+	return expScaledR(e, dd.DivF(invSqrt2Pi, s.s))
 }
 
 func (s lognormStd) logpdf(x float64) float64 {
@@ -115,23 +115,23 @@ func ndtriD(p float64, upper bool) dd.DD {
 
 func (s lognormStd) ppf(p float64) float64 {
 	if p > 0.5 {
-		return dd.Exp(dd.MulF(ndtriD(1-p, true), s.s))
+		return expR(dd.MulF(ndtriD(1-p, true), s.s))
 	}
-	return dd.Exp(dd.MulF(ndtriD(p, false), s.s))
+	return expR(dd.MulF(ndtriD(p, false), s.s))
 }
 
 func (s lognormStd) isf(q float64) float64 {
 	if q > 0.5 {
-		return dd.Exp(dd.MulF(ndtriD(1-q, false), s.s))
+		return expR(dd.MulF(ndtriD(1-q, false), s.s))
 	}
-	return dd.Exp(dd.MulF(ndtriD(q, true), s.s))
+	return expR(dd.MulF(ndtriD(q, true), s.s))
 }
 
 // The moments with e = expm1(s²), p = 1 + e: mean exp(s²/2), variance
 // p·e, skewness √e (2 + p), excess kurtosis p⁴ + 2p³ + 3p² - 6 expanded in
 // e so that nothing cancels for small s.
 func (s lognormStd) e() float64    { return expm1D(dd.MulFF(s.s, s.s)).Float() }
-func (s lognormStd) mean() float64 { return dd.Exp(halfSquare(s.s)) }
+func (s lognormStd) mean() float64 { return expR(halfSquare(s.s)) }
 func (s lognormStd) variance() float64 {
 	sq := dd.MulFF(s.s, s.s)
 	return dd.Mul(expD(sq), expm1D(sq)).Float()
@@ -154,7 +154,7 @@ func (s lognormStd) entropy() float64 {
 // munp is exp(n² s²/2).
 func (s lognormStd) munp(n int) float64 {
 	fn := float64(n)
-	return dd.Exp(dd.MulF(halfSquare(s.s), fn*fn))
+	return expR(dd.MulF(halfSquare(s.s), fn*fn))
 }
 
 // rvs is SciPy's exp(s·Z) for standard normal Z.

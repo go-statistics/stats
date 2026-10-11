@@ -65,8 +65,8 @@ func (s reciprocalStd) sf(x float64) float64     { return s.sfD(x).Float() }
 func (s reciprocalStd) logcdf(x float64) float64 { return logPair(s.cdfD(x), s.sfD(x)) }
 func (s reciprocalStd) logsf(x float64) float64  { return logPair(s.sfD(x), s.cdfD(x)) }
 
-func (s reciprocalStd) ppf(p float64) float64 { return expScaled(dd.MulF(s.l, p), dd.F(s.a)) }
-func (s reciprocalStd) isf(q float64) float64 { return expScaled(dd.MulF(s.l, -q), dd.F(s.b)) }
+func (s reciprocalStd) ppf(p float64) float64 { return expScaledR(dd.MulF(s.l, p), dd.F(s.a)) }
+func (s reciprocalStd) isf(q float64) float64 { return expScaledR(dd.MulF(s.l, -q), dd.F(s.b)) }
 
 // ratioMoment is E[(Y/a)^n] = expm1(n l)/(n l), n >= 1, in double-double.
 func (s reciprocalStd) ratioMoment(n int) dd.DD {

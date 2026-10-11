@@ -30,10 +30,10 @@ type exponStd struct{}
 func (exponStd) valid() bool             { return true }
 func (exponStd) support() (a, b float64) { return 0, math.Inf(1) }
 
-func (exponStd) pdf(x float64) float64    { return dd.Exp(dd.F(-x)) }
+func (exponStd) pdf(x float64) float64    { return expR(dd.F(-x)) }
 func (exponStd) logpdf(x float64) float64 { return -x }
 func (exponStd) cdf(x float64) float64    { return dd.Neg(expm1D(dd.F(-x))).Float() }
-func (exponStd) sf(x float64) float64     { return dd.Exp(dd.F(-x)) }
+func (exponStd) sf(x float64) float64     { return expR(dd.F(-x)) }
 func (exponStd) logcdf(x float64) float64 { return log1mexpD(dd.F(x)).Float() }
 func (exponStd) logsf(x float64) float64  { return -x }
 func (exponStd) ppf(p float64) float64    { return -log1pDD(dd.F(-p)).Float() }
