@@ -195,13 +195,13 @@ func (s bernoulliStd) isf(q float64) float64 {
 	return 1
 }
 
-func (s bernoulliStd) binom() binomStd    { return binomStd{n: 1, p: s.p, q: s.q} }
-func (s bernoulliStd) mean() float64      { return s.p }
-func (s bernoulliStd) variance() float64  { return s.binom().variance() }
-func (s bernoulliStd) skew() float64      { return s.binom().skew() }
-func (s bernoulliStd) kurtosis() float64  { return s.binom().kurtosis() }
-func (s bernoulliStd) munp(int) float64   { return s.p }
-func (s bernoulliStd) entropy() float64   { return entr(s.p) + entr(s.q.Float()) }
+func (s bernoulliStd) binom() binomStd   { return binomStd{n: 1, p: s.p, q: s.q} }
+func (s bernoulliStd) mean() float64     { return s.p }
+func (s bernoulliStd) variance() float64 { return s.binom().variance() }
+func (s bernoulliStd) skew() float64     { return s.binom().skew() }
+func (s bernoulliStd) kurtosis() float64 { return s.binom().kurtosis() }
+func (s bernoulliStd) munp(int) float64  { return s.p }
+func (s bernoulliStd) entropy() float64  { return entr(s.p) + entr(s.q.Float()) }
 func (s bernoulliStd) rvs(g *random.Generator, size []int) (*ndarray.Array, error) {
 	return g.Binomial(1, s.p, size...)
 }
