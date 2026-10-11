@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"math"
 	"math/cmplx"
+	"sort"
 
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
 	"github.com/go-numerics/special"
+	"github.com/go-statistics/stats/internal/dd"
 )
 
 // MultivariateNormalCDFOptions configures MultivariateNormal.CDF and
@@ -189,8 +191,111 @@ func bvnl(h, k, r float64) float64 {
 		return special.Ndtr(k)
 	case k == math.Inf(1):
 		return special.Ndtr(h)
+	case math.Min(h, k) < -1 && math.Abs(r) < 1:
+		return bvnlTail(math.Min(h, k), math.Max(h, k), r)
 	}
 	return bvnu(-h, -k, r)
+}
+
+// bvnlTail is P(X ≤ h, Y ≤ k), h ≤ k and h < -1, as the integral
+// ∫_{-∞}^{h} φ(x)·Φ((k - r·x)/√(1-r²)) dx of positive terms, by adaptive
+// Gauss–Kronrod quadrature: unlike Genz's formula, which adds terms of
+// both signs when r < 0, it keeps its relative accuracy in the tail, down
+// to the underflow.
+func bvnlTail(h, k, r float64) float64 {
+	// The integrand is evaluated at exactly x = h - t, in double-double, so
+	// that the rounding of x, of 1-r² and of the normal cdf's argument (each
+	// amplified by up to the square of that argument) does not show.
+	p1, e1 := dd.TwoSum(1, -r)
+	p2, e2 := dd.TwoSum(1, r)
+	s := dd.Sqrt(dd.Mul(dd.DD{Hi: p1, Lo: e1}, dd.DD{Hi: p2, Lo: e2}))
+	f := func(t float64) float64 {
+		xh, xl := dd.TwoSum(h, -t)
+		x := dd.DD{Hi: xh, Lo: xl}
+		u := dd.Div(dd.Sub(dd.F(k), dd.MulF(x, r)), s)
+		phi := special.Ndtr(u.Hi) + expScaled(negHalfSq(u.Hi), invSqrt2Pi)*u.Lo
+		return expScaled(dd.MulF(dd.Mul(x, x), -0.5), invSqrt2Pi) * phi
+	}
+	// exp(-x²/2) falls by more than 2^-80 relative to x = h within upper.
+	a := -h
+	upper := -a + math.Sqrt(a*a+111)
+	pts := []float64{0, upper}
+	for _, j := range []float64{1, 4, 16} {
+		pts = append(pts, j/a)
+	}
+	// The cdf factor steps from 0 to 1 (or back) over a width s/|r| around
+	// x = k/r: break the interval there so that no piece straddles the step
+	// unseen.
+	if r != 0 {
+		ts, w := h-k/r, s.Hi/math.Abs(r)
+		for _, j := range []float64{0, 1, -1, 4, -4, 16, -16, 64, -64} {
+			pts = append(pts, ts+j*w)
+		}
+	}
+	return gaussKronrod(f, 0, upper, pts)
+}
+
+// Gauss–Kronrod 7/15 nodes and weights (QUADPACK's qk15).
+var (
+	gkX = [8]float64{0.991455371120812639206854697526329, 0.949107912342758524526189684047851, 0.864864423359769072789712788640926, 0.741531185599394439863864773280788, 0.586087235467691130294144845693013, 0.405845151377397166906606412076961, 0.207784955007898467600689403773245, 0}
+	gkW = [8]float64{0.022935322010529224963732008058970, 0.063092092629978553290700663189204, 0.104790010322250183839876322541518, 0.140653259715525918745189590510238, 0.169004726639267902826583426598550, 0.190350578064785409913256402421014, 0.204432940075298892414161999234649, 0.209482141084727828012999174891714}
+	gW  = [4]float64{0.129484966168869693270611432679082, 0.279705391489276667901467771423780, 0.381830050505118944950369775488975, 0.417959183673469387755102040816327}
+)
+
+// gk15 is the 15-point Kronrod estimate of ∫_a^b f and its difference
+// from the embedded 7-point Gauss rule.
+func gk15(f func(float64) float64, a, b float64) (k, e float64) {
+	c, h := (a+b)/2, (b-a)/2
+	fc := f(c)
+	k = gkW[7] * fc
+	g := gW[3] * fc
+	for i := range 7 {
+		v := f(c-h*gkX[i]) + f(c+h*gkX[i])
+		k += gkW[i] * v
+		if i%2 == 1 {
+			g += gW[i/2] * v
+		}
+	}
+	return k * h, math.Abs(k-g) * h
+}
+
+// gaussKronrod integrates a smooth positive f over [a, b], first split at
+// the breakpoints pts that fall inside, by adaptive bisection until each
+// piece's Gauss–Kronrod difference is below 1e-13 of the total (the
+// Kronrod values are then accurate to far better), or the pieces are
+// 2^-40 of the interval.
+func gaussKronrod(f func(float64) float64, a, b float64, pts []float64) float64 {
+	type piece struct{ a, b float64 }
+	cuts := []float64{a, b}
+	for _, p := range pts {
+		if p > a && p < b {
+			cuts = append(cuts, p)
+		}
+	}
+	sort.Float64s(cuts)
+	var stack []piece
+	total := 0.0
+	for i := 1; i < len(cuts); i++ {
+		if cuts[i] > cuts[i-1] {
+			stack = append(stack, piece{cuts[i-1], cuts[i]})
+			k, _ := gk15(f, cuts[i-1], cuts[i])
+			total += k
+		}
+	}
+	minW := (b - a) * 0x1p-40
+	sum := 0.0
+	for len(stack) > 0 {
+		p := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		k, e := gk15(f, p.a, p.b)
+		if e <= 1e-13*total || p.b-p.a <= minW {
+			sum += k
+			continue
+		}
+		m := (p.a + p.b) / 2
+		stack = append(stack, piece{m, p.b}, piece{p.a, m})
+	}
+	return sum
 }
 
 // Gauss–Legendre nodes (the negative half) and weights of orders 6, 12
@@ -300,35 +405,31 @@ func qmvn(m int, cov, low, high []float64, g *random.Generator) (prob, est float
 	ct := cho[0]
 	ci := special.Ndtr(lo[0] / ct)
 	dci := special.Ndtr(hi[0]/ct) - ci
-	y := make([]float64, (n-1)*nq)
-	c := make([]float64, nq)
-	dc := make([]float64, nq)
+	y := make([]float64, n-1)
 	pv := make([]float64, nq)
 	ev := 0.0
 	for j := range batches {
+		sh := rnd[j*n : (j+1)*n]
 		for s := range nq {
-			c[s], dc[s], pv[s] = ci, dci, dci
-		}
-		for i := 1; i < n; i++ {
-			sh := rnd[j*n+i]
-			row := cho[i*n : i*n+i]
-			lo, hi, ct := lo[i], hi[i], cho[i*n+i]
-			yi := y[(i-1)*nq : i*nq]
-			for s := range nq {
-				z := float64(q[i-1]*float64(s+1)) + sh
+			c, dc, p := ci, dci, dci
+			for i := 1; i < n && p != 0; i++ {
+				// Once p is 0 the sample contributes 0; stopping there
+				// also keeps a singular covariance (zero pivots, so
+				// infinite y) from turning it into 0·∞ = NaN.
+				z := float64(q[i-1]*float64(s+1)) + sh[i]
 				z -= math.Trunc(z)
 				xv := math.Abs(2*z - 1)
-				yi[s] = special.Ndtri(c[s] + float64(xv*dc[s]))
+				y[i-1] = special.Ndtri(c + float64(xv*dc))
 				t := 0.0
-				for k := range i {
-					t += float64(row[k] * y[k*nq+s])
+				for k, r := range cho[i*n : i*n+i] {
+					t += float64(r * y[k])
 				}
-				cs := special.Ndtr((lo - t) / ct)
-				ds := special.Ndtr((hi - t) / ct)
-				c[s] = cs
-				dc[s] = ds - cs
-				pv[s] *= dc[s]
+				ct := cho[i*n+i]
+				c = special.Ndtr((lo[i] - t) / ct)
+				dc = special.Ndtr((hi[i]-t)/ct) - c
+				p *= dc
 			}
+			pv[s] = p
 		}
 		d := (mean(pv) - prob) / float64(j+1)
 		prob += d
