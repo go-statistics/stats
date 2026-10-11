@@ -148,20 +148,19 @@ func TestMultinomialEdges(t *testing.T) {
 	if _, err := m.Rvs(random.DefaultRNG(0), -1); !errors.Is(err, ErrParam) {
 		t.Error(err)
 	}
-	// The binomial probabilities against the exact values.
+	// The binomial probabilities against mpmath: Loader's algorithm is
+	// accurate to about |log pmf|·ε relative (the final exponential).
 	for _, c := range []struct {
 		x, n int
 		p    float64
-	}{{0, 10, 0.3}, {10, 10, 0.3}, {3, 10, 0}, {0, 10, 0}, {7, 10, 1}, {10, 10, 1}, {5, 10, 0.5}, {400, 1000, 0.4}, {1, 2000, 0.3}} {
-		want := math.Exp(lchoose(c.n, c.x) + float64(c.x)*math.Log(c.p) + float64(c.n-c.x)*math.Log1p(-c.p))
-		if c.p == 0 || c.p == 1 {
-			want = 0
-			if c.p == 0 && c.x == 0 || c.p == 1 && c.x == c.n {
-				want = 1
-			}
-		}
-		if got := binomPMF(c.x, c.n, c.p); mvRel(got, want) > 1e-12 {
-			t.Errorf("binom(%d; %d, %g) = %g, want %g", c.x, c.n, c.p, got, want)
+		want float64
+	}{{0, 10, 0.3, 0.028247524900000005}, {10, 10, 0.3, 5.9048999999999975e-06}, {5, 10, 0.5, 0.24609375},
+		{400, 1000, 0.4, 0.025744818801482515}, {1, 2000, 0.3, 1.3462733191013244e-307}, {3, 10, 0.3, 0.266827932},
+		{3, 10, 0, 0}, {0, 10, 0, 1}, {7, 10, 1, 0}, {10, 10, 1, 1}} {
+		got := binomPMF(c.x, c.n, c.p)
+		tol := 8 * 0x1p-52 * math.Max(1, -math.Log(c.want))
+		if mvRel(got, c.want) > tol {
+			t.Errorf("binom(%d; %d, %g) = %g, want %g", c.x, c.n, c.p, got, c.want)
 		}
 	}
 	// stirlerr against mpmath.
@@ -173,9 +172,3 @@ func TestMultinomialEdges(t *testing.T) {
 	}
 }
 
-func lchoose(n, k int) float64 {
-	a, _ := math.Lgamma(float64(n + 1))
-	b, _ := math.Lgamma(float64(k + 1))
-	c, _ := math.Lgamma(float64(n - k + 1))
-	return a - b - c
-}

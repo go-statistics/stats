@@ -12,11 +12,11 @@ import (
 
 type kdeFixture struct {
 	Cases []struct {
-		Name       string     `json:"name"`
-		Weights    mvFloats   `json:"weights"`
-		BW         string     `json:"bw"`
-		BWValue    *float64   `json:"bw_value"`
-		Dataset    mvFloats   `json:"dataset"`
+		Name       string   `json:"name"`
+		Weights    mvFloats `json:"weights"`
+		BW         string   `json:"bw"`
+		BWValue    *float64 `json:"bw_value"`
+		Dataset    mvFloats `json:"dataset"`
 		D, N, M    int
 		Factor     mvFloat    `json:"factor"`
 		Neff       mvFloat    `json:"neff"`
@@ -37,7 +37,7 @@ type kdeFixture struct {
 			Lo, Hi mvFloats
 			Value  mvFloat
 		} `json:"box"`
-		Resample   []struct {
+		Resample []struct {
 			Seed  uint64   `json:"seed"`
 			Size  int      `json:"size"`
 			Shape []int    `json:"shape"`
@@ -400,5 +400,11 @@ func BenchmarkGaussianKDE2D(b *testing.B) {
 	b.ResetTimer()
 	for b.Loop() {
 		_, _ = k.Evaluate(pa)
+	}
+}
+
+func TestGaussianKDEBadBandwidth(t *testing.T) {
+	if _, err := NewGaussianKDE([]float64{1, 2, 3}, &GaussianKDEOptions{Bandwidth: KDEBandwidth{Factor: math.NaN()}}); !errors.Is(err, ErrParam) {
+		t.Error(err)
 	}
 }

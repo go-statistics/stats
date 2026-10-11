@@ -538,6 +538,8 @@ func permutedCholesky(cov, low, high []float64) (cho, lo, hi []float64) {
 // cbcLattice is SciPy's _cbc_lattice: the generating vector of a rank-1
 // lattice rule of nq points (nq the largest prime ≤ m) in dim dimensions,
 // by the fast component-by-component construction of Nuyens and Cools.
+// It is SciPy's vector except where the construction meets an exact tie
+// (see below), which happens for about half of the sizes.
 func cbcLattice(dim, m int) (q []float64, nq int) {
 	nq = largestPrime(m)
 	half := (nq - 1) / 2
@@ -583,11 +585,19 @@ func cbcLattice(dim, m int) (q []float64, nq int) {
 			fq[j] *= fc[j]
 		}
 		conv := fft(fq, true)
+		// The criterion has exact ties (pairs of equally good components);
+		// which one an FFT's rounding favours is arbitrary, and differs
+		// between SciPy's FFT and this one, and between architectures
+		// with and without fused multiply-adds. Take the first index
+		// within 1e-10 of the minimum, so that the lattice is the same
+		// everywhere.
+		lo := real(conv[0])
+		for _, v := range conv {
+			lo = math.Min(lo, real(v))
+		}
 		w = 0
-		for j := range conv {
-			if real(conv[j]) < real(conv[w]) {
-				w = j
-			}
+		for real(conv[w]) > lo+1e-10*math.Abs(lo) {
+			w++
 		}
 		z[s] = perm[w]
 	}

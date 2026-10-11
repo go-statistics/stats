@@ -291,14 +291,10 @@ func quantileLinear(y []float64, p float64, nan bool) float64 {
 		return math.NaN()
 	}
 	n := float64(len(y))
-	jg := float64(p*n) + (1 - p)
+	jg := float64(p*n) + (1 - p) // in [1, n] for p in [0, 1]
 	jp1 := math.Floor(jg)
-	j := jp1 - 1
+	j := math.Max(jp1-1, 0) // guards a rounding of jg below 1
 	g := jg - jp1
-	if j < 0 {
-		g = 0
-	}
-	j = math.Max(0, math.Min(j, n-1))
-	jp1 = math.Max(0, math.Min(jp1, n-1))
+	jp1 = math.Min(jp1, n-1)
 	return float64((1-g)*y[int(j)]) + float64(g*y[int(jp1)])
 }

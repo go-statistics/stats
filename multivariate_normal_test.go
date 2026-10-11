@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"testing"
@@ -230,7 +231,8 @@ func TestBivariateNormalTails(t *testing.T) {
 
 // TestCBCLattice compares the lattice generating vectors with SciPy's
 // _cbc_lattice. They agree except where the CBC criterion has exact ties
-// (which index wins then depends on the FFT's rounding).
+// (which index SciPy picks then depends on its FFT's rounding; this
+// package takes the first, on every architecture).
 func TestCBCLattice(t *testing.T) {
 	var fx mvnFixture
 	loadMV(t, "mvn", &fx)
@@ -253,7 +255,7 @@ func TestCBCLattice(t *testing.T) {
 		}
 	}
 	t.Logf("lattices identical to SciPy's: %d of %d", same, n)
-	if same < n*2/3 {
+	if same < n/3 {
 		t.Errorf("only %d of %d lattices agree", same, n)
 	}
 	// The FFT against the direct transform, for both kinds of length.
@@ -314,5 +316,156 @@ func TestMultivariateNormalFit(t *testing.T) {
 		if (err != nil) != c.Raises {
 			t.Errorf("cov %v: error %v, SciPy raises %v", c.Cov.f(), err, c.Raises)
 		}
+	}
+}
+
+func TestMultivariateNormalEdges(t *testing.T) {
+	m, err := NewMultivariateNormal([]float64{1, 2}, mvArr([]float64{2, 0.5, 0.5, 1}, 2, 2), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m.Dim() != 2 || m.Mean()[1] != 2 || m.Rank() != 2 {
+		t.Error(m.Dim(), m.Mean(), m.Rank())
+	}
+	if c, _ := ndarray.Data[float64](m.Cov()); c[1] != 0.5 {
+		t.Error(c)
+	}
+	if got, want := m.LogPDet(), math.Log(1.75); mvRel(got, want) > 1e-15 {
+		t.Error(got, want)
+	}
+	// Points that are NaN, infinite or so far that z² overflows.
+	for _, c := range []struct {
+		x    []float64
+		want float64
+	}{{[]float64{math.NaN(), 0}, math.NaN()}, {[]float64{math.Inf(1), 0}, math.Inf(-1)}, {[]float64{1e200, 0}, math.Inf(-1)}} {
+		lp, err := m.LogPDF(c.x)
+		p, _ := m.PDF(c.x)
+		if err != nil || mvRel(lp, c.want) != 0 || mvRel(p, math.Exp(c.want)) != 0 {
+			t.Errorf("x %v: %g %g %v", c.x, lp, p, err)
+		}
+	}
+	// Covariance arguments: nil, scalar, diagonal.
+	for _, c := range []struct {
+		mean []float64
+		cov  *ndarray.Array
+		d    int
+		v    float64
+	}{
+		{nil, nil, 1, 1}, {[]float64{0, 0}, nil, 2, 1}, {[]float64{0, 0, 0}, ndarray.Scalar(4.0), 3, 4},
+		{nil, mvArr([]float64{2, 3}, 2), 2, 3}, {nil, ndarray.Scalar(2.0), 1, 2},
+	} {
+		mm, err := NewMultivariateNormal(c.mean, c.cov, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		cv, _ := ndarray.Data[float64](mm.Cov())
+		if mm.Dim() != c.d || cv[len(cv)-1] != c.v {
+			t.Errorf("%v %v: dim %d cov %v", c.mean, c.cov, mm.Dim(), cv)
+		}
+	}
+	for _, c := range []struct {
+		name string
+		mean []float64
+		cov  *ndarray.Array
+	}{
+		{"empty mean", []float64{}, nil},
+		{"NaN mean", []float64{math.NaN()}, nil},
+		{"diagonal length", []float64{0, 0}, mvArr([]float64{1, 2, 3}, 3)},
+		{"matrix shape", []float64{0, 0}, mvArr([]float64{1, 0, 0, 1, 0, 0}, 2, 3)},
+		{"3-D cov", []float64{0}, mvArr([]float64{1}, 1, 1, 1)},
+		{"infinite cov", []float64{0}, ndarray.Scalar(math.Inf(1))},
+		{"singular", []float64{0, 0}, mvArr([]float64{1, 1, 1, 1}, 2, 2)},
+	} {
+		if _, err := NewMultivariateNormal(c.mean, c.cov, nil); !errors.Is(err, ErrParam) {
+			t.Errorf("%s: %v", c.name, err)
+		}
+	}
+	// Errors of the point methods.
+	if _, err := m.LogPDF([]float64{1}); !errors.Is(err, ErrData) {
+		t.Error(err)
+	}
+	if _, err := m.PDF([]float64{1}); !errors.Is(err, ErrData) {
+		t.Error(err)
+	}
+	if _, err := m.CDF([]float64{1}, nil); !errors.Is(err, ErrData) {
+		t.Error(err)
+	}
+	if _, err := m.CDF([]float64{1, 1}, &MultivariateNormalCDFOptions{Lower: []float64{0}}); !errors.Is(err, ErrParam) {
+		t.Error(err)
+	}
+	if _, err := m.LogPDFPoints(nil); !errors.Is(err, ErrData) {
+		t.Error(err)
+	}
+	if _, err := m.CDFPoints(mvArr([]float64{1, 2, 3}, 3), nil); !errors.Is(err, ErrData) {
+		t.Error(err)
+	}
+	if _, err := m.CDFPoints(mvArr([]float64{1, 2}, 2), &MultivariateNormalCDFOptions{Lower: []float64{0}}); !errors.Is(err, ErrParam) {
+		t.Error(err)
+	}
+	if _, err := m.Rvs(random.DefaultRNG(0), -1); !errors.Is(err, ErrParam) {
+		t.Error(err)
+	}
+	// CDF in one dimension is the normal cdf; LogCDF is LogNdtr there.
+	m1, _ := NewMultivariateNormal([]float64{1}, ndarray.Scalar(4.0), nil)
+	n := Normal{Loc: 1, Scale: 2}
+	for _, x := range []float64{-80, -3, 0.5, 1, 4, 30} {
+		c, _ := m1.CDF([]float64{x}, nil)
+		lc, _ := m1.LogCDF([]float64{x}, nil)
+		if c != n.CDF(x) || lc != n.LogCDF(x) {
+			t.Errorf("x %g: cdf %g logcdf %g, normal %g %g", x, c, lc, n.CDF(x), n.LogCDF(x))
+		}
+	}
+	// One-dimensional interval above the mean, swapped limits, 2-D LogCDF.
+	c, _ := m1.CDF([]float64{5}, &MultivariateNormalCDFOptions{Lower: []float64{3}})
+	if want := n.SF(3) - n.SF(5); mvRel(c, want) > 1e-15 {
+		t.Error(c, want)
+	}
+	c, _ = m1.CDF([]float64{3}, &MultivariateNormalCDFOptions{Lower: []float64{5}})
+	if want := n.SF(5) - n.SF(3); mvRel(c, want) > 1e-15 {
+		t.Error(c, want)
+	}
+	if lc, _ := m.LogCDF([]float64{1, 2}, nil); math.IsNaN(lc) || lc > 0 {
+		t.Error(lc)
+	}
+	// Infinite upper limits reduce to the marginal.
+	all, _ := m.CDF([]float64{math.Inf(1), math.Inf(1)}, nil)
+	mx, _ := m.CDF([]float64{0, math.Inf(1)}, nil)
+	my, _ := m.CDF([]float64{math.Inf(1), 0}, nil)
+	if all != 1 || mx != (Normal{Loc: 1, Scale: math.Sqrt2}).CDF(0) || my != (Normal{Loc: 2, Scale: 1}).CDF(0) {
+		t.Error(all, mx, my)
+	}
+	// d ≥ 3 with a zero variance (the integration fixes that variable)
+	// and the default generator.
+	m3, err := NewMultivariateNormal([]float64{0, 0, 0}, mvArr([]float64{1, 0.5, 0, 0.5, 1, 0, 0, 0, 0}, 3, 3), &MultivariateNormalOptions{AllowSingular: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, _ := m3.CDF([]float64{0, 0, 1}, nil)
+	if want := 1.0/4 + math.Asin(0.5)/(2*math.Pi); math.Abs(p-want) > 1e-5 {
+		t.Errorf("degenerate trivariate: %g, want %g", p, want)
+	}
+	ps, _ := m3.CDFPoints(mvArr([]float64{0, 0, 1}, 1, 3), nil)
+	if ps[0] != p {
+		t.Error(ps, p)
+	}
+	// Fit errors.
+	x := mvArr([]float64{1, 2, 3, 4, 5, 7}, 3, 2)
+	for _, o := range []*MultivariateNormalFitOptions{
+		{FixMean: []float64{1}},
+		{FixCov: ndarray.Scalar(1.0)},
+		{FixCov: mvArr([]float64{1, 2, 2, 1}, 2, 2)},
+	} {
+		if _, _, err := FitMultivariateNormal(x, o); !errors.Is(err, ErrParam) {
+			t.Error(o, err)
+		}
+	}
+	if mu, _, err := FitMultivariateNormal(x, nil); err != nil || mu[1] != 13.0/3 {
+		t.Error(mu, err)
+	}
+	if _, _, err := FitMultivariateNormal(mvArr([]float64{1, 2}, 2), nil); !errors.Is(err, ErrData) {
+		t.Error(err)
+	}
+	if _, cv, err := FitMultivariateNormal(mvArr([]float64{1, 2, 4}, 3, 1), &MultivariateNormalFitOptions{FixCov: ndarray.Scalar(2.0)}); err != nil || cv.Shape()[0] != 1 {
+		t.Error(err)
 	}
 }

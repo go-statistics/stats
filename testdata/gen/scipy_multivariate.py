@@ -96,7 +96,11 @@ def mp_bvn(h, k, r):
             h, k = k, h
         f = lambda t: mp.npdf(h - t) * mp.ncdf((k - r * (h - t)) / s)
         sc = 1 / max(abs(h), 1)
-        pts = [0] + [sc * 2 ** (j / 4) for j in range(-16, 40)] + [mp.inf]
+        pts = [0] + [sc * 2 ** (j / 4) for j in range(-16, 40)]
+        if r != 0:  # the cdf factor steps over a width s/|r| at x = k/r
+            ts, w = h - k / r, s / abs(r)
+            pts += [ts + j * w for j in (-256, -64, -16, -4, -1, 0, 1, 4, 16, 64, 256)]
+        pts = sorted(set(p for p in pts if p >= 0)) + [mp.inf]
         return float(mp.quad(f, pts, method="gauss-legendre"))
 
 
@@ -163,7 +167,7 @@ def gen_mvn():
 
     # bivariate normal probabilities against mpmath
     bvn = []
-    for r in (0.0, 0.3, -0.3, 0.5, -0.5, 0.8, -0.8, 0.95, -0.95, 0.999, -0.999):
+    for r in (0.0, 0.3, -0.3, 0.5, -0.5, 0.8, -0.8, 0.95, -0.95, 0.999, -0.999, 1 - 1e-6, -1 + 1e-6):
         for h, k in ((0.0, 0.0), (1.0, -0.5), (-2.0, -3.0), (-5.0, -4.0), (-8.0, -8.5),
                      (-12.0, -11.0), (3.0, 2.5), (6.0, -1.0), (-1.0, 7.0), (-30.0, 2.0)):
             cov = np.array([[1.0, r], [r, 1.0]])

@@ -25,11 +25,8 @@ func mvPoints(x *ndarray.Array, d int) ([]float64, int, error) {
 	}
 	v := arrayFloats(x)
 	shape := x.Shape()
-	last := 1
-	switch {
-	case len(shape) == 1 && d == 1:
-		last = 1
-	case len(shape) >= 1:
+	last := 1 // a 0-d array, or a 1-D array of points in one dimension
+	if len(shape) >= 2 || len(shape) == 1 && d > 1 {
 		last = shape[len(shape)-1]
 	}
 	if last != d {
@@ -182,10 +179,7 @@ func npMultivariateNormal(g *random.Generator, mean, cov []float64, d, size int)
 		return nil, fmt.Errorf("%w: %v", ErrParam, err)
 	}
 	x, _ := ndarray.Data[float64](xa)
-	ua, sa, _, err := linalg.SVD(mustArray(cov, d, d), true)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrParam, err)
-	}
+	ua, sa, _, _ := linalg.SVD(mustArray(cov, d, d), true) // cov is finite
 	u, _ := ndarray.Data[float64](ua)
 	s, _ := ndarray.Data[float64](sa)
 	f := make([]float64, d*d)
@@ -207,7 +201,3 @@ func npMultivariateNormal(g *random.Generator, mean, cov []float64, d, size int)
 	}
 	return out, nil
 }
-
-// pairSum is NumPy's pairwise sum of a few values (fewer than 8 summands
-// are added left to right).
-func pairSum(v ...float64) float64 { return sum(v) }
