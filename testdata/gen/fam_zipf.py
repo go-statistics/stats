@@ -48,7 +48,8 @@ def _a(r, region):
 
 def _estimate(q, a):
     """k with sf(k) about q (sf(k) ~ k^(1-a) / ((a-1) ζ(a)))."""
-    return ((a - 1) * float(mpmath.zeta(a)) * q) ** (-1 / (a - 1))
+    lk = -math.log((a - 1) * float(mpmath.zeta(a)) * q) / (a - 1)
+    return math.exp(min(lk, 700))
 
 
 def _guard_x(f):
@@ -80,9 +81,21 @@ def xcases(name, fn):
 
 
 def pcases(name, fn):
+    """Quantiles whose answer stays below 1e15 (near a = 1 the upper
+    quantiles run to 10^(10^6) and beyond)."""
     r = discfix.rng(name)
-    return [(region, (probs(r, region), _a(r, ar))) for region in ("core", "lower", "upper")
-            for ar in ("near1", "core", "large_a") for _ in range(N // 3)]
+    out = []
+    for region in ("core", "lower", "upper"):
+        for ar in ("near1", "core", "large_a"):
+            n = 0
+            while n < N // 3:
+                p, a = probs(r, region), _a(r, ar)
+                q = p if fn == "isf" else 1 - p
+                if q <= 0 or not (_estimate(q, a) < 1e15):
+                    continue
+                out.append((region, (p, a)))
+                n += 1
+    return out
 
 
 _sp = {fn: _guard_x(getattr(st.zipf, fn)) for fn in ("pmf", "logpmf", "cdf", "sf", "logcdf", "logsf")}

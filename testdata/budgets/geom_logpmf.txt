@@ -1,0 +1,4 @@
+small_p 1
+core 1
+near1 1
+small_k 1

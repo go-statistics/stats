@@ -1,0 +1,6 @@
+small_mu 1
+bulk 1
+large_mu 1
+tiny_mu 1
+tail 1
+deep 1
