@@ -458,7 +458,7 @@ func KruskalWallis[D Data](samples ...D) (TestResult, error) {
 	}
 	ranks, t := rankWithTies(all, RankAverage, true)
 	n := float64(total)
-	ties := 1 - tieTerm(t)/(n*n*n-n)
+	ties := 1 - tieTerm(t)/(float64(n*n*n)-n) // products rounded as NumPy does (no FMA)
 	ssbn := 0.0
 	off := 0
 	for _, g := range groups {
@@ -466,7 +466,7 @@ func KruskalWallis[D Data](samples ...D) (TestResult, error) {
 		ssbn += s * s / float64(len(g))
 		off += len(g)
 	}
-	h := 12.0/(n*(n+1))*ssbn - 3*(n+1)
+	h := float64(12.0/(n*(n+1))*ssbn) - 3*(n+1)
 	h /= ties
 	return TestResult{h, chi2SF(float64(len(groups)-1), h)}, nil
 }
