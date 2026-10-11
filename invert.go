@@ -92,6 +92,12 @@ func invertCDF(target float64, upper bool, f, pdf func(float64) float64, x0, lo,
 // midpoint is (a+b)/2 without overflow, and in the middle of the
 // exponents when the bracket spans many binades of positive numbers.
 func midpoint(a, b float64) float64 {
+	if math.IsInf(b, 1) {
+		return math.Max(2*a, 1)
+	}
+	if math.IsInf(a, -1) {
+		return math.Min(2*b, -1)
+	}
 	if a > 0 && b/a > 4 {
 		return math.Sqrt(a) * math.Sqrt(b)
 	}

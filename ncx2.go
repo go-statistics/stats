@@ -153,7 +153,7 @@ func (s ncx2Std) tailSum(y float64, upper bool) float64 {
 	for j := j0 + 1; ; j++ {
 		t := term(j)
 		sum += t
-		if (t <= sum*0x1p-60 && t <= prev && j > s.mu+10*math.Sqrt(s.mu+1)) || (t == 0 && j > s.mu) {
+		if (t <= sum*0x1p-60 && t <= prev && j > s.mu+10*math.Sqrt(s.mu+1)) || (t == 0 && j > s.mu) || t != t || j > s.mu+60*math.Sqrt(s.mu+1)+1e5 {
 			break
 		}
 		prev = t
@@ -173,7 +173,7 @@ func (s ncx2Std) sf(x float64) float64 {
 		return s.central().sf(x)
 	}
 	v := s.tailSum(x/2, true)
-	if v < 1e-280 {
+	if !(v >= 1e-280) {
 		return expDD(s.logSFDeep(x / 2))
 	}
 	return math.Min(1, v)
@@ -183,7 +183,7 @@ func (s ncx2Std) logcdf(x float64) float64 { return logPQ(s.cdf(x), s.sf(x)) }
 
 func (s ncx2Std) logsf(x float64) float64 {
 	if s.mu != 0 {
-		if v := s.tailSum(x/2, true); v < 1e-280 {
+		if v := s.tailSum(x/2, true); !(v >= 1e-280) {
 			return s.logSFDeep(x / 2).Float()
 		}
 	}
@@ -200,7 +200,7 @@ func (s ncx2Std) logSFDeep(y float64) dd.DD {
 		l := dd.Add(s.poissonLog(j), logUpperGamma(s.k+j, y))
 		terms = append(terms, l)
 		best = math.Max(best, l.Hi)
-		if l.Hi < best-40 && j > s.mu {
+		if (l.Hi < best-40 && j > s.mu) || l.Hi != l.Hi || j > s.mu+60*math.Sqrt(s.mu+1)+500 {
 			break
 		}
 	}
@@ -211,10 +211,15 @@ func (s ncx2Std) logSFDeep(y float64) dd.DD {
 	return dd.Add(dd.F(best), logDD(dd.F(sum)))
 }
 
-func (s ncx2Std) guess(p float64) float64 {
-	// Pearson's three-moment chi-squared approximation through the normal
+// guess is the normal approximation to the quantile with lower tail p and
+// upper tail q = 1-p (each given exactly by the caller).
+func (s ncx2Std) guess(p, q float64) float64 {
 	m, v := s.mean(), s.variance()
-	return math.Max(m+math.Sqrt(v)*special.Ndtri(p), m*1e-3)
+	z := special.Ndtri(p)
+	if q < p {
+		z = -special.Ndtri(q)
+	}
+	return math.Max(m+math.Sqrt(v)*z, m*1e-3)
 }
 
 func (s ncx2Std) ppf(p float64) float64 {
@@ -222,9 +227,9 @@ func (s ncx2Std) ppf(p float64) float64 {
 		return s.central().ppf(p)
 	}
 	if p > 0.5 {
-		return invertCDF(1-p, true, s.sf, s.pdf, s.guess(p), 0, math.Inf(1))
+		return invertCDF(1-p, true, s.sf, s.pdf, s.guess(p, 1-p), 0, math.Inf(1))
 	}
-	return invertCDF(p, false, s.cdf, s.pdf, s.guess(p), 0, math.Inf(1))
+	return invertCDF(p, false, s.cdf, s.pdf, s.guess(p, 1-p), 0, math.Inf(1))
 }
 
 func (s ncx2Std) isf(q float64) float64 {
@@ -232,9 +237,9 @@ func (s ncx2Std) isf(q float64) float64 {
 		return s.central().isf(q)
 	}
 	if q > 0.5 {
-		return invertCDF(1-q, false, s.cdf, s.pdf, s.guess(1-q), 0, math.Inf(1))
+		return invertCDF(1-q, false, s.cdf, s.pdf, s.guess(1-q, q), 0, math.Inf(1))
 	}
-	return invertCDF(q, true, s.sf, s.pdf, s.guess(1-q), 0, math.Inf(1))
+	return invertCDF(q, true, s.sf, s.pdf, s.guess(1-q, q), 0, math.Inf(1))
 }
 
 func (s ncx2Std) mean() float64     { return 2*s.k + 2*s.mu }
