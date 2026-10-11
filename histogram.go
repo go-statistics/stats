@@ -145,7 +145,11 @@ func binEdges(v []float64, o *HistogramOptions) (edges []float64, nb int, first,
 		nb = 1
 		if len(a) > 0 {
 			if w := binWidth(a, o.Rule, first, last); w != 0 {
-				nb = int(math.Ceil((last - first) / w))
+				f := math.Ceil((last - first) / w)
+				if !(f <= maxBins) {
+					return nil, 0, 0, 0, fmt.Errorf("%w: Histogram: the bin rule asks for %v bins", ErrParam, f)
+				}
+				nb = int(f)
 			}
 		}
 	case o.Bins == 0:
@@ -161,6 +165,10 @@ func binEdges(v []float64, o *HistogramOptions) (edges []float64, nb int, first,
 	}
 	return edges, nb, first, last, nil
 }
+
+// maxBins caps the number of bins a rule may ask for (NumPy fails to
+// allocate them instead).
+const maxBins = 1 << 27
 
 // binWidth is numpy's _hist_bin_* estimators on non-empty, finite data.
 func binWidth(a []float64, rule BinRule, first, last float64) float64 {
@@ -349,6 +357,10 @@ func Histogram[D Data](x D, o *HistogramOptions) (HistogramResult, error) {
 	edges, err := HistogramBinEdges(x, o)
 	if err != nil {
 		return HistogramResult{}, err
+	}
+	if len(edges) < 2 {
+		// a rule's width overflowed to +Inf: no bin (NumPy fails too)
+		return HistogramResult{}, fmt.Errorf("%w: Histogram: the bin rule gives no bin", ErrParam)
 	}
 	var counts []float64
 	if o.Edges == nil {

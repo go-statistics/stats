@@ -130,7 +130,7 @@ func Var[D Data](x D, o *MeanOptions) (float64, error) {
 	}
 	dof := scl - o.Ddof
 	switch {
-	case w == nil && omitted && dof <= 0:
+	case w == nil && o.OmitNaN && dof <= 0:
 		return math.NaN(), nil
 	case w == nil:
 		dof = max(dof, 0)
@@ -366,8 +366,8 @@ func SEM[D Data](x D, o *DdofOptions) (float64, error) {
 	if omit {
 		v = dropNaN(v)
 	}
-	if len(v) == 0 {
-		return math.NaN(), fmt.Errorf("%w: SEM of no observations", ErrData)
+	if len(v) < 2 {
+		return math.NaN(), fmt.Errorf("%w: SEM of %d observations", ErrData, len(v))
 	}
 	n := float64(len(v))
 	return math.Sqrt(npVar(v, ddof)) / math.Sqrt(n), nil

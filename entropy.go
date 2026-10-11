@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"slices"
+
+	"github.com/go-statistics/stats/internal/dd"
 )
 
 // EntropyOptions are the options of Entropy.
@@ -35,6 +37,11 @@ func Entropy[D Data](pk D, o *EntropyOptions) (float64, error) {
 		for i, t := range p {
 			vec[i] = entr(t / sp)
 		}
+	} else if r, ok := relEntropyDD(p, o.QK); ok {
+		if o.Base != 0 {
+			r /= crLog(o.Base)
+		}
+		return r, nil
 	} else {
 		sq := sum(o.QK)
 		for i, t := range p {
@@ -68,7 +75,10 @@ func relEntr(x, y float64) float64 {
 	case x != x || y != y:
 		return math.NaN()
 	case x > 0 && y > 0:
-		return x * crLog(x/y)
+		// log x - log y in double-double: log of the exact ratio, which
+		// matters when x and y are close (the ratio rounded to float64
+		// would lose the digits of its logarithm)
+		return x * dd.Sub(dd.LogAccurate(x), dd.LogAccurate(y)).Float()
 	case x == 0 && y >= 0:
 		return 0
 	}
@@ -242,4 +252,33 @@ func correaEntropy(x []float64, m int) float64 {
 		logs[k] = crLog(num / float64(float64(n)*den))
 	}
 	return -mean(logs)
+}
+
+// relEntropyDD is Σ p log(p/q) of the normalised distributions carried in
+// double-double throughout: the normalising sums, the logarithms of the
+// exact ratios and the final sum. Two close distributions make the terms
+// cancel, and SciPy's float64 result (its normalised probabilities are
+// rounded first) then keeps only a few digits; this one stays accurate. It
+// reports false when the data need the special cases (a zero, a negative
+// value, a NaN or an infinity), left to the float64 path.
+func relEntropyDD(p, q []float64) (float64, bool) {
+	var sp, sq dd.DD
+	for i, t := range p {
+		u := q[i]
+		if !(t > 0 && u > 0) || math.IsInf(t, 0) || math.IsInf(u, 0) {
+			return 0, false
+		}
+		sp, sq = dd.AddF(sp, t), dd.AddF(sq, u)
+	}
+	if len(p) == 0 || math.IsInf(sp.Hi, 0) || math.IsInf(sq.Hi, 0) {
+		return 0, false
+	}
+	logOf := func(a dd.DD) dd.DD { return dd.AddF(dd.LogAccurate(a.Hi), a.Lo/a.Hi) }
+	c := dd.Sub(logOf(sq), logOf(sp))
+	var acc dd.DD
+	for i, t := range p {
+		l := dd.Add(dd.Sub(dd.LogAccurate(t), dd.LogAccurate(q[i])), c)
+		acc = dd.Add(acc, dd.Mul(dd.Div(dd.F(t), sp), l))
+	}
+	return acc.Float(), true
 }
