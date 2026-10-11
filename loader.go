@@ -22,11 +22,11 @@ import (
 // accurate u - log(1+u) of log1pmxNeg, so that the mass keeps its relative
 // accuracy also at n = 1e15 and in the far tails.
 
-// stirlerrMin is where stirlerr switches from the shifted form to the
+// stirlerrMin is where stirlingErrDD switches from the shifted form to the
 // asymptotic series.
 const stirlerrMin = 10
 
-// stirlerr returns δ(x) = log Γ(x+1) - (x+1/2) log x + x - log(2π)/2 for
+// stirlingErrDD returns δ(x) = log Γ(x+1) - (x+1/2) log x + x - log(2π)/2 for
 // x > 0, as a double-double.
 //
 // For x >= 10 the Stirling series to the x^-19 term (truncation below
@@ -37,7 +37,7 @@ const stirlerrMin = 10
 //
 // all in double-double, so that the cancellation between the terms (of size
 // about 25) costs nothing.
-func stirlerr(x float64) dd.DD {
+func stirlingErrDD(x float64) dd.DD {
 	if x >= stirlerrMin {
 		return dd.F(stirlingSeries(x))
 	}
@@ -64,12 +64,12 @@ func stirlingSeries(x float64) float64 {
 	return r * (1.0/12 - r2*(1.0/360-r2*(1.0/1260-r2*(1.0/1680-r2*(1.0/1188-r2*(691.0/360360-r2*(1.0/156-r2*(3617.0/122400-r2*(43867.0/244188-r2*(174611.0/125400))))))))))
 }
 
-// bd0 returns D(x, M) = x log(x/M) + M - x for x > 0 and M > 0 (a
+// devianceTerm returns D(x, M) = x log(x/M) + M - x for x > 0 and M > 0 (a
 // double-double, so that the caller's np need not be rounded), as
 // M·g(u) with u = (x-M)/M and g(u) = (1+u) log(1+u) - u = u² - (1+u)·h(u),
 // h(u) = u - log(1+u) from log1pmx (accurate also for small u); for
 // x > 2M and x < M/2 directly.
-func bd0(x float64, m dd.DD) dd.DD {
+func devianceTerm(x float64, m dd.DD) dd.DD {
 	u := dd.Div(dd.AddF(dd.Neg(m), x), m)
 	if u.Hi > 1 || u.Hi < -0.5 {
 		// x > 2M or x < M/2: the direct form, without cancellation there
@@ -111,10 +111,10 @@ func binomTerm(k, nk float64, n, p, q dd.DD) (e, c dd.DD) {
 	case nk == 0:
 		return dd.Mul(n, logDD(p)), dd.F(1)
 	}
-	e = dd.Sub(stirlerr(n.Hi), stirlerr(k))
-	e = dd.Sub(e, stirlerr(nk))
-	e = dd.Sub(e, bd0(k, dd.Mul(n, p)))
-	e = dd.Sub(e, bd0(nk, dd.Mul(n, q)))
+	e = dd.Sub(stirlingErrDD(n.Hi), stirlingErrDD(k))
+	e = dd.Sub(e, stirlingErrDD(nk))
+	e = dd.Sub(e, devianceTerm(k, dd.Mul(n, p)))
+	e = dd.Sub(e, devianceTerm(nk, dd.Mul(n, q)))
 	c = dd.Sqrt(dd.Div(dd.Mul(n, inv2Pi), dd.MulFF(k, nk)))
 	return e, c
 }
@@ -125,7 +125,7 @@ func poissonTerm(k, mu float64) (e, c dd.DD) {
 	if k == 0 {
 		return dd.F(-mu), dd.F(1)
 	}
-	e = dd.Neg(dd.Add(stirlerr(k), bd0(k, dd.F(mu))))
+	e = dd.Neg(dd.Add(stirlingErrDD(k), devianceTerm(k, dd.F(mu))))
 	c = dd.Sqrt(dd.DivF(inv2Pi, k))
 	return e, c
 }
@@ -138,12 +138,6 @@ func logMassOf(e, c dd.DD) float64 {
 		return e.Hi
 	}
 	return dd.Add(e, logDD(c)).Float()
-}
-
-// oneMinus returns 1 - p as an exact double-double.
-func oneMinus(p float64) dd.DD {
-	h, l := dd.TwoSum(1, -p)
-	return dd.DD{Hi: h, Lo: l}
 }
 
 // expm1DD returns exp(a) - 1 as a double-double: from the exponential's

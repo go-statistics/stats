@@ -1,0 +1,7 @@
+small_n 6
+bulk 17
+large_n 3.7
+small_p 7.4
+p_near_1 2
+lower 1
+upper 9.1
