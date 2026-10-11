@@ -107,23 +107,57 @@ type contStd interface {
 // momentLocScale is E[(loc + scale·Y)^n] from the raw moments of Y, the
 // expansion SciPy's rv_continuous.moment uses:
 // loc^n · Σ C(n,k) (scale/loc)^k E[Y^k], or scale^n·E[Y^n] when loc is 0.
-func momentLocScale(n int, loc, scale float64, munp func(int) float64) float64 {
+// raw(k) is E[Y^k] (rawMoment).
+func momentLocScale(n int, loc, scale float64, raw func(int) float64) float64 {
 	switch {
 	case n < 0:
 		return math.NaN()
 	case n == 0:
 		return 1
 	case loc == 0:
-		return math.Pow(scale, float64(n)) * munp(n)
+		return math.Pow(scale, float64(n)) * raw(n)
 	}
 	fac := scale / loc
 	res := 1.0 // k = 0: C(n,0)·fac^0·E[Y^0]
 	c := 1.0
 	for k := 1; k <= n; k++ {
 		c = c * float64(n-k+1) / float64(k)
-		res += c * math.Pow(fac, float64(k)) * munp(k)
+		res += c * math.Pow(fac, float64(k)) * raw(k)
 	}
 	return res * math.Pow(loc, float64(n))
+}
+
+// stdMoments is what rawMoment needs of a standard form.
+type stdMoments interface {
+	mean() float64
+	variance() float64
+	skew() float64
+	kurtosis() float64
+	munp(n int) float64
+}
+
+// rawMoment is E[Y^n] for n >= 1: munp(n) when it is finite, and otherwise,
+// for n <= 4, the value SciPy's _moment_from_stats derives from the mean,
+// variance, skewness and kurtosis, so that a moment that does not exist is
+// +Inf or NaN exactly where SciPy says so.
+func rawMoment(s stdMoments, n int) float64 {
+	v := s.munp(n)
+	if finite(v) || n > 4 {
+		return v
+	}
+	mu, mu2 := s.mean(), s.variance()
+	switch n {
+	case 1:
+		return mu
+	case 2:
+		return mu2 + mu*mu
+	case 3:
+		mu3 := s.skew() * math.Pow(mu2, 1.5)
+		return mu3 + 3*mu*mu2 + mu*mu*mu
+	}
+	mu4 := (s.kurtosis() + 3) * (mu2 * mu2)
+	mu3 := s.skew() * math.Pow(mu2, 1.5)
+	return mu4 + 4*mu*mu3 + 6*mu*mu*mu2 + mu*mu*mu*mu
 }
 
 // locScaleDraws applies X = Y·scale + loc to fresh draws in place, in

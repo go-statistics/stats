@@ -1,6 +1,7 @@
 """Regenerate the accuracy fixtures in testdata/fixtures.
 
-    uv run --with mpmath==1.4.1 --with scipy==1.18.1 --with numpy==2.5.4 \
+    uv run --python cpython-3.12-macos-x86_64-none \
+        --with mpmath==1.4.1 --with scipy==1.18.1 --with numpy==2.5.4 \
         python testdata/gen/gen.py [fixture-name ...]
 
 Each fam_*.py module exposes FIXTURES = {name: builder}; a builder returns

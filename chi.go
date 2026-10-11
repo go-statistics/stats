@@ -55,27 +55,48 @@ func (s chiStd) logsf(x float64) float64 {
 func (s chiStd) ppf(p float64) float64 { return math.Sqrt(2 * special.GammaPInv(s.k, p)) }
 func (s chiStd) isf(q float64) float64 { return math.Sqrt(2 * special.GammaQInv(s.k, q)) }
 
-// mu is SciPy's mean √2·Γ(k+1/2)/Γ(k).
-func (s chiStd) mu() float64 { return math.Sqrt2 * gammaRatioHalf(s.k) }
+// moments returns the mean, variance, skewness and excess kurtosis from
+// SciPy's formulas, μ = √2·Γ(k+1/2)/Γ(k), μ2 = df - μ², ..., evaluated in
+// double-double: for large df they cancel catastrophically in float64
+// (SciPy's kurtosis at df = 400 is wrong in the first digit; here every
+// moment is within a few ulp of mpmath's).
+func (s chiStd) moments() (mean, mu2, g1, g2 float64) {
+	df := dd.F(2 * s.k)
+	mu := dd.Mul(dd.DD{Hi: 1.4142135623730951, Lo: -9.667293313452913e-17}, gammaRatioHalf(s.k))
+	mumu := dd.Mul(mu, mu)
+	v := dd.Sub(df, mumu)
+	// g1 = (2μ³ + μ(1 - 2df)) / μ2^1.5
+	num1 := dd.Add(dd.MulF(dd.Mul(mumu, mu), 2), dd.Mul(mu, dd.AddF(dd.MulF(df, -2), 1)))
+	sd := dd.Sqrt(v)
+	g1d := dd.Div(num1, dd.Mul(v, sd))
+	// g2 = (2df(1-df) - 6μ⁴ + 4μ²(2df-1)) / μ2²
+	num2 := dd.Mul(dd.MulF(df, 2), dd.AddF(dd.Neg(df), 1))
+	num2 = dd.Sub(num2, dd.MulF(dd.Mul(mumu, mumu), 6))
+	num2 = dd.Add(num2, dd.Mul(dd.MulF(mumu, 4), dd.AddF(dd.MulF(df, 2), -1)))
+	g2d := dd.Div(num2, dd.Mul(v, v))
+	return mu.Float(), v.Float(), g1d.Float(), g2d.Float()
+}
 
-func (s chiStd) mean() float64 { return s.mu() }
+func (s chiStd) mean() float64 {
+	m, _, _, _ := s.moments()
+	return m
+}
+
 func (s chiStd) variance() float64 {
-	mu := s.mu()
-	return 2*s.k - mu*mu
+	_, v, _, _ := s.moments()
+	return v
 }
+
 func (s chiStd) skew() float64 {
-	mu := s.mu()
-	df := 2 * s.k
-	mu2 := df - mu*mu
-	return (2*mu*mu*mu + mu*(1-2*df)) / math.Pow(mu2, 1.5)
+	_, _, g1, _ := s.moments()
+	return g1
 }
+
 func (s chiStd) kurtosis() float64 {
-	mu := s.mu()
-	df := 2 * s.k
-	mu2 := df - mu*mu
-	g2 := 2*df*(1-df) - 6*mu*mu*mu*mu + 4*mu*mu*(2*df-1)
-	return g2 / (mu2 * mu2)
+	_, _, _, g2 := s.moments()
+	return g2
 }
+
 func (s chiStd) median() float64 { return s.ppf(0.5) }
 
 func (s chiStd) entropy() float64 {
@@ -99,15 +120,6 @@ func (s chiStd) rvs(g *random.Generator, size []int) (*ndarray.Array, error) {
 		return nil, err
 	}
 	return a.Sqrt(), nil
-}
-
-// gammaRatioHalf is Γ(x+1/2)/Γ(x) (SciPy's poch(x, 1/2)).
-func gammaRatioHalf(x float64) float64 {
-	if x < 50 {
-		return special.Gamma(x+0.5) / special.Gamma(x)
-	}
-	r := 1 / x
-	return math.Sqrt(x) * (1 + r*(-0.125+r*(0.0078125+r*(0.0048828125+r*(-0.000640869140625+r*(-0.001522064208984375+r*(0.0002071857452392578+r*(0.0011719763278961182+r*(-0.0001557529903948307)))))))))
 }
 
 // FitChi returns the maximum-likelihood chi distribution for x:

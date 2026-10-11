@@ -435,7 +435,8 @@ func (d {{.Name}}) Moment(n int) float64 {
 	if !d.ok() {
 		return math.NaN()
 	}
-	return momentLocScale(n, d.Loc, d.Scale, d.std().munp)
+	s := d.std()
+	return momentLocScale(n, d.Loc, d.Scale, func(k int) float64 { return rawMoment(s, k) })
 }
 
 // Interval is the equal-tailed interval with the given probability mass:
@@ -679,7 +680,8 @@ func (d {{.Name}}) Moment(n int) float64 {
 	if !d.ok() {
 		return math.NaN()
 	}
-	return momentLocScale(n, d.Loc, 1, d.std().munp)
+	s := d.std()
+	return momentLocScale(n, d.Loc, 1, func(k int) float64 { return rawMoment(s, k) })
 }
 
 // Interval is the interval with the given probability mass between

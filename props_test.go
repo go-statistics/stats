@@ -100,11 +100,11 @@ func TestDistributionContract(t *testing.T) {
 					x := fns["ppf"](p)
 					xs := fns["isf"](p)
 					if pf.Kind == "continuous" {
-						if c := fns["cdf"](x); math.Abs(c-p) > 1e-9*p+1e-15 {
-							t.Errorf("%s %v cdf(ppf(%g)) = %v", name, in.Params, p, c)
+						if !quantileBrackets(fns["cdf"], x, p, false) {
+							t.Errorf("%s %v cdf(ppf(%g)) = %v (x = %v)", name, in.Params, p, fns["cdf"](x), x)
 						}
-						if s := fns["sf"](xs); math.Abs(s-p) > 1e-9*p+1e-15 {
-							t.Errorf("%s %v sf(isf(%g)) = %v", name, in.Params, p, s)
+						if !quantileBrackets(fns["sf"], xs, p, true) {
+							t.Errorf("%s %v sf(isf(%g)) = %v (x = %v)", name, in.Params, p, fns["sf"](xs), xs)
 						}
 					} else {
 						if fns["cdf"](x) < p || (x > lo && fns["cdf"](x-1) >= p) {
@@ -175,6 +175,22 @@ func TestDistributionContract(t *testing.T) {
 			}
 		})
 	}
+}
+
+// quantileBrackets reports whether x is a quantile of p for the monotone
+// function f (increasing, or decreasing when dec) up to the resolution of
+// float64 x: f(x) is within 1e-9 relative of p, or p lies between f at
+// the neighbours of x (the exact quantile is not representable).
+func quantileBrackets(f func(float64) float64, x, p float64, dec bool) bool {
+	if math.Abs(f(x)-p) <= 1e-9*p+1e-300 {
+		return true
+	}
+	lo, hi := f(math.Nextafter(x, math.Inf(-1))), f(math.Nextafter(x, math.Inf(1)))
+	if dec {
+		lo, hi = hi, lo
+	}
+	tol := 1e-9 * p
+	return lo <= p+tol && p-tol <= hi
 }
 
 func TestMomentLocScale(t *testing.T) {

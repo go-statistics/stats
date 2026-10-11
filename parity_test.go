@@ -81,6 +81,7 @@ type parityInstance struct {
 	Points    []map[string]jf `json:"points"`
 	Quantiles []map[string]jf `json:"quantiles"`
 	Rvs       []parityDraws   `json:"rvs"`
+	MPMath    map[string]jf   `json:"mpmath"`
 }
 
 type parityFit struct {
@@ -129,11 +130,18 @@ func loadParity(t testing.TB) []parityFile {
 	return out
 }
 
-// Tolerances of the parity comparison, relative, per Go type (default
-// parityRtol). SciPy is not the reference for accuracy (the ULP fixtures
-// are); these only guard against a formula that is wrong, so they are
-// loose enough to absorb SciPy's own rounding in the bulk.
-const parityRtol = 1e-11
+// Tolerances of the parity comparison, relative. SciPy is not the
+// reference for accuracy (the ULP fixtures are, against mpmath); these only
+// guard against a formula that is wrong, so they absorb SciPy's own
+// rounding: parityRtol for the moments, entropy, median, interval and
+// support (per Go type: parityTol), parityPointRtol for the function values
+// and quantiles at the fixture's points (per type: parityPointTol).
+const (
+	parityRtol      = 1e-11
+	parityPointRtol = 1e-9
+)
+
+var parityPointTol = map[string]float64{}
 
 var parityTol = map[string]float64{}
 
@@ -202,9 +210,12 @@ func TestParity(t *testing.T) {
 			if e.kind != pf.Kind {
 				t.Fatalf("kind %s, fixture says %s", e.kind, pf.Kind)
 			}
-			rtol := parityRtol
+			rtol, prtol := parityRtol, parityPointRtol
 			if v, ok := parityTol[pf.Go]; ok {
 				rtol = v
+			}
+			if v, ok := parityPointTol[pf.Go]; ok {
+				prtol = v
 			}
 			for i, in := range pf.Instances {
 				v, err := e.construct(in.Params.floats())
@@ -213,10 +224,21 @@ func TestParity(t *testing.T) {
 				}
 				name := fmt.Sprintf("%s%v", pf.Go, in.Params)
 				d := v.(momenter)
-				check := func(what string, got float64, want jf) {
-					if !closeTo(got, float64(want), rtol) {
+				checkTol := func(what string, got float64, want jf, tol float64) {
+					if !closeTo(got, float64(want), tol) {
 						t.Errorf("%s %s = %v, SciPy %v", name, what, got, float64(want))
 					}
+				}
+				check := func(what string, got float64, want jf) {
+					if exact, ok := in.MPMath[what]; ok {
+						// SciPy's value is known to be inaccurate here: hold
+						// ours to mpmath's instead.
+						if !closeTo(got, float64(exact), 1e-14) {
+							t.Errorf("%s %s = %v, mpmath %v (SciPy %v)", name, what, got, float64(exact), float64(want))
+						}
+						return
+					}
+					checkTol(what, got, want, rtol)
 				}
 				check("mean", d.Mean(), in.Mean)
 				check("var", d.Var(), in.Var)
@@ -241,13 +263,13 @@ func TestParity(t *testing.T) {
 						if k == "x" {
 							continue
 						}
-						check(fmt.Sprintf("%s(%v)", k, x), fns[k](x), want)
+						checkTol(fmt.Sprintf("%s(%v)", k, x), fns[k](x), want, prtol)
 					}
 				}
 				for _, q := range in.Quantiles {
 					p := float64(q["p"])
-					check(fmt.Sprintf("ppf(%v)", p), fns["ppf"](p), q["ppf"])
-					check(fmt.Sprintf("isf(%v)", p), fns["isf"](p), q["isf"])
+					checkTol(fmt.Sprintf("ppf(%v)", p), fns["ppf"](p), q["ppf"], prtol)
+					checkTol(fmt.Sprintf("isf(%v)", p), fns["isf"](p), q["isf"], prtol)
 				}
 				_ = i
 			}
