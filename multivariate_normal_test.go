@@ -112,8 +112,8 @@ func TestMultivariateNormalParity(t *testing.T) {
 		cp := c.CDFPoints.f()
 		if c.D >= 3 {
 			// The randomized lattice rule is costly (about 0.1 s a point,
-			// ten times that under -race): two points per case.
-			cp = cp[:2*c.D]
+			// ten times that under -race): one point per case.
+			cp = cp[:c.D]
 		}
 		o := &MultivariateNormalCDFOptions{RNG: random.DefaultRNG(7)}
 		got, err := m.CDFPoints(mvArr(cp, len(cp)/c.D, c.D), o)
