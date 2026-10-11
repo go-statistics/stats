@@ -41,8 +41,9 @@ func init() {
 	// go-ndarray's von Mises sampler differs from NumPy's in the last
 	// bits of about one draw in eight (its acos/cos round differently), and
 	// SciPy's wrap np.mod(x + π, 2π) - π magnifies a last-bit difference
-	// of x + π into up to a million ulps of a draw near 0.
-	rvsULP["VonMises"] = 1e6
+	// of x + π into millions of ulps of a draw near 0 (measured 1.5e6 on
+	// amd64; the difference is a few ulps of π in absolute terms).
+	rvsULP["VonMises"] = 4e6
 	// SciPy's Cauchy draws are Boost's -1/tan(π·U) with the C library's
 	// tan, which on the reference build is its sin/cos ratio and misrounds
 	// a third of its results by up to 3 ulp; ours rounds the same formula
