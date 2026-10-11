@@ -67,20 +67,20 @@ type parityDraws struct {
 }
 
 type parityInstance struct {
-	Params    jmap               `json:"params"`
-	Mean      jf                 `json:"mean"`
-	Var       jf                 `json:"var"`
-	Std       jf                 `json:"std"`
-	Skew      jf                 `json:"skew"`
-	Kurtosis  jf                 `json:"kurtosis"`
-	Median    jf                 `json:"median"`
-	Entropy   jf                 `json:"entropy"`
-	Moments   []jf               `json:"moments"`
-	Interval  []jf               `json:"interval"`
-	Support   []jf               `json:"support"`
-	Points    []map[string]jf    `json:"points"`
-	Quantiles []map[string]jf    `json:"quantiles"`
-	Rvs       []parityDraws      `json:"rvs"`
+	Params    jmap            `json:"params"`
+	Mean      jf              `json:"mean"`
+	Var       jf              `json:"var"`
+	Std       jf              `json:"std"`
+	Skew      jf              `json:"skew"`
+	Kurtosis  jf              `json:"kurtosis"`
+	Median    jf              `json:"median"`
+	Entropy   jf              `json:"entropy"`
+	Moments   []jf            `json:"moments"`
+	Interval  []jf            `json:"interval"`
+	Support   []jf            `json:"support"`
+	Points    []map[string]jf `json:"points"`
+	Quantiles []map[string]jf `json:"quantiles"`
+	Rvs       []parityDraws   `json:"rvs"`
 }
 
 type parityFit struct {
@@ -91,13 +91,13 @@ type parityFit struct {
 }
 
 type parityFile struct {
-	SciPy     string               `json:"scipy"`
-	Go        string               `json:"go"`
-	Kind      string               `json:"kind"`
-	Instances []parityInstance     `json:"instances"`
-	Invalid   []jmap               `json:"invalid"`
-	Fit       []parityFit          `json:"fit"`
-	FitKind   string               `json:"fit_kind"`
+	SciPy     string           `json:"scipy"`
+	Go        string           `json:"go"`
+	Kind      string           `json:"kind"`
+	Instances []parityInstance `json:"instances"`
+	Invalid   []jmap           `json:"invalid"`
+	Fit       []parityFit      `json:"fit"`
+	FitKind   string           `json:"fit_kind"`
 }
 
 func loadParity(t testing.TB) []parityFile {

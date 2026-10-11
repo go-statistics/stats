@@ -139,3 +139,99 @@ func sortedCopy(v []float64) []float64 {
 	sort.Float64s(s)
 	return s
 }
+
+// fitLocScaleSupport is SciPy's starting point for loc and scale given the
+// shape (rv_continuous._fit_loc_scale_support): the method of moments, moved
+// so that the support covers the data when it does not.
+func fitLocScaleSupport(v []float64, s contStd) (loc, scale float64) {
+	mu, mu2 := s.mean(), s.variance()
+	muhat, mu2hat := mean(v), variance(v, 0)
+	scale = math.Sqrt(mu2hat / mu2)
+	loc = muhat - scale*mu
+	if !finite(loc) {
+		loc = 0
+	}
+	if !(finite(scale) && scale > 0) {
+		scale = 1
+	}
+	a, b := s.support()
+	width := b - a
+	lo, hi := minMax(v)
+	if !(width > 0) {
+		return loc, scale
+	}
+	ahat, bhat := loc+a*scale, loc+b*scale
+	if ahat < lo && hi < bhat {
+		return loc, scale
+	}
+	margin := (hi - lo) * 0.1
+	if !math.IsInf(width, 1) {
+		return (lo - a) - margin, (hi - lo + 2*margin) / width
+	}
+	if !math.IsInf(a, -1) {
+		return (lo - a) - margin, 1
+	}
+	return (hi - b) + margin, 1
+}
+
+func minMax(v []float64) (lo, hi float64) {
+	lo, hi = v[0], v[0]
+	for _, x := range v[1:] {
+		lo = math.Min(lo, x)
+		hi = math.Max(hi, x)
+	}
+	return lo, hi
+}
+
+// contLogLik is the log-likelihood of v under the standard form s moved by
+// loc and scale, with the boundary rules of LogPDF; NaN for invalid
+// parameters.
+func contLogLik(v []float64, s contStd, loc, scale float64) float64 {
+	if !(scale > 0) || !s.valid() {
+		return math.NaN()
+	}
+	a, b := s.support()
+	ll := 0.0
+	for _, x := range v {
+		z := (x - loc) / scale
+		if z < a || z > b || math.IsInf(z, 0) {
+			return math.Inf(-1)
+		}
+		ll += s.logpdf(z)
+	}
+	return ll - float64(len(v))*math.Log(scale)
+}
+
+// fitContinuous is the numerical maximum-likelihood fit of a continuous
+// family with the given shape parameters (names and which are positive),
+// started as SciPy starts it: shapes from start, loc and scale from
+// fitLocScaleSupport. It returns the shapes, loc and scale.
+func fitContinuous(v []float64, fixed map[string]float64, names []string, positive []bool, start []float64, mk func(shapes []float64) contStd) ([]float64, float64, float64, error) {
+	k := len(names)
+	sh := append([]float64(nil), start...)
+	for i, n := range names {
+		if f, ok := fixed[n]; ok {
+			sh[i] = f
+		}
+	}
+	loc, scale := fitLocScaleSupport(v, mk(sh))
+	if f, ok := fixed["Loc"]; ok {
+		loc = f
+	}
+	if f, ok := fixed["Scale"]; ok {
+		scale = f
+	}
+	p := mleProblem{
+		names:    append(append([]string(nil), names...), "Loc", "Scale"),
+		positive: append(append([]bool(nil), positive...), false, true),
+		start:    append(append([]float64(nil), sh...), loc, scale),
+		loglik: func(th []float64) float64 {
+			return contLogLik(v, mk(th[:k]), th[k], th[k+1])
+		},
+	}
+	th, err := fitMLE(p, fixed)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+	return th[:k], th[k], th[k+1], nil
+}
