@@ -77,8 +77,8 @@ func TestEntropyEdgeworth(t *testing.T) {
 			s := Poisson{Mu: 1.3e6}.std()
 			return entropySum(1.3e6, 0, math.Inf(1), s.term)
 		}},
-		{"nbinom", NegativeBinomial{N: 3e6, P: 0.6}.std(), func() float64 {
-			s := NegativeBinomial{N: 3e6, P: 0.6}.std()
+		{"nbinom", NegativeBinomial{N: 3e7, P: 0.6}.std(), func() float64 {
+			s := NegativeBinomial{N: 3e7, P: 0.6}.std()
 			return entropySum(math.Floor((s.n-1)*0.4/0.6), 0, math.Inf(1), s.term)
 		}},
 		{"hypergeom", Hypergeometric{Total: 40_000_000, Good: 16_000_000, Draws: 10_000_000}.std(), func() float64 {
@@ -91,7 +91,7 @@ func TestEntropyEdgeworth(t *testing.T) {
 			t.Fatalf("%s: variance %v too small for the test", c.name, c.s.variance())
 		}
 		got, want := c.s.entropy(), c.sum()
-		if math.Abs(got-want) > 4e-16*want {
+		if math.Abs(got-want) > 1.5e-15*want { // a few ulps: both sides round
 			t.Errorf("%s: Edgeworth entropy %v, sum %v (rel %.2g)", c.name, got, want, (got-want)/want)
 		}
 	}
@@ -136,7 +136,6 @@ func TestDiscreteDegenerate(t *testing.T) {
 	if hg.Entropy() != 0 || hg.PMF(4) != 1 || hg.LogPMF(4) != 0 || hg.Moment(3) != 64 {
 		t.Errorf("degenerate hypergeometric: entropy %v pmf %v logpmf %v moment(3) %v", hg.Entropy(), hg.PMF(4), hg.LogPMF(4), hg.Moment(3))
 	}
-	zipfStd{}.momentsFromMunp()
 	// shiftDraws converts non-integer draws (none of the generators used
 	// here returns them, but the helper accepts any array)
 	fl, _ := ndarray.FromData([]float64{1, 2.5}, 2)

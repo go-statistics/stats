@@ -139,7 +139,7 @@ type stdMoments interface {
 // munpMoments marks a standard form whose SciPy distribution defines no
 // _stats (scipy.stats.zipf): SciPy's moment(n) is then _munp(n) for every
 // n, +Inf included, never derived from the skewness or kurtosis.
-type munpMoments interface{ momentsFromMunp() }
+type munpMoments interface{ momentsFromMunp() bool }
 
 // rawMoment is E[Y^n] for n >= 1: munp(n) when it is finite (or when the
 // standard form is a munpMoments), and otherwise, for n <= 4, the value
@@ -148,7 +148,7 @@ type munpMoments interface{ momentsFromMunp() }
 // where SciPy says so.
 func rawMoment(s stdMoments, n int) float64 {
 	v := s.munp(n)
-	if _, ok := s.(munpMoments); ok || finite(v) || n > 4 {
+	if m, ok := s.(munpMoments); ok && m.momentsFromMunp() || finite(v) || n > 4 {
 		return v
 	}
 	mu, mu2 := s.mean(), s.variance()

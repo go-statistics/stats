@@ -7,7 +7,7 @@ Regions: a near 1 (to 1 + 1e-6), moderate and large a, k up to 1e15.
 SciPy's zipf has no cdf, sf or quantile of its own: the generic ones sum
 the masses from 1 to k, which for k beyond a few million exhausts memory.
 The SciPy column is therefore left out ("-") where k (or, for the
-quantiles, the answer) exceeds 1e6.
+quantiles, the answer) exceeds 1e4 (each generic quantile call sums every mass up to the answer, repeatedly).
 """
 
 import math
@@ -20,7 +20,7 @@ import discfix
 from discfix import ilogu, logu, probs
 
 N = 250
-KMAX_SCIPY = 1e6
+KMAX_SCIPY = 1e4
 
 
 def logpmf(k, a):
@@ -88,7 +88,9 @@ def pcases(name, fn):
     for region in ("core", "lower", "upper"):
         for ar in ("near1", "core", "large_a"):
             n = 0
-            while n < N // 3:
+            for _ in range(200 * N):  # some combinations have no such case
+                if n >= N // 3:
+                    break
                 p, a = probs(r, region), _a(r, ar)
                 q = p if fn == "isf" else 1 - p
                 if q <= 0 or not (_estimate(q, a) < 1e15):

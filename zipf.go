@@ -52,7 +52,7 @@ type zipfStd struct {
 func (s zipfStd) lz() dd.DD { return log1pDD(s.eta) }
 
 // momentsFromMunp: SciPy's zipf has no _stats, its moment(n) is _munp(n).
-func (s zipfStd) momentsFromMunp() {}
+func (s zipfStd) momentsFromMunp() bool { return true }
 
 func (s zipfStd) valid() bool               { return s.a > 1 && !math.IsInf(s.a, 1) }
 func (s zipfStd) support() (lo, hi float64) { return 1, math.Inf(1) }
