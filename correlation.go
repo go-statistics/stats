@@ -164,8 +164,15 @@ func Spearmanr[D Data](x, y D, o *CorrelationOptions) (TestResult, error) {
 	if len(a) <= 1 || hasNaN(a, b) {
 		return TestResult{qnan, qnan}, nil
 	}
-	ra, _ := rankWithTies(a, RankAverage, false)
-	rb, _ := rankWithTies(b, RankAverage, false)
+	// The two rankings (each a sort) run concurrently.
+	var ra, rb []float64
+	done := make(chan struct{})
+	go func() {
+		ra, _ = rankWithTies(a, RankAverage, false)
+		close(done)
+	}()
+	rb, _ = rankWithTies(b, RankAverage, false)
+	<-done
 	// np.corrcoef: the covariance matrix scaled by the standard deviations.
 	n := float64(len(a))
 	xm, ym := deviations(ra), deviations(rb)
@@ -298,7 +305,7 @@ type kendallPair struct{ x, y int }
 
 // denseRanks returns the dense ranks (1, 2, ...) of the values.
 func denseRanks(a []float64) []int {
-	p := sortedPairs(a)
+	p := sortedPairs(a, false)
 	r := make([]int, len(a))
 	k := 0
 	for i, q := range p {

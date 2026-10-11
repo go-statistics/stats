@@ -117,10 +117,12 @@ func correctionSign(z float64, alt Alternative) float64 {
 }
 
 // mwu is the null distribution of the Mann-Whitney U statistic for
-// samples of sizes n1 <= n2, SciPy's _MWU: the counts of the
-// configurations by Löffler's recurrence
-// c(u) = Σ_{i<u} c(i)·σ(u-i) / u, σ(a) the sum of the divisors d of a with
-// d <= n1, minus those with n2 < d <= n1+n2.
+// samples of sizes n1 <= n2 (SciPy's _MWU). The number of configurations
+// with U = u is the coefficient of q^u in the Gaussian binomial
+// [n1+n2 choose n1]_q = Π_{i=1}^{n1} (1 - q^(n2+i)) / (1 - q^i), built
+// factor by factor: after step i the polynomial is [n2+i choose i]_q, all
+// of whose coefficients are non-negative integers (exact while below
+// 2^53), at O(n1·u) cost where SciPy's recurrence costs O(u²).
 type mwu struct {
 	n1, n2 int
 }
@@ -130,31 +132,21 @@ func newMWU(a, b int) mwu { return mwu{min(a, b), max(a, b)} }
 // pmfs returns P(U = u) for u = 0..maxu.
 func (m mwu) pmfs(maxu int) []float64 {
 	n1, n2 := m.n1, m.n2
-	sigma := make([]float64, maxu+1)
-	for d := 1; d <= n1; d++ {
-		for i := d; i <= maxu; i += d {
-			sigma[i] += float64(d)
+	c := make([]float64, maxu+1)
+	c[0] = 1
+	for i := 1; i <= n1; i++ {
+		for u := i; u <= maxu; u++ { // divide by 1 - q^i
+			c[u] += c[u-i]
 		}
-	}
-	for d := n2 + 1; d <= n2+n1; d++ {
-		for i := d; i <= maxu; i += d {
-			sigma[i] -= float64(d)
+		for u := maxu; u >= n2+i; u-- { // multiply by 1 - q^(n2+i)
+			c[u] -= c[u-n2-i]
 		}
-	}
-	conf := make([]float64, maxu+1)
-	conf[0] = 1
-	for u := 1; u <= maxu; u++ {
-		s := 0.0
-		for i := 0; i < u; i++ {
-			s += conf[i] * sigma[u-i]
-		}
-		conf[u] = s / float64(u)
 	}
 	total := special.Binom(float64(n1+n2), float64(n1))
-	for i := range conf {
-		conf[i] /= total
+	for i := range c {
+		c[i] /= total
 	}
-	return conf
+	return c
 }
 
 // sf is P(U >= k), SciPy's _MWU.sf: the complement's CDF where it is

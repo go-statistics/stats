@@ -174,9 +174,104 @@ func Chi2Contingency(observed *ndarray.Array, o *Chi2ContingencyOptions) (Chi2Co
 		res.Statistic, res.PValue = qnan, qnan
 		return res, nil
 	}
-	r := powerDivergence(obs, exp, float64(len(obs)-1-dof), lambda)
+	r := balancedDivergence(obs, exp, float64(len(obs)-1-dof), lambda)
 	res.Statistic, res.PValue = r.Statistic, r.PValue
 	return res, nil
+}
+
+// balancedDivergence is the power divergence statistic for observed and
+// expected frequencies with equal totals (as in a contingency table, where
+// the expected frequencies come from the margins). Each term is written
+// with its part linear in f - e removed (Σ (f - e) = 0), which leaves the
+// sum unchanged but makes every term non-negative: SciPy sums terms of
+// both signs that cancel, and loses all accuracy when the table is close
+// to independence (a G statistic of 2.5e-7 off by 9e-8 relative).
+func balancedDivergence(obs, exp []float64, ddof, lambda float64) TestResult {
+	if lambda == 1 {
+		return powerDivergence(obs, exp, ddof, lambda)
+	}
+	terms := make([]float64, len(obs))
+	for i, f := range obs {
+		e := exp[i]
+		t := (f - e) / e
+		switch lambda {
+		case 0:
+			// 2e[(1+t)·log(1+t) - t]
+			if f == 0 {
+				terms[i] = 2 * e
+			} else {
+				terms[i] = 2 * e * xlog1pxMinusX(t)
+			}
+		case -1:
+			// 2e[t - log(1+t)]
+			terms[i] = 2 * e * xMinusLog1p(t)
+		default:
+			// e[(1+t)^(λ+1) - 1 - (λ+1)t] / (λ(λ+1)/2); for f = 0 and
+			// λ < 0 SciPy's term is 0·∞ = NaN, kept for parity.
+			if f == 0 && lambda < 0 {
+				terms[i] = qnan
+				continue
+			}
+			terms[i] = e * powExcess(t, lambda+1) / (0.5 * lambda * (lambda + 1))
+		}
+	}
+	stat := sum(terms)
+	df := float64(len(obs)) - 1 - ddof
+	return TestResult{stat, chi2SF(df, stat)}
+}
+
+// xlog1pxMinusX is (1+t)·log(1+t) - t, by its series Σ_{k>=2}
+// (-1)^k t^k / (k(k-1)) for small |t|.
+func xlog1pxMinusX(t float64) float64 {
+	if math.Abs(t) < 0.1 {
+		s, p := 0.0, t
+		for k := 2; k < 60; k++ {
+			p *= -t
+			s1 := s - p/float64(k*(k-1))
+			if s1 == s {
+				break
+			}
+			s = s1
+		}
+		return s
+	}
+	return (1+t)*math.Log1p(t) - t
+}
+
+// xMinusLog1p is t - log(1+t), by its series Σ_{k>=2} (-1)^k t^k / k for
+// small |t|.
+func xMinusLog1p(t float64) float64 {
+	if math.Abs(t) < 0.1 {
+		s, p := 0.0, t
+		for k := 2; k < 60; k++ {
+			p *= -t
+			s1 := s - p/float64(k)
+			if s1 == s {
+				break
+			}
+			s = s1
+		}
+		return s
+	}
+	return t - math.Log1p(t)
+}
+
+// powExcess is (1+t)^a - 1 - a·t, by its binomial series Σ_{k>=2}
+// C(a,k) t^k for small |t|.
+func powExcess(t, a float64) float64 {
+	if math.Abs(t) < 0.1 {
+		s, p := 0.0, a*t
+		for k := 2; k < 60; k++ {
+			p *= (a - float64(k-1)) / float64(k) * t
+			s1 := s + p
+			if s1 == s {
+				break
+			}
+			s = s1
+		}
+		return s
+	}
+	return math.Expm1(a*math.Log1p(t)) - a*t
 }
 
 // expectedFreq is scipy.stats.contingency.expected_freq: the product of

@@ -147,19 +147,58 @@ func clipTo(x, lo, hi float64) float64 {
 	return x
 }
 
+// sumMapped is sum(f(a)) without forming f(a): NumPy's pairwise
+// summation (the recursion and the 8-way unrolled leaves of data.go's
+// sum), with f applied to each element as the leaves read it, so that the
+// result is the bit-identical np.sum of the mapped array.
+func sumMapped(a []float64, f func(float64) float64) float64 {
+	n := len(a)
+	switch {
+	case n < 8:
+		r := 0.0
+		for _, v := range a {
+			r += f(v)
+		}
+		return r
+	case n <= 128:
+		var r [8]float64
+		for k := 0; k < 8; k++ {
+			r[k] = f(a[k])
+		}
+		i := 8
+		for ; i < n-n%8; i += 8 {
+			r[0] += f(a[i])
+			r[1] += f(a[i+1])
+			r[2] += f(a[i+2])
+			r[3] += f(a[i+3])
+			r[4] += f(a[i+4])
+			r[5] += f(a[i+5])
+			r[6] += f(a[i+6])
+			r[7] += f(a[i+7])
+		}
+		res := ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]))
+		for ; i < n; i++ {
+			res += f(a[i])
+		}
+		return res
+	default:
+		n2 := n / 2
+		n2 -= n2 % 8
+		return sumMapped(a[:n2], f) + sumMapped(a[n2:], f)
+	}
+}
+
 // centralMoment is SciPy's _moment(a, order) about the given center:
 // mean((a - center)**order), the powers formed by repeated products.
 func centralMoment(a []float64, center float64, order int) float64 {
-	d := make([]float64, len(a))
-	for i, v := range a {
+	return sumMapped(a, func(v float64) float64 {
 		e := v - center
 		p := e
 		for k := 1; k < order; k++ {
 			p = float64(p * e)
 		}
-		d[i] = p
-	}
-	return mean(d)
+		return p
+	}) / float64(len(a))
 }
 
 // sampleSkew is scipy.stats.skew(a) (biased): m3/m2^1.5, NaN where the

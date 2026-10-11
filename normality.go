@@ -282,22 +282,26 @@ func fitLogisticAD(x []float64, xbar float64) (loc, scale float64, err error) {
 // fitGumbelR is scipy.stats.gumbel_r.fit(data): the scale solving the
 // maximum-likelihood equation mean(x) - Σ x·e^{-x/s} / Σ e^{-x/s} = s by
 // Brent's method (bracket grown from (0.5, 2), xtol = rtol = 1e-14), then
-// loc = -s·(logsumexp(-x/s) - log n).
+// loc = -s·(logsumexp(-x/s) - log n). The equation is written in the
+// deviations d = x - min(x), which leaves it unchanged mathematically but
+// removes the cancellation SciPy suffers between mean(x) and the weighted
+// mean when the data sit far from 0 (data near 1e8 leave SciPy's scale
+// with an error of about 1e-9).
 func fitGumbelR(data []float64) (loc, scale float64, err error) {
 	n := float64(len(data))
-	dm := mean(data)
-	sdata := make([]float64, len(data))
+	xmin := slices.Min(data)
+	d := make([]float64, len(data))
+	for i, x := range data {
+		d[i] = x - xmin
+	}
+	dm := mean(d)
+	sd := make([]float64, len(data))
 	wts := make([]float64, len(data))
 	prod := make([]float64, len(data))
 	fn := func(s float64) float64 {
-		mx := math.Inf(-1)
-		for i, x := range data {
-			sdata[i] = -x / s
-			mx = math.Max(mx, sdata[i])
-		}
-		for i, x := range data {
-			wts[i] = math.Exp(sdata[i] - mx)
-			prod[i] = x * wts[i]
+		for i, v := range d {
+			wts[i] = math.Exp(-v / s)
+			prod[i] = v * wts[i]
 		}
 		return dm - sum(prod)/sum(wts) - s
 	}
@@ -320,10 +324,10 @@ func fitGumbelR(data []float64) (loc, scale float64, err error) {
 		return qnan, qnan, fmt.Errorf("%w: gumbel fit: %v", ErrFit, err)
 	}
 	scale = r.Root
-	for i, x := range data {
-		sdata[i] = -x / scale
+	for i, v := range d {
+		sd[i] = -v / scale
 	}
-	loc = -scale * (special.LogSumExp(sdata) - math.Log(n))
+	loc = xmin - scale*(special.LogSumExp(sd)-math.Log(n))
 	return loc, scale, nil
 }
 

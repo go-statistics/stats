@@ -198,7 +198,7 @@ func kolmogn(n int, x float64, cdf bool) float64 {
 		}
 		if nxsquared <= 4 {
 			prob := kolmogPomeranz(n, x)
-			return selectProb(prob, 1-prob, cdf)
+			return selectProb(prob.Float(), dd.Sub(dd.F(1), prob).Float(), cdf)
 		}
 		prob := 2 * smirnovSF(n, x)
 		return selectProb(1-prob, prob, cdf)
@@ -326,36 +326,47 @@ func pomeranzBounds(i, n, ll, ceilf, roundf int) (int, int) {
 	return max(j1+2, 0), min(j2, n)
 }
 
-// kolmogPomeranz is Pr(D_n <= x) by Pomeranz's recursion: SciPy's
-// _kolmogn_Pomeranz.
-func kolmogPomeranz(n int, x float64) float64 {
+// kolmogPomeranz is Pr(D_n <= x) by Pomeranz's recursion, SciPy's
+// _kolmogn_Pomeranz, carried out in double-double: the recursion is used
+// where the upper tail is as small as 1e-3, and 1 - CDF then needs the CDF
+// to well beyond double precision (SciPy's float64 recursion leaves an
+// error of about 1e-11 relative in the survival function there).
+func kolmogPomeranz(n int, x float64) dd.DD {
 	fn := float64(n)
-	t := fn * x
-	ll := int(math.Floor(t))
-	f := t - float64(ll)
-	g := math.Min(f, 1-f)
+	t := dd.MulFF(fn, x)
+	ll := int(math.Floor(t.Hi))
+	if float64(ll) == t.Hi && t.Lo < 0 {
+		ll--
+	}
+	f := dd.AddF(t, -float64(ll)) // fractional part of n·x, exact
+	g := f
+	if f.Hi > 0.5 {
+		g = dd.Sub(dd.F(1), f)
+	}
 	ceilf, roundf := 0, 0
-	if f > 0 {
+	if f.Hi > 0 {
 		ceilf = 1
 	}
-	if f > 0.5 {
+	if f.Hi > 0.5 || (f.Hi == 0.5 && f.Lo > 0) {
 		roundf = 1
 	}
 	npwrs := 2 * (ll + 1)
-	gpower := make([]float64, npwrs)
-	twogpower := make([]float64, npwrs)
-	onem2gpower := make([]float64, npwrs)
-	gpower[0], twogpower[0], onem2gpower[0] = 1, 1, 1
-	gn, tgn, omn := g/fn, 2*g/fn, (1-2*g)/fn
+	gpower := make([]dd.DD, npwrs)
+	twogpower := make([]dd.DD, npwrs)
+	onem2gpower := make([]dd.DD, npwrs)
+	gpower[0], twogpower[0], onem2gpower[0] = dd.F(1), dd.F(1), dd.F(1)
+	gn := dd.DivF(g, fn)
+	tgn := dd.MulF(gn, 2)
+	omn := dd.DivF(dd.Sub(dd.F(1), dd.MulF(g, 2)), fn)
 	for m := 1; m < npwrs; m++ {
 		fm := float64(m)
-		gpower[m] = gpower[m-1] * gn / fm
-		twogpower[m] = twogpower[m-1] * tgn / fm
-		onem2gpower[m] = onem2gpower[m-1] * omn / fm
+		gpower[m] = dd.DivF(dd.Mul(gpower[m-1], gn), fm)
+		twogpower[m] = dd.DivF(dd.Mul(twogpower[m-1], tgn), fm)
+		onem2gpower[m] = dd.DivF(dd.Mul(onem2gpower[m-1], omn), fm)
 	}
-	V0 := make([]float64, npwrs)
-	V1 := make([]float64, npwrs)
-	V1[0] = 1
+	V0 := make([]dd.DD, npwrs)
+	V1 := make([]dd.DD, npwrs)
+	V1[0] = dd.F(1)
 	V0s, V1s := 0, 0
 	expnt := 0
 	j1, j2 := pomeranzBounds(0, n, ll, ceilf, roundf)
@@ -365,7 +376,7 @@ func kolmogPomeranz(n int, x float64) float64 {
 		V0s, V1s = V1s, V0s
 		clear(V1)
 		j1, j2 = pomeranzBounds(i, n, ll, ceilf, roundf)
-		var pwrs []float64
+		var pwrs []dd.DD
 		switch {
 		case i == 1 || i == 2*n+1:
 			pwrs = gpower
@@ -382,16 +393,16 @@ func kolmogPomeranz(n int, x float64) float64 {
 			vmax := 0.0
 			for q := 0; q < cl; q++ {
 				c := start + q
-				s := 0.0
+				var s dd.DD
 				for r := max(0, c-ln2+1); r <= min(c, ln2-1); r++ {
-					s += a[r] * pwrs[c-r]
+					s = dd.Add(s, dd.Mul(a[r], pwrs[c-r]))
 				}
 				V1[q] = s
-				vmax = math.Max(vmax, s)
+				vmax = math.Max(vmax, s.Hi)
 			}
 			if 0 < vmax && vmax < ks2m128 {
 				for q := range V1 {
-					V1[q] *= ks2p128
+					V1[q] = dd.Ldexp(V1[q], ksExp128)
 				}
 				expnt -= ksExp128
 			}
@@ -400,16 +411,13 @@ func kolmogPomeranz(n int, x float64) float64 {
 	}
 	ans := V1[n-V1s]
 	for m := 1; m <= n; m++ {
-		if math.Abs(ans) > ks2p128 {
-			ans *= ks2m128
+		if math.Abs(ans.Hi) > ks2p128 {
+			ans = dd.Ldexp(ans, -ksExp128)
 			expnt += ksExp128
 		}
-		ans *= float64(m)
+		ans = dd.MulF(ans, float64(m))
 	}
-	if expnt != 0 {
-		ans = math.Ldexp(ans, expnt)
-	}
-	return clip01(ans)
+	return dd.Ldexp(ans, expnt)
 }
 
 // kolmogPelzGood is the Pelz-Good approximation of Pr(D_n <= x): SciPy's

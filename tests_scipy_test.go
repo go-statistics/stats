@@ -2,7 +2,9 @@ package stats
 
 import (
 	"compress/gzip"
+	"crypto/sha256"
 	"embed"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -11,6 +13,7 @@ import (
 	"math"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -24,6 +27,58 @@ import (
 //go:embed testdata/scipy/tests_*.json.gz
 var testsFS embed.FS
 
+// The exact references of testdata/gen/oracle_tests.py, by fixture file.
+//
+//go:embed testdata/oracle/tests_*.json.gz
+var oracleFS embed.FS
+
+// oracleTol is the relative error against the exact value a Go output may
+// always have; beyond it, it must be no worse than SciPy's.
+const oracleTol = 1e-13
+
+type oracleFile struct {
+	Source string                   `json:"source_sha256"`
+	Exact  map[string]map[string]jf `json:"exact"`
+}
+
+// loadOracle returns the exact outputs for the cases of a fixture file,
+// failing when the references were computed from another version of it.
+func loadOracle(t *testing.T, name string) map[string]map[string]float64 {
+	t.Helper()
+	raw, err := testsFS.ReadFile("testdata/scipy/" + name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := oracleFS.ReadFile("testdata/oracle/" + name)
+	if err != nil {
+		t.Fatalf("%s: no exact references (run testdata/gen/oracle_tests.py): %v", name, err)
+	}
+	zr, err := gzip.NewReader(strings.NewReader(string(b)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err = io.ReadAll(zr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var o oracleFile
+	if err := json.Unmarshal(b, &o); err != nil {
+		t.Fatal(err)
+	}
+	sum := sha256.Sum256(raw)
+	if hex.EncodeToString(sum[:]) != o.Source {
+		t.Fatalf("testdata/oracle/%s was computed from another version of the fixture: rerun testdata/gen/oracle_tests.py", name)
+	}
+	out := map[string]map[string]float64{}
+	for k, m := range o.Exact {
+		out[k] = map[string]float64{}
+		for f, v := range m {
+			out[k][f] = float64(v)
+		}
+	}
+	return out
+}
+
 var testsReport = flag.String("tests.report", "", "write the per-function maximum relative differences against SciPy (markdown) to this file")
 
 type testCase struct {
@@ -34,12 +89,14 @@ type testCase struct {
 	Error bool                       `json:"error"`
 	Crash bool                       `json:"crash"`
 
-	file string
-	data [][]float64
+	file  string
+	idx   int // index in its file
+	data  [][]float64
+	exact map[string]float64 // the exact outputs (testdata/oracle), if any
 }
 
 type testsFile struct {
-	Datasets [][]jf    `json:"datasets"`
+	Datasets [][]jf     `json:"datasets"`
 	Cases    []testCase `json:"cases"`
 }
 
@@ -78,8 +135,10 @@ func loadTestCases(t *testing.T) []testCase {
 				ds[i][k] = float64(v)
 			}
 		}
-		for _, c := range f.Cases {
-			c.file = e.Name()
+		exact := loadOracle(t, e.Name())
+		for k, c := range f.Cases {
+			c.file, c.idx = e.Name(), k
+			c.exact = exact[strconv.Itoa(k)]
 			for _, i := range c.Data {
 				c.data = append(c.data, ds[i])
 			}
@@ -177,6 +236,13 @@ func relDiff(got, want float64) float64 {
 	return math.Abs(got-want) / math.Abs(want)
 }
 
+type oracleStat struct {
+	n                     int
+	ours, scipy           float64
+	oursWhere, scipyWhere string
+	worse                 int
+}
+
 type diffStat struct {
 	n       int
 	max     float64
@@ -193,6 +259,7 @@ func TestScipyTests(t *testing.T) {
 		t.Fatal("no fixtures")
 	}
 	stats := map[string]*diffStat{}
+	oracleStats := map[string]*oracleStat{}
 	for i, c := range cases {
 		run, ok := testRunners[c.Fn]
 		if !ok {
@@ -259,11 +326,36 @@ func TestScipyTests(t *testing.T) {
 				st = &diffStat{tol: tolFor(c.Fn, field)}
 				stats[key] = st
 			}
+			ex, hasExact := c.exact[field]
+			if hasExact && len(got) == 1 {
+				ours, theirs := relDiff(got[0], ex), relDiff(want[0], ex)
+				ost := oracleStats[c.Fn+"."+field]
+				if ost == nil {
+					ost = &oracleStat{}
+					oracleStats[c.Fn+"."+field] = ost
+				}
+				ost.n++
+				if ours > ost.ours {
+					ost.ours, ost.oursWhere = ours, name
+				}
+				if theirs > ost.scipy {
+					ost.scipy, ost.scipyWhere = theirs, name
+				}
+				if ours > theirs && ours > 4e-16 {
+					ost.worse++
+				}
+				if ours > math.Max(theirs, oracleTol) {
+					t.Errorf("%s: field %s: got %v, exact %v (rel. error %.3g), SciPy %v (rel. error %.3g)", name, field, got[0], ex, ours, want[0], theirs)
+				}
+			}
 			for k := range got {
 				d := relDiff(got[k], want[k])
 				st.n++
 				if d > st.max || (st.where == "" && d >= st.max) {
 					st.max, st.where, st.got, st.want = d, fmt.Sprintf("%s [%d]", name, k), got[k], want[k]
+				}
+				if hasExact && len(got) == 1 {
+					continue // judged against the exact value above
 				}
 				if d > st.tol {
 					st.failing++
@@ -287,6 +379,16 @@ func TestScipyTests(t *testing.T) {
 		if s.failing > 5 {
 			t.Errorf("%s: %d values outside tolerance", k, s.failing)
 		}
+	}
+	okeys := make([]string, 0, len(oracleStats))
+	for k := range oracleStats {
+		okeys = append(okeys, k)
+	}
+	sort.Strings(okeys)
+	fmt.Fprintf(&b, "\n| function.field | values with an exact reference | ours: max rel. error | SciPy: max rel. error | ours worse than SciPy (beyond 4e-16) |\n|---|---:|---:|---:|---:|\n")
+	for _, k := range okeys {
+		s := oracleStats[k]
+		fmt.Fprintf(&b, "| %s | %d | %.3g | %.3g | %d |\n", k, s.n, s.ours, s.scipy, s.worse)
 	}
 	if *testsReport != "" {
 		if err := os.WriteFile(*testsReport, []byte(b.String()), 0o644); err != nil {

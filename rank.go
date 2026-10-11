@@ -54,22 +54,18 @@ type rankPair struct {
 }
 
 // sortedPairs returns the values with their positions sorted ascending,
-// ties (and NaNs, which go last as in np.argsort) in order of position:
-// the stable argsort SciPy's _rankdata uses.
-func sortedPairs(x []float64) []rankPair {
+// NaNs last in order of position, as np.argsort(kind="stable") orders
+// them. With stable false, equal values may come in any order (enough
+// for every ranking but the ordinal one, and faster).
+func sortedPairs(x []float64, stable bool) []rankPair {
 	p := make([]rankPair, len(x))
-	lo, hi := 0, len(x)
-	// NaNs go to the end, in order of position; the rest is sorted with a
-	// total order (value, then position), which makes the unstable sort
-	// stable.
 	nNaN := 0
 	for _, v := range x {
 		if v != v {
 			nNaN++
 		}
 	}
-	hi = len(x) - nNaN
-	k := hi
+	lo, k := 0, len(x)-nNaN
 	for i, v := range x {
 		if v != v {
 			p[k] = rankPair{v, i}
@@ -79,15 +75,29 @@ func sortedPairs(x []float64) []rankPair {
 			lo++
 		}
 	}
-	slices.SortFunc(p[:hi], func(a, b rankPair) int {
-		switch {
-		case a.v < b.v:
-			return -1
-		case a.v > b.v:
-			return 1
-		}
-		return a.i - b.i
-	})
+	if stable {
+		// (value, position) is a total order: an unstable sort under it
+		// is stable.
+		slices.SortFunc(p[:lo], func(a, b rankPair) int {
+			switch {
+			case a.v < b.v:
+				return -1
+			case a.v > b.v:
+				return 1
+			}
+			return a.i - b.i
+		})
+	} else {
+		slices.SortFunc(p[:lo], func(a, b rankPair) int {
+			switch {
+			case a.v < b.v:
+				return -1
+			case a.v > b.v:
+				return 1
+			}
+			return 0
+		})
+	}
 	return p
 }
 
@@ -98,7 +108,7 @@ func sortedPairs(x []float64) []rankPair {
 // as in SciPy.
 func rankWithTies(x []float64, method RankMethod, ties bool) (ranks, t []float64) {
 	n := len(x)
-	p := sortedPairs(x)
+	p := sortedPairs(x, method == RankOrdinal)
 	ranks = make([]float64, n)
 	if ties {
 		t = make([]float64, n)

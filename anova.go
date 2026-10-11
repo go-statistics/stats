@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"slices"
+
+	"github.com/go-statistics/stats/internal/dd"
 )
 
 // FOnewayOptions are the options of FOneway. The zero value (or nil) is
@@ -202,7 +204,11 @@ func Levene[D Data](o *LeveneOptions, samples ...D) (TestResult, error) {
 			if lc > len(s)-lc {
 				return TestResult{qnan, qnan}, fmt.Errorf("%w: proportion to cut %v too big", ErrParam, cut)
 			}
-			c = mean(s[lc : len(s)-lc])
+			// The trimmed mean in double-double: SciPy averages the
+			// middle of np.partition's output, whose order (and so
+			// rounding) cannot be reproduced; the correctly rounded mean
+			// is the better reference.
+			c = meanDD(s[lc : len(s)-lc])
 		default:
 			c = medianOf(g)
 		}
@@ -236,6 +242,15 @@ func Levene[D Data](o *LeveneOptions, samples ...D) (TestResult, error) {
 	denom *= dfn
 	w := numer / denom
 	return TestResult{w, F{Dfn: dfn, Dfd: dfd, Scale: 1}.SF(w)}, nil
+}
+
+// meanDD is the mean of a, the sum accumulated in double-double.
+func meanDD(a []float64) float64 {
+	var s dd.DD
+	for _, v := range a {
+		s = dd.AddF(s, v)
+	}
+	return dd.DivF(s, float64(len(a))).Float()
 }
 
 // median is np.median.
