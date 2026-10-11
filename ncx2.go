@@ -48,14 +48,13 @@ func (s ncx2Std) central() chi2Std { return chi2Std{k: s.k} }
 func (s ncx2Std) mixture(start float64, logTerm func(j float64) dd.DD, ratio func(j float64) float64) float64 {
 	// locate the largest term: the ratio crosses 1 there (log-concave
 	// terms); start from the caller's estimate and step to it
+	// start is the root of ratio(j) = 1, so ratio(j-1) > 1 at its floor
+	// (up to rounding, which only costs a step of the walk below)
 	j := math.Max(0, math.Floor(start))
 	if !(j < 1<<40) {
 		// the largest term is beyond any index that matters: the density
 		// is far below the smallest subnormal there
 		return 0
-	}
-	for j > 0 && ratio(j-1) < 1 {
-		j--
 	}
 	for ratio(j) > 1 {
 		j++

@@ -199,11 +199,9 @@ func fitBetaShapes(v []float64, loc, scale float64, fx map[string]float64) (Beta
 		a = solveDigammaDiff(b, s1, b0FromMean(mean(y), b))
 	default:
 		xbar := mean(y)
+		// data strictly inside (0, 1) have variance below x̄(1-x̄): fac > 0
 		fac := xbar*(1-xbar)/variance(y, 0) - 1
 		a, b = xbar*fac, (1-xbar)*fac
-		if !(a > 0 && b > 0) {
-			a, b = 1, 1
-		}
 		// Newton on (log a, log b) for ψ(a)-ψ(a+b) = s1, ψ(b)-ψ(a+b) = s2.
 		for i := 0; i < 200; i++ {
 			pab := special.Digamma(a + b)
@@ -215,13 +213,8 @@ func fitBetaShapes(v []float64, loc, scale float64, fx map[string]float64) (Beta
 			det := j11*j22 - j12*j21
 			da := (f1*j22 - f2*j12) / det
 			db := (j11*f2 - j21*f1) / det
-			na, nb := a-da, b-db
-			if !(na > 0) {
-				na = a / 2
-			}
-			if !(nb > 0) {
-				nb = b / 2
-			}
+			// a Newton step may not leave the domain: at most an 8-fold shrink
+			na, nb := math.Max(a-da, a/8), math.Max(b-db, b/8)
 			done := math.Abs(na-a) <= 4e-16*a && math.Abs(nb-b) <= 4e-16*b
 			a, b = na, nb
 			if done {
@@ -242,16 +235,11 @@ func solveDigammaDiff(c, s, u float64) float64 {
 	if !(u > 0) || math.IsInf(u, 0) {
 		u = 1
 	}
-	for i := 0; i < 200; i++ {
+	for i, done := 0, false; i < 200 && !done; i++ {
 		f := special.Digamma(u) - special.Digamma(u+c) - s
 		fp := special.Polygamma(1, u) - special.Polygamma(1, u+c)
-		nu := u - f/fp
-		if !(nu > 0) {
-			nu = u / 2
-		}
-		if math.Abs(nu-u) <= 4e-16*u {
-			return nu
-		}
+		nu := math.Max(u-f/fp, u/8)
+		done = math.Abs(nu-u) <= 4e-16*u
 		u = nu
 	}
 	return u

@@ -121,10 +121,8 @@ func fitMLE(p mleProblem, fixed map[string]float64) ([]float64, error) {
 		r, _ := optimize.Minimize(optimize.Problem{Func: obj}, u, optimize.NelderMead, &optimize.Options{
 			Xatol: 1e-12, Fatol: 1e-13 * math.Max(1, math.Abs(best)), MaxIter: 1000 * len(u), MaxFev: 2000 * len(u), Adaptive: len(u) > 2,
 		})
+		// Nelder-Mead never returns a point worse than its start
 		improved := best - r.Fun
-		if !(r.Fun <= best) {
-			break
-		}
 		u, best = r.X, r.Fun
 		if improved <= 1e-14*math.Max(1, math.Abs(best)) {
 			break

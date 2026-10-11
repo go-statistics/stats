@@ -51,10 +51,7 @@ func invertCDF(target float64, upper bool, f, pdf func(float64) float64, x0, lo,
 		}
 		step *= 2
 	}
-	x = midpoint(a, b)
-	if x0 > a && x0 < b {
-		x = x0
-	}
+	x = midpoint(a, b) // x0 is now an end of the bracket
 	for i := 0; i < 200; i++ {
 		v := f(x)
 		gx := v - target

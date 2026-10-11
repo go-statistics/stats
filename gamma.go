@@ -168,16 +168,11 @@ func fitGammaFixedLoc(v []float64, loc float64, fx map[string]float64) (Gamma, e
 // polished to full precision.
 func solveLogMinusDigamma(s float64) float64 {
 	a := (3 - s + math.Sqrt((s-3)*(s-3)+24*s)) / (12 * s)
-	for i := 0; i < 100; i++ {
+	for i, done := 0, false; i < 100 && !done; i++ {
 		f := logMinusDigamma(a) - s
 		fp := 1/a - special.Polygamma(1, a)
-		na := a - f/fp
-		if !(na > 0) {
-			na = a / 2
-		}
-		if math.Abs(na-a) <= 4e-16*a {
-			return na
-		}
+		na := math.Max(a-f/fp, a/8)
+		done = math.Abs(na-a) <= 4e-16*a
 		a = na
 	}
 	return a
@@ -190,14 +185,9 @@ func digammaInv(y float64) float64 {
 	if y < -2.22 {
 		a = -1 / (y - special.Digamma(1))
 	}
-	for i := 0; i < 100; i++ {
-		na := a - (special.Digamma(a)-y)/special.Polygamma(1, a)
-		if !(na > 0) {
-			na = a / 2
-		}
-		if math.Abs(na-a) <= 4e-16*a {
-			return na
-		}
+	for i, done := 0, false; i < 100 && !done; i++ {
+		na := math.Max(a-(special.Digamma(a)-y)/special.Polygamma(1, a), a/8)
+		done = math.Abs(na-a) <= 4e-16*a
 		a = na
 	}
 	return a

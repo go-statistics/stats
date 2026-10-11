@@ -10,10 +10,7 @@ import "math"
 // step is halved until two estimates agree to 1e-14.
 func entropyPositive(pdf, logpdf func(float64) float64, m float64) float64 {
 	eval := func(t float64) float64 {
-		x := m * math.Exp(math.Pi/2*math.Sinh(t))
-		if x == 0 || math.IsInf(x, 1) {
-			return 0
-		}
+		x := m * math.Exp(math.Pi/2*math.Sinh(t)) // finite: |t| <= 6
 		f := pdf(x)
 		if f == 0 {
 			return 0
@@ -26,15 +23,13 @@ func entropyPositive(pdf, logpdf func(float64) float64, m float64) float64 {
 		sum += eval(-float64(k)*h) + eval(float64(k)*h)
 	}
 	est := sum * h
-	for level := 0; level < 10; level++ {
+	for level, done := 0, false; level < 10 && !done; level++ {
 		h /= 2
 		for k := 1; float64(k)*h <= 6; k += 2 {
 			sum += eval(-float64(k)*h) + eval(float64(k)*h)
 		}
 		next := sum * h
-		if math.Abs(next-est) <= 1e-14*math.Abs(next) {
-			return next
-		}
+		done = math.Abs(next-est) <= 1e-14*math.Abs(next)
 		est = next
 	}
 	return est

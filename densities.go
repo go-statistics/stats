@@ -143,22 +143,16 @@ func logUpperGamma(a, y float64) dd.DD {
 	if !(y > a+1) {
 		return dd.F(math.Log(special.GammaQ(a, y)))
 	}
-	const tiny = 1e-300
 	b := y + 1 - a
-	c := 1 / tiny
+	c := 1e300
 	d := 1 / b
 	h := d
 	for i := 1.0; i < 1000; i++ {
 		an := -i * (i - a)
 		b += 2
+		// for y > a+1 the denominators stay away from 0 (b >= 2)
 		d = an*d + b
-		if math.Abs(d) < tiny {
-			d = tiny
-		}
 		c = b + an/c
-		if math.Abs(c) < tiny {
-			c = tiny
-		}
 		d = 1 / d
 		del := d * c
 		h *= del
