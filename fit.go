@@ -3,7 +3,6 @@ package stats
 import (
 	"fmt"
 	"math"
-	"sort"
 	"strings"
 
 	"github.com/go-numerics/optimize"
@@ -117,9 +116,9 @@ func fitMLE(p mleProblem, fixed map[string]float64) ([]float64, error) {
 	if math.IsInf(best, 1) {
 		return nil, fmt.Errorf("%w: the starting point has zero likelihood", ErrFit)
 	}
-	for restart := 0; restart < 20; restart++ {
+	for restart := 0; restart < 6; restart++ {
 		r, _ := optimize.Minimize(optimize.Problem{Func: obj}, u, optimize.NelderMead, &optimize.Options{
-			Xatol: 1e-12, Fatol: 1e-13 * math.Max(1, math.Abs(best)), MaxIter: 20000 * len(u), MaxFev: 40000 * len(u), Adaptive: len(u) > 2,
+			Xatol: 1e-12, Fatol: 1e-13 * math.Max(1, math.Abs(best)), MaxIter: 1000 * len(u), MaxFev: 2000 * len(u), Adaptive: len(u) > 2,
 		})
 		improved := best - r.Fun
 		if !(r.Fun <= best) {
@@ -131,13 +130,6 @@ func fitMLE(p mleProblem, fixed map[string]float64) ([]float64, error) {
 		}
 	}
 	return append([]float64(nil), unpack(u)...), nil
-}
-
-// sortedCopy returns a sorted copy of v.
-func sortedCopy(v []float64) []float64 {
-	s := append([]float64(nil), v...)
-	sort.Float64s(s)
-	return s
 }
 
 // fitLocScaleSupport is SciPy's starting point for loc and scale given the

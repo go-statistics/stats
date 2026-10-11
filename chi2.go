@@ -57,16 +57,8 @@ func (s chi2Std) skew() float64     { return 2 * math.Sqrt(2.0/(2*s.k)) }
 func (s chi2Std) kurtosis() float64 { return 12.0 / (2 * s.k) }
 func (s chi2Std) median() float64   { return 2 * special.GammaPInv(s.k, 0.5) }
 
-// entropy is SciPy's formula, asymptotic from df/2 = 125.
-func (s chi2Std) entropy() float64 {
-	h := s.k
-	if h < 125 {
-		return h + math.Ln2 + special.LogGamma(h) + (1-h)*special.Digamma(h)
-	}
-	c := math.Ln2 + 0.5*(1+math.Log(2*math.Pi))
-	r := 0.5 / h
-	return r*(-2.0/3+r*(-1.0/3+r*(-4.0/45+r/7.5))) + 0.5*math.Log(h) + c
-}
+// entropy is the gamma entropy at k = df/2 plus log 2 (the scale).
+func (s chi2Std) entropy() float64 { return gammaEntropyPart(s.k) + math.Ln2 }
 
 // munp is 2^n Γ(k+n)/Γ(k).
 func (s chi2Std) munp(n int) float64 { return math.Ldexp(poch(s.k, n), n) }

@@ -91,7 +91,7 @@ def evaluate(fn, args):
                     vals.append(mpf(v) if not isinstance(v, mpf) else +v)
         except Timeout:
             return "timeout"
-        except (mpmath.libmp.libhyper.NoConvergence, ZeroDivisionError, ValueError, TypeError):
+        except (mpmath.libmp.libhyper.NoConvergence, ZeroDivisionError, ValueError, TypeError, OverflowError):
             return None  # counted as dropped: the oracle could not decide
         finally:
             signal.alarm(0)

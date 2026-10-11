@@ -82,13 +82,8 @@ func (s invGammaStd) kurtosis() float64 {
 }
 func (s invGammaStd) median() float64 { return s.ppf(0.5) }
 
-func (s invGammaStd) entropy() float64 {
-	a := s.a
-	if a >= 200 {
-		return (1-3*math.Log(a)+math.Ln2+math.Log(math.Pi))/2 + 2.0/3/a + math.Pow(a, -2)/12 - math.Pow(a, -3)/90 - math.Pow(a, -4)/120
-	}
-	return a - (a+1)*special.Digamma(a) + special.LogGamma(a)
-}
+// entropy is a - (a+1)ψ(a) + log Γ(a) = gammaEntropyPart(a) - 2ψ(a).
+func (s invGammaStd) entropy() float64 { return gammaEntropyPart(s.a) - 2*special.Digamma(s.a) }
 
 // munp is Γ(a-n)/Γ(a) = 1/((a-1)...(a-n)) for n < a, +Inf beyond.
 func (s invGammaStd) munp(n int) float64 {

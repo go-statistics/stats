@@ -201,11 +201,6 @@ func ExpMant(a DD) (m DD, k int) {
 	return Mul(e, expTable[j]), k
 }
 
-// Ldexp returns a * 2^k for a double-double (both parts scaled).
-func Ldexp(a DD, k int) DD {
-	return DD{math.Ldexp(a.Hi, k), math.Ldexp(a.Lo, k)}
-}
-
 // Log returns log(x) for finite x > 0 as a double-double accurate to about
 // 2^-72 relative (measured 2^-72.9; the float64 tail limits it).
 //

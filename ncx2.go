@@ -87,13 +87,7 @@ func (s ncx2Std) mixture(start float64, logTerm func(j float64) dd.DD, ratio fun
 // poissonLog is log(e^-μ μ^j / j!) in double-double: the gamma(j+1)
 // density at μ.
 func (s ncx2Std) poissonLog(j float64) dd.DD {
-	if s.mu == 0 {
-		if j == 0 {
-			return dd.F(0)
-		}
-		return dd.F(math.Inf(-1))
-	}
-	return gammaLogDensity(j+1, dd.F(s.mu))
+	return gammaLogDensity(j+1, dd.F(s.mu)) // μ > 0 here: μ = 0 is the central case
 }
 
 func (s ncx2Std) pdf(x float64) float64 {
