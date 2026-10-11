@@ -52,7 +52,7 @@ func invertCDF(target float64, upper bool, f, pdf func(float64) float64, x0, lo,
 		step *= 2
 	}
 	x = midpoint(a, b) // x0 is now an end of the bracket
-	for i := 0; i < 400; i++ {
+	for i := 0; ; i++ {
 		v := f(x)
 		gx := v - target
 		if upper {
@@ -78,12 +78,11 @@ func invertCDF(target float64, upper bool, f, pdf func(float64) float64, x0, lo,
 		if nx == x || math.Nextafter(a, b) >= b {
 			return x
 		}
-		if math.Abs(nx-x) <= 2e-16*math.Abs(x) {
+		if math.Abs(nx-x) <= 2e-16*math.Abs(x) || i == 400 { // converged, or out of patience
 			return nx
 		}
 		x = nx
 	}
-	return x
 }
 
 // midpoint is (a+b)/2 without overflow, and in the middle of the
