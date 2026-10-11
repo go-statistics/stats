@@ -123,7 +123,7 @@ func smallestK(k0, a, b float64, ok func(float64) bool) float64 {
 func bisectK(lo, hi float64, ok func(float64) bool) float64 {
 	for hi-lo > 1 {
 		mid := math.Floor(lo + (hi-lo)/2)
-		if mid == lo { // beyond 2^53 the integers are not all representable
+		if mid == lo || mid == hi { // beyond 2^53 the integers are not all representable
 			break
 		}
 		if ok(mid) {
