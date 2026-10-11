@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
-	"github.com/go-numerics/special"
 	"github.com/go-statistics/stats/internal/dd"
 )
 
@@ -14,9 +13,11 @@ import (
 // concentration parameters Alpha (K of them, all positive):
 // scipy.stats.dirichlet(alpha).
 //
-// The log-density -log B(α) + Σ(αᵢ-1)·log xᵢ is summed in double-double
-// with double-double logarithms, so that its only rounding errors are
-// those of the log-gamma values; SciPy sums the float64 terms.
+// The log-density -log B(α) + Σ(αᵢ-1)·log xᵢ is summed in double-double,
+// with double-double logarithms and, for α ≥ 30, double-double log-gamma
+// values (Stirling's series): its terms nearly cancel when the
+// concentrations are large, and SciPy, which sums float64 log-gamma
+// values, loses their ULPs (about 4e-12 at α₀ = 3000).
 type Dirichlet struct {
 	alpha []float64
 	lnB   dd.DD
@@ -36,9 +37,9 @@ func NewDirichlet(alpha []float64) (*Dirichlet, error) {
 	}
 	d := &Dirichlet{alpha: append([]float64(nil), alpha...)}
 	for _, a := range alpha {
-		d.lnB = dd.AddF(d.lnB, special.LogGamma(a))
+		d.lnB = dd.Add(d.lnB, lgammaDD(a))
 	}
-	d.lnB = dd.AddF(d.lnB, -special.LogGamma(sum(alpha)))
+	d.lnB = dd.Sub(d.lnB, lgammaDDAt(sumDD(alpha)))
 	return d, nil
 }
 
@@ -192,15 +193,18 @@ func (d *Dirichlet) Cov() *ndarray.Array {
 }
 
 // Entropy returns the differential entropy log B(α) + (α₀-K)ψ(α₀) -
-// Σ(αᵢ-1)ψ(αᵢ): scipy.stats.dirichlet.entropy.
+// Σ(αᵢ-1)ψ(αᵢ): scipy.stats.dirichlet.entropy. The terms are summed in
+// double-double (with double-double log-gamma and digamma values for
+// large α), since they nearly cancel when the concentrations are large.
 func (d *Dirichlet) Entropy() float64 {
-	a0 := sum(d.alpha)
+	a0 := sumDD(d.alpha)
 	k := float64(len(d.alpha))
-	t := make([]float64, len(d.alpha))
-	for i, a := range d.alpha {
-		t[i] = float64((a - 1) * special.Digamma(a))
+	s := dd.Add(d.lnB, dd.Mul(dd.AddF(a0, -k), digammaDDAt(a0)))
+	for _, a := range d.alpha {
+		h, l := dd.TwoSum(a, -1)
+		s = dd.Sub(s, dd.Mul(dd.DD{Hi: h, Lo: l}, digammaDD(a)))
 	}
-	return d.lnB.Hi + d.lnB.Lo + float64((a0-k)*special.Digamma(a0)) - sum(t)
+	return s.Float()
 }
 
 // Rvs draws size points, an array of shape (size, K), as

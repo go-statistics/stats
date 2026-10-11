@@ -6,8 +6,6 @@ import (
 
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
-	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
 )
 
 // Multinomial is the multinomial distribution of the counts in K
@@ -46,32 +44,50 @@ func (m *Multinomial) N() int { return m.n }
 // P returns the category probabilities (a copy).
 func (m *Multinomial) P() []float64 { return append([]float64(nil), m.p...) }
 
-// logPMF is log n! + Σ (xᵢ log pᵢ - log xᵢ!) summed in double-double; -∞
-// off the support (a negative or fractional count, or counts not summing
-// to n).
-func (m *Multinomial) logPMF(x []float64) dd.DD {
+// logPMF is log(n!/Πxᵢ! · Πpᵢ^xᵢ); -∞ off the support (a negative or
+// fractional count, or counts not summing to n). It is computed as
+// Loader computes binomial probabilities, not as a difference of
+// log-gamma values (which loses the ULPs of log n!, about 1e-13 at
+// n = 1000): with Stirling's formula log m! = m log m - m + log(2πm)/2 +
+// δ(m), the large terms cancel exactly and
+//
+//	log pmf = δ(n) - Σδ(xᵢ) - Σ bd0(xᵢ, npᵢ) + n(Σpᵢ - 1)
+//	          + (log n - Σ log xᵢ - (r-1)·log 2π)/2
+//
+// over the r positive counts, with the deviance terms bd0(x, np) =
+// x log(x/np) + np - x ≥ 0.
+func (m *Multinomial) logPMF(x []float64) float64 {
 	t := 0.0
 	for _, v := range x {
 		if v < 0 || v != math.Trunc(v) {
-			return dd.F(math.Inf(-1))
+			return math.Inf(-1)
 		}
 		t += v
 	}
 	if t != float64(m.n) {
-		return dd.F(math.Inf(-1))
+		return math.Inf(-1)
 	}
-	s := dd.F(special.LogGamma(float64(m.n) + 1))
+	if m.n == 0 {
+		return 0
+	}
+	n := float64(m.n)
+	s := stirlerr(n) + n*(sum(m.p)-1)
+	logs := 0.5 * math.Log(n)
+	r := 0
 	for i, v := range x {
+		p := m.p[i]
 		if v == 0 {
+			s -= n * p // bd0(0, np) = np
 			continue
 		}
-		if m.p[i] == 0 {
-			return dd.F(math.Inf(-1))
+		if p == 0 {
+			return math.Inf(-1)
 		}
-		s = dd.Add(s, dd.MulF(dd.LogAccurate(m.p[i]), v))
-		s = dd.AddF(s, -special.LogGamma(v+1))
+		r++
+		s -= stirlerr(v) + bd0(v, n*p)
+		logs -= 0.5 * math.Log(v)
 	}
-	return s
+	return s + logs - float64(r-1)*0.9189385332046728
 }
 
 func (m *Multinomial) check(x []float64) error {
@@ -93,17 +109,13 @@ func (m *Multinomial) LogPMF(x []float64) (float64, error) {
 			return math.NaN(), nil
 		}
 	}
-	h := m.logPMF(x)
-	return h.Hi + h.Lo, nil
+	return m.logPMF(x), nil
 }
 
 // PMF returns the probability of the counts x: scipy.stats.multinomial.pmf.
 func (m *Multinomial) PMF(x []float64) (float64, error) {
 	l, err := m.LogPMF(x)
-	if err != nil || math.IsNaN(l) || math.IsInf(l, -1) {
-		return math.Exp(l), err
-	}
-	return expDD(m.logPMF(x)), nil
+	return math.Exp(l), err
 }
 
 // LogPMFPoints returns LogPMF at each row of x, an (n, K) array of counts
@@ -154,27 +166,37 @@ func (m *Multinomial) Cov() *ndarray.Array {
 	return mustArray(c, k, k)
 }
 
-// Entropy returns the entropy -log n! - nΣpᵢlog pᵢ + Σᵢ Σₓ₌₁ⁿ
-// binom.pmf(x; n, pᵢ)·log x!, SciPy's formula
-// (scipy.stats.multinomial.entropy), with the binomial probabilities by
-// Loader's saddle-point algorithm.
+// Entropy returns the entropy: scipy.stats.multinomial.entropy, which
+// evaluates -log n! - nΣpᵢlog pᵢ + Σᵢ E[log Xᵢ!] with Xᵢ ~ Bin(n, pᵢ).
+// Those terms nearly cancel (SciPy loses about 1e-13 relative at
+// n = 1000); with Stirling's formula for each log m! the large parts cancel
+// exactly, leaving
+//
+//	Σᵢ E[bd0(Xᵢ, npᵢ) + (log(2πXᵢ)/2 + δ(Xᵢ))·[Xᵢ > 0]] - log(2πn)/2 - δ(n)
+//
+// of moderate, mostly positive terms, summed with compensation, and
+// binomial probabilities by Loader's saddle-point algorithm.
 func (m *Multinomial) Entropy() float64 {
-	k := len(m.p)
-	e := make([]float64, k)
-	for i, p := range m.p {
-		if p > 0 {
-			e[i] = -float64(p * math.Log(p))
+	if m.n == 0 {
+		return 0
+	}
+	n := float64(m.n)
+	var s, c float64
+	for _, p := range m.p {
+		if p == 0 {
+			continue // X = 0 surely: no contribution
+		}
+		np := n * p
+		s, c = neumaier(s, c, binomPMF(0, m.n, p)*np)
+		for x := 1; x <= m.n; x++ {
+			fx := float64(x)
+			t := bd0(fx, np) + 0.5*math.Log(2*math.Pi*fx) + stirlerr(fx)
+			s, c = neumaier(s, c, binomPMF(x, m.n, p)*t)
 		}
 	}
-	term1 := float64(m.n)*sum(e) - special.LogGamma(float64(m.n)+1)
-	t := make([]float64, 0, m.n*k)
-	for x := 1; x <= m.n; x++ {
-		lg := special.LogGamma(float64(x) + 1)
-		for _, p := range m.p {
-			t = append(t, float64(binomPMF(x, m.n, p)*lg))
-		}
-	}
-	return term1 + sum(t)
+	s, c = neumaier(s, c, -0.5*math.Log(2*math.Pi*n))
+	s, c = neumaier(s, c, -stirlerr(n))
+	return s + c
 }
 
 // Rvs draws size points, an int64 array of shape (size, K), as

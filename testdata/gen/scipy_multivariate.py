@@ -217,7 +217,8 @@ def mp_dir_logpdf(x, alpha):
         a = [mp.mpf(float(v)) for v in alpha]
         x = [mp.mpf(float(v)) for v in x]
         s = sum(mp.loggamma(v) for v in a) - mp.loggamma(sum(a))
-        return float(-s + sum((ai - 1) * mp.log(xi) for ai, xi in zip(a, x) if ai != 1))
+        lp = -s + sum((ai - 1) * mp.log(xi) for ai, xi in zip(a, x) if ai != 1)
+        return float(lp), float(mp.exp(lp))
 
 
 def mp_dir_entropy(alpha):
@@ -243,8 +244,9 @@ def gen_dirichlet():
         for p in x:
             if raises(lambda: st.dirichlet.logpdf(p, alpha)):
                 continue
+            mpl, mpp = mp_dir_logpdf(p, alpha)
             row = {"x": H(p), "logpdf": H(st.dirichlet.logpdf(p, alpha)),
-                   "pdf": H(st.dirichlet.pdf(p, alpha)), "mp": H(mp_dir_logpdf(p, alpha))}
+                   "pdf": H(st.dirichlet.pdf(p, alpha)), "mp": H(mpl), "mp_pdf": H(mpp)}
             if k > 1:
                 row["logpdf_short"] = H(st.dirichlet.logpdf(p[:-1], alpha))
             pts.append(row)
@@ -255,7 +257,7 @@ def gen_dirichlet():
         for seed in (0, 42):
             r = st.dirichlet(alpha).rvs(size=6, random_state=np.random.default_rng(seed))
             rv.append({"seed": seed, "size": 6, "hex": H(np.asarray(r).ravel())})
-        out.append({"alpha": H(alpha), "points": pts, "mean": H(st.dirichlet.mean(alpha)),
+        out.append({"alpha": H(alpha), "points": pts, "mean": H(np.atleast_1d(st.dirichlet.mean(alpha))),
                     "var": H(np.atleast_1d(st.dirichlet.var(alpha))),
                     "cov": H(np.atleast_2d(st.dirichlet.cov(alpha)).ravel()),
                     "entropy": H(st.dirichlet.entropy(alpha)), "mp_entropy": H(mp_dir_entropy(alpha)),
@@ -274,6 +276,16 @@ def mp_multi_logpmf(x, n, p):
             if xi == 0:
                 continue
             s += xi * mp.log(mp.mpf(float(pi))) - mp.loggamma(xi + 1)
+        return float(s), float(mp.exp(s))
+
+
+def mp_multi_entropy(n, p):
+    with mp.workdps(40):
+        p = [mp.mpf(float(v)) for v in p]
+        s = -mp.loggamma(n + 1) - n * sum(v * mp.log(v) for v in p if v > 0)
+        for v in p:
+            for x in range(1, n + 1):
+                s += mp.binomial(n, x) * v ** x * (1 - v) ** (n - x) * mp.loggamma(x + 1)
         return float(s)
 
 
@@ -295,7 +307,9 @@ def gen_multinomial():
             lp = st.multinomial.logpmf(q, n, p)
             row = {"x": H(q), "logpmf": H(lp), "pmf": H(st.multinomial.pmf(q, n, p))}
             if math.isfinite(lp):
-                row["mp"] = H(mp_multi_logpmf([int(v) for v in q], n, p))
+                mpl, mpp = mp_multi_logpmf([int(v) for v in q], n, p)
+                row["mp"] = H(mpl)
+                row["mp_pmf"] = H(mpp)
             rows.append(row)
         rv = []
         for seed in (0, 42):
@@ -303,7 +317,8 @@ def gen_multinomial():
             rv.append({"seed": seed, "size": 6, "int": [int(v) for v in np.asarray(r).ravel()]})
         out.append({"n": n, "p": H(p), "points": rows, "mean": H(st.multinomial.mean(n, p)),
                     "cov": H(st.multinomial.cov(n, p).ravel()),
-                    "entropy": H(st.multinomial.entropy(n, p)), "rvs": rv})
+                    "entropy": H(st.multinomial.entropy(n, p)),
+                    "mp_entropy": H(mp_multi_entropy(n, p)), "rvs": rv})
     invalid = [{"n": -1, "p": H([0.5, 0.5])}, {"n": 3, "p": H([0.5, 0.6])},
                {"n": 3, "p": H([1.5, -0.5])}]
     for c in invalid:
