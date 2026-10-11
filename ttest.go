@@ -16,7 +16,7 @@ type TTestResult struct {
 	DF float64
 
 	alt      Alternative
-	nan      bool    // the result is NaN (NaN input, too few observations)
+	isNaN    bool    // the result is NaN (NaN input, too few observations)
 	se       float64 // the denominator of the statistic
 	estimate float64 // the point estimate (mean, or difference of means)
 }
@@ -28,10 +28,10 @@ type TTestResult struct {
 // an infinite bound): TtestResult.confidence_interval(confidence_level).
 func (r TTestResult) ConfidenceInterval(level float64) (ConfidenceInterval, error) {
 	if !(level >= 0 && level <= 1) {
-		return ConfidenceInterval{nan, nan}, fmt.Errorf("%w: confidence level %v outside [0, 1]", ErrParam, level)
+		return ConfidenceInterval{qnan, qnan}, fmt.Errorf("%w: confidence level %v outside [0, 1]", ErrParam, level)
 	}
-	if r.nan {
-		return ConfidenceInterval{nan, nan}, nil
+	if r.isNaN {
+		return ConfidenceInterval{qnan, qnan}, nil
 	}
 	t := StudentT{Df: r.DF, Scale: 1}
 	lo, hi := math.Inf(-1), math.Inf(1)
@@ -67,7 +67,7 @@ type TTestIndOptions struct {
 }
 
 func nanTTest() TTestResult {
-	return TTestResult{Statistic: nan, PValue: nan, DF: nan, nan: true, se: nan, estimate: nan}
+	return TTestResult{Statistic: qnan, PValue: qnan, DF: qnan, isNaN: true, se: qnan, estimate: qnan}
 }
 
 // TTest1Samp is the one-sample t-test of the null hypothesis that the

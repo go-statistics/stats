@@ -40,7 +40,7 @@ func RankData[D Data](x D, method RankMethod) (D, error) {
 	r, _ := rankWithTies(v, method, false)
 	if hasNaN(v) {
 		for i := range r {
-			r[i] = nan
+			r[i] = qnan
 		}
 	}
 	return like(x, r), nil

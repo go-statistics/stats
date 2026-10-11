@@ -63,7 +63,7 @@ func (m Method) String() string {
 	return "invalid"
 }
 
-var nan = math.NaN()
+var qnan = math.NaN()
 
 // checkAlternative returns an error wrapping ErrParam for an Alternative
 // outside {TwoSided, Less, Greater}.
@@ -137,7 +137,7 @@ func clip01(p float64) float64 {
 }
 
 // clip clips x to [lo, hi], propagating NaN.
-func clip(x, lo, hi float64) float64 {
+func clipTo(x, lo, hi float64) float64 {
 	switch {
 	case x < lo:
 		return lo
@@ -169,7 +169,7 @@ func sampleSkew(a []float64) float64 {
 	m2 := centralMoment(a, m, 2)
 	m3 := centralMoment(a, m, 3)
 	if m2 <= (0x1p-52*m)*(0x1p-52*m) {
-		return nan
+		return qnan
 	}
 	return m3 / math.Pow(m2, 1.5)
 }
@@ -182,7 +182,7 @@ func sampleKurtosis(a []float64) float64 {
 	m2 := centralMoment(a, m, 2)
 	m4 := centralMoment(a, m, 4)
 	if m2 <= (0x1p-52*m)*(0x1p-52*m) {
-		return nan
+		return qnan
 	}
 	return m4 / (m2 * m2)
 }

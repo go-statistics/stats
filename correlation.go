@@ -33,7 +33,7 @@ type PearsonResult struct {
 // interval is [-1, 1].
 func (r PearsonResult) ConfidenceInterval(level float64) (ConfidenceInterval, error) {
 	if !(level >= 0 && level <= 1) {
-		return ConfidenceInterval{nan, nan}, fmt.Errorf("%w: confidence level %v outside [0, 1]", ErrParam, level)
+		return ConfidenceInterval{qnan, qnan}, fmt.Errorf("%w: confidence level %v outside [0, 1]", ErrParam, level)
 	}
 	if r.n <= 3 {
 		return ConfidenceInterval{-1, 1}, nil
@@ -62,7 +62,7 @@ func pairs[D Data](x, y D, name string) ([]float64, []float64, error) {
 }
 
 // dot is Σ a[i]·b[i] in double-double, rounded once.
-func dot(a, b []float64) float64 {
+func dotDD(a, b []float64) float64 {
 	var s dd.DD
 	for i := range a {
 		s = dd.Add(s, dd.MulFF(a[i], b[i]))
@@ -71,7 +71,7 @@ func dot(a, b []float64) float64 {
 }
 
 // constant reports whether every value equals the first.
-func constant(a []float64) bool {
+func isConstant(a []float64) bool {
 	for _, v := range a {
 		if v != a[0] {
 			return false
@@ -90,7 +90,7 @@ func Pearsonr[D Data](x, y D, o *CorrelationOptions) (PearsonResult, error) {
 	if o == nil {
 		o = &CorrelationOptions{}
 	}
-	bad := PearsonResult{Statistic: nan, PValue: nan, n: nan}
+	bad := PearsonResult{Statistic: qnan, PValue: qnan, n: qnan}
 	if err := checkAlternative(o.Alternative); err != nil {
 		return bad, err
 	}
@@ -103,11 +103,11 @@ func Pearsonr[D Data](x, y D, o *CorrelationOptions) (PearsonResult, error) {
 	}
 	n := float64(len(a))
 	res := PearsonResult{n: n, alt: o.Alternative}
-	if hasNaN(a, b) || constant(a) || constant(b) {
-		res.Statistic, res.PValue = nan, nan
+	if hasNaN(a, b) || isConstant(a) || isConstant(b) {
+		res.Statistic, res.PValue = qnan, qnan
 		return res, nil
 	}
-	r := clip(correlate(a, b), -1, 1)
+	r := clipTo(correlate(a, b), -1, 1)
 	if len(a) == 2 {
 		res.Statistic, res.PValue = math.RoundToEven(r), 1
 		return res, nil
@@ -131,7 +131,7 @@ func Pearsonr[D Data](x, y D, o *CorrelationOptions) (PearsonResult, error) {
 func correlate(a, b []float64) float64 {
 	xm := deviations(a)
 	ym := deviations(b)
-	return dot(xm, ym) / math.Sqrt(dot(xm, xm)) / math.Sqrt(dot(ym, ym))
+	return dotDD(xm, ym) / math.Sqrt(dotDD(xm, xm)) / math.Sqrt(dotDD(ym, ym))
 }
 
 // deviations returns a - mean(a).
@@ -155,24 +155,24 @@ func Spearmanr[D Data](x, y D, o *CorrelationOptions) (TestResult, error) {
 		o = &CorrelationOptions{}
 	}
 	if err := checkAlternative(o.Alternative); err != nil {
-		return TestResult{nan, nan}, err
+		return TestResult{qnan, qnan}, err
 	}
 	a, b, err := pairs(x, y, "spearmanr")
 	if err != nil {
-		return TestResult{nan, nan}, err
+		return TestResult{qnan, qnan}, err
 	}
 	if len(a) <= 1 || hasNaN(a, b) {
-		return TestResult{nan, nan}, nil
+		return TestResult{qnan, qnan}, nil
 	}
 	ra, _ := rankWithTies(a, RankAverage, false)
 	rb, _ := rankWithTies(b, RankAverage, false)
 	// np.corrcoef: the covariance matrix scaled by the standard deviations.
 	n := float64(len(a))
 	xm, ym := deviations(ra), deviations(rb)
-	cxy := dot(xm, ym) / (n - 1)
-	sx := math.Sqrt(dot(xm, xm) / (n - 1))
-	sy := math.Sqrt(dot(ym, ym) / (n - 1))
-	rs := clip(cxy/sx/sy, -1, 1)
+	cxy := dotDD(xm, ym) / (n - 1)
+	sx := math.Sqrt(dotDD(xm, xm) / (n - 1))
+	sy := math.Sqrt(dotDD(ym, ym) / (n - 1))
+	rs := clipTo(cxy/sx/sy, -1, 1)
 	dof := n - 2
 	q := dof / ((rs + 1) * (1 - rs))
 	if q < 0 {
@@ -215,20 +215,20 @@ func Kendalltau[D Data](x, y D, o *KendallOptions) (TestResult, error) {
 		o = &KendallOptions{}
 	}
 	if err := checkAlternative(o.Alternative); err != nil {
-		return TestResult{nan, nan}, err
+		return TestResult{qnan, qnan}, err
 	}
 	if o.Variant != TauB && o.Variant != TauC {
-		return TestResult{nan, nan}, fmt.Errorf("%w: Kendall variant %d", ErrParam, int(o.Variant))
+		return TestResult{qnan, qnan}, fmt.Errorf("%w: Kendall variant %d", ErrParam, int(o.Variant))
 	}
 	if o.Method != MethodAuto && o.Method != MethodExact && o.Method != MethodAsymptotic {
-		return TestResult{nan, nan}, fmt.Errorf("%w: kendalltau method %v", ErrParam, o.Method)
+		return TestResult{qnan, qnan}, fmt.Errorf("%w: kendalltau method %v", ErrParam, o.Method)
 	}
 	a, b, err := pairs(x, y, "kendalltau")
 	if err != nil {
-		return TestResult{nan, nan}, err
+		return TestResult{qnan, qnan}, err
 	}
 	if len(a) <= 1 || hasNaN(a, b) {
-		return TestResult{nan, nan}, nil
+		return TestResult{qnan, qnan}, nil
 	}
 	return kendall(a, b, o)
 }
@@ -263,7 +263,7 @@ func kendall(a, b []float64, o *KendallOptions) (TestResult, error) {
 	ytie, y0, y1, ny := tieCounts(ry)
 	tot := int64(size) * int64(size-1) / 2
 	if xtie == tot || ytie == tot {
-		return TestResult{nan, nan}, nil
+		return TestResult{qnan, qnan}, nil
 	}
 	cmd := tot - xtie - ytie + ntie - 2*dis
 	var tau float64
@@ -276,7 +276,7 @@ func kendall(a, b []float64, o *KendallOptions) (TestResult, error) {
 	tau = math.Min(1, math.Max(-1, tau))
 	method := o.Method
 	if method == MethodExact && (xtie != 0 || ytie != 0) {
-		return TestResult{nan, nan}, fmt.Errorf("%w: ties found, the exact method cannot be used", ErrData)
+		return TestResult{qnan, qnan}, fmt.Errorf("%w: ties found, the exact method cannot be used", ErrData)
 	}
 	if method == MethodAuto {
 		method = MethodAsymptotic
@@ -472,7 +472,7 @@ func Linregress[D Data](x, y D, o *CorrelationOptions) (LinregressResult, error)
 	if o == nil {
 		o = &CorrelationOptions{}
 	}
-	bad := LinregressResult{nan, nan, nan, nan, nan, nan}
+	bad := LinregressResult{qnan, qnan, qnan, qnan, qnan, qnan}
 	if err := checkAlternative(o.Alternative); err != nil {
 		return bad, err
 	}
@@ -487,18 +487,18 @@ func Linregress[D Data](x, y D, o *CorrelationOptions) (LinregressResult, error)
 	n := float64(len(a))
 	xmean, ymean := mean(a), mean(b)
 	xm, ym := deviations(a), deviations(b)
-	ssxm := dot(xm, xm) / n
-	ssym := dot(ym, ym) / n
-	ssxym := dot(xm, ym) / n
+	ssxm := dotDD(xm, xm) / n
+	ssym := dotDD(ym, ym) / n
+	ssxym := dotDD(xm, ym) / n
 	var r float64
 	switch {
 	case ssxm == 0 || ssym == 0:
 		r = 0
 		if ssxym == 0 {
-			r = nan
+			r = qnan
 		}
 	default:
-		r = clip(ssxym/math.Sqrt(ssxm*ssym), -1, 1)
+		r = clipTo(ssxym/math.Sqrt(ssxm*ssym), -1, 1)
 	}
 	slope := ssxym / ssxm
 	intercept := ymean - slope*xmean

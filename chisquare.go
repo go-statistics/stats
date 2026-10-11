@@ -51,20 +51,20 @@ func PowerDivergence[D Data](observed D, lambda float64, o *ChiSquareOptions) (T
 	exp := o.Expected
 	if exp != nil {
 		if len(exp) != len(obs) {
-			return TestResult{nan, nan}, fmt.Errorf("%w: %d expected frequencies for %d observed", ErrData, len(exp), len(obs))
+			return TestResult{qnan, qnan}, fmt.Errorf("%w: %d expected frequencies for %d observed", ErrData, len(exp), len(obs))
 		}
 		if hasNaN(obs, exp) {
-			return TestResult{nan, nan}, nil
+			return TestResult{qnan, qnan}, nil
 		}
 		so, se := sum(obs), sum(exp)
 		if rel := math.Abs(so-se) / math.Min(so, se); rel > 1.4901161193847656e-08 {
-			return TestResult{nan, nan}, fmt.Errorf("%w: the observed frequencies sum to %v and the expected ones to %v (relative difference %v > sqrt(eps))", ErrData, so, se, rel)
+			return TestResult{qnan, qnan}, fmt.Errorf("%w: the observed frequencies sum to %v and the expected ones to %v (relative difference %v > sqrt(eps))", ErrData, so, se, rel)
 		}
 	} else if hasNaN(obs) {
-		return TestResult{nan, nan}, nil
+		return TestResult{qnan, qnan}, nil
 	}
 	if math.IsNaN(lambda) {
-		return TestResult{nan, nan}, fmt.Errorf("%w: lambda is NaN", ErrParam)
+		return TestResult{qnan, qnan}, fmt.Errorf("%w: lambda is NaN", ErrParam)
 	}
 	return powerDivergence(obs, exp, float64(o.DDOF), lambda), nil
 }
@@ -127,7 +127,7 @@ func Chi2Contingency(observed *ndarray.Array, o *Chi2ContingencyOptions) (Chi2Co
 	if o == nil {
 		o = &Chi2ContingencyOptions{}
 	}
-	bad := Chi2ContingencyResult{Statistic: nan, PValue: nan}
+	bad := Chi2ContingencyResult{Statistic: qnan, PValue: qnan}
 	if observed == nil || observed.Size() == 0 {
 		return bad, fmt.Errorf("%w: chi2_contingency needs a non-empty table", ErrData)
 	}
@@ -171,7 +171,7 @@ func Chi2Contingency(observed *ndarray.Array, o *Chi2ContingencyOptions) (Chi2Co
 		lambda = *o.Lambda
 	}
 	if hasNaN(obs) {
-		res.Statistic, res.PValue = nan, nan
+		res.Statistic, res.PValue = qnan, qnan
 		return res, nil
 	}
 	r := powerDivergence(obs, exp, float64(len(obs)-1-dof), lambda)
@@ -230,14 +230,14 @@ func FisherExact(table [2][2]int64, o *FisherExactOptions) (TestResult, error) {
 		o = &FisherExactOptions{}
 	}
 	if err := checkAlternative(o.Alternative); err != nil {
-		return TestResult{nan, nan}, err
+		return TestResult{qnan, qnan}, err
 	}
 	c00, c01, c10, c11 := table[0][0], table[0][1], table[1][0], table[1][1]
 	if c00 < 0 || c01 < 0 || c10 < 0 || c11 < 0 {
-		return TestResult{nan, nan}, fmt.Errorf("%w: negative count in the table", ErrData)
+		return TestResult{qnan, qnan}, fmt.Errorf("%w: negative count in the table", ErrData)
 	}
 	if c00+c10 == 0 || c01+c11 == 0 || c00+c01 == 0 || c10+c11 == 0 {
-		return TestResult{nan, 1}, nil
+		return TestResult{qnan, 1}, nil
 	}
 	odds := math.Inf(1)
 	if c10 > 0 && c01 > 0 {

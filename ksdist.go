@@ -25,7 +25,7 @@ import (
 func smirnovSF(n int, x float64) float64 {
 	switch {
 	case x != x:
-		return nan
+		return qnan
 	case x <= 0:
 		return 1
 	case x >= 1:
@@ -63,11 +63,9 @@ func smirnovSF(n int, x float64) float64 {
 		return 1 + math.Expm1(logp)
 	}
 	// Lower sum: sf = x·Σ_{j=0}^{J} C(n,j) (1-x-j/n)^(n-j) (x+j/n)^(j-1),
-	// J the last j with 1-x-j/n > 0.
+	// J the last j with 1-x-j/n > 0
+	// (when n·x is an integer the term j = n - n·x is zero).
 	last := int(fn - nxfl - 1)
-	if alpha == 0 {
-		last--
-	}
 	logn := dd.Log(fn)
 	var logC dd.DD
 	var s dd.DD
@@ -98,7 +96,7 @@ func smirnovSF(n int, x float64) float64 {
 func kolmogorovSF(x float64) float64 {
 	switch {
 	case x != x:
-		return nan
+		return qnan
 	case x <= math.Pi/math.Sqrt(746*8):
 		return 1
 	}
@@ -132,7 +130,7 @@ func kolmogorovSF(x float64) float64 {
 func kstwoSF(n int, d float64) float64 {
 	switch {
 	case n < 1 || d != d:
-		return nan
+		return qnan
 	case d <= 0.5/float64(n):
 		return 1
 	case d >= 1:

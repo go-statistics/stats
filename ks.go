@@ -35,7 +35,7 @@ type KSResult struct {
 	StatisticSign int
 }
 
-var nanKS = KSResult{nan, nan, nan, 0}
+var nanKS = KSResult{qnan, qnan, qnan, 0}
 
 // KSTest1Samp is the one-sample Kolmogorov-Smirnov test of the null
 // hypothesis that x is a sample of the continuous distribution whose CDF
@@ -64,8 +64,8 @@ func KSTest1Samp[D Data](x D, cdf func(float64) float64, o *KSOptions) (KSResult
 	s := slices.Clone(v)
 	slices.Sort(s)
 	n := float64(len(s))
-	dplus, lplus := math.Inf(-1), nan
-	dminus, lminus := math.Inf(-1), nan
+	dplus, lplus := math.Inf(-1), qnan
+	dminus, lminus := math.Inf(-1), qnan
 	for i, xi := range s {
 		c := cdf(xi)
 		if d := float64(i+1)/n - c; d > dplus {
@@ -162,7 +162,7 @@ func KSTest2Samp[D Data](a, b D, o *KSOptions) (KSResult, error) {
 			minD, locMin = diff, v
 		}
 	}
-	minS := clip(-minD, 0, 1)
+	minS := clipTo(-minD, 0, 1)
 	var d, loc float64
 	sign := 1
 	switch {
@@ -176,7 +176,7 @@ func KSTest2Samp[D Data](a, b D, o *KSOptions) (KSResult, error) {
 
 // ks2Prob is SciPy's _ks_2samp_prob.
 func ks2Prob(d float64, n1, n2 int, method Method, alt Alternative) float64 {
-	g := gcd(n1, n2)
+	g := gcdInt(n1, n2)
 	n1g, n2g := n1/g, n2/g
 	switch method {
 	case MethodAuto:
@@ -204,7 +204,7 @@ func ks2Prob(d float64, n1, n2 int, method Method, alt Alternative) float64 {
 	return clip01(math.Exp(expt))
 }
 
-func gcd(a, b int) int {
+func gcdInt(a, b int) int {
 	for b != 0 {
 		a, b = b, a%b
 	}
@@ -234,7 +234,7 @@ func ks2Exact(n1, n2, g int, d float64, alt Alternative) (float64, bool) {
 		paths := countPathsOutside(n1, n2, g, h)
 		bin := special.Binom(float64(n1+n2), float64(n1))
 		if paths > bin || math.IsInf(bin, 0) {
-			return nan, false
+			return qnan, false
 		}
 		prob = paths / bin
 	}
