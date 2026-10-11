@@ -75,7 +75,7 @@ func checkAlternative(a Alternative) error {
 }
 
 // hasNaN reports whether any value is NaN.
-func hasNaN(v ...[]float64) bool {
+func anyNaN(v ...[]float64) bool {
 	for _, s := range v {
 		for _, x := range s {
 			if x != x {
@@ -97,17 +97,6 @@ func pvalueSym(t float64, sf func(float64) float64, alt Alternative) float64 {
 		return sf(t)
 	}
 	return 2 * sf(math.Abs(t))
-}
-
-// pvalueCDF is SciPy's _get_pvalue with explicit cdf and sf.
-func pvalueCDF(t float64, cdf, sf func(float64) float64, alt Alternative) float64 {
-	switch alt {
-	case Less:
-		return cdf(t)
-	case Greater:
-		return sf(t)
-	}
-	return 2 * math.Min(cdf(t), sf(t))
 }
 
 // normSF is special.ndtr(-z), SciPy's _SimpleNormal().sf.
@@ -199,31 +188,6 @@ func centralMoment(a []float64, center float64, order int) float64 {
 		}
 		return p
 	}) / float64(len(a))
-}
-
-// sampleSkew is scipy.stats.skew(a) (biased): m3/m2^1.5, NaN where the
-// variance is zero to working precision (m2 <= (eps·mean)²).
-func sampleSkew(a []float64) float64 {
-	m := mean(a)
-	m2 := centralMoment(a, m, 2)
-	m3 := centralMoment(a, m, 3)
-	if m2 <= (0x1p-52*m)*(0x1p-52*m) {
-		return qnan
-	}
-	return m3 / math.Pow(m2, 1.5)
-}
-
-// sampleKurtosis is scipy.stats.kurtosis(a, fisher=False) (biased,
-// Pearson's definition): m4/m2², NaN where the variance is zero to working
-// precision.
-func sampleKurtosis(a []float64) float64 {
-	m := mean(a)
-	m2 := centralMoment(a, m, 2)
-	m4 := centralMoment(a, m, 4)
-	if m2 <= (0x1p-52*m)*(0x1p-52*m) {
-		return qnan
-	}
-	return m4 / (m2 * m2)
 }
 
 // varDdof is SciPy's _var(a, ddof): mean of the squared deviations, then

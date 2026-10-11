@@ -126,6 +126,7 @@ def samples_2():
     out.append((np.full(5, 1.0), np.array([1.0, 2.0, 3.0])))
     out.append((np.array([1.0, np.nan, 3.0]), np.array([1.0, 2.0])))
     out.append((np.array([1.0]), np.array([2.0, 3.0, 5.0])))
+    out.append((np.array([2.0, 3.5, 5.0, 4.0]), np.array([1.0])))
     out.append((np.array([]), np.array([2.0, 3.0])))
     return out
 
@@ -223,7 +224,7 @@ def gen_chisq():
     ]
     for t in tables:
         for corr in [True, False]:
-            for lam in [None, 0, 2 / 3, -2]:
+            for lam in [None, 0, 2 / 3, -2, -1]:
                 def comp():
                     res = st.contingency.chi2_contingency(t, correction=corr, lambda_=lam)
                     return {"statistic": res.statistic, "pvalue": res.pvalue, "dof": res.dof,
@@ -234,7 +235,12 @@ def gen_chisq():
                [[0, 0], [3, 4]], [[2, 0], [5, 7]], [[100, 50], [40, 120]],
                [[1000, 980], [990, 1010]], [[20, 1], [1, 20]], [[7, 12], [0, 9]],
                [[1, 2], [3, 4]], [[50, 0], [0, 50]], [[3000, 2900], [2950, 3100]],
-               [[5, 15], [25, 10]], [[0, 1], [1, 0]], [[12, 5], [29, 2]]]
+               [[5, 15], [25, 10]], [[0, 1], [1, 0]], [[12, 5], [29, 2]],
+               [[0, 3], [30, 2]], [[3, 0], [2, 30]], [[1, 40], [0, 2]], [[2, 0], [40, 1]],
+               [[30, 1], [1, 0]], [[0, 1], [1, 30]], [[4, 50], [6, 2]], [[60, 2], [3, 1]]]
+    rf = rng(41)
+    for _ in range(40):
+        ftables.append(rf.integers(0, 25, (2, 2)).tolist())
     for t in ftables:
         for alt in ALTS:
             c.add("fisher_exact", [np.array(t, dtype=float).ravel()], {"alternative": alt},
@@ -273,7 +279,7 @@ def gen_corr():
     # few discordant pairs), and the n >= 171 recursion.
     r = rng(5)
     for n in [20, 33, 34, 60, 171, 180]:
-        x = r.permutation(n).astype(float)
+        x = np.arange(n, dtype=float)
         y = x.copy()
         y[:2] = y[1::-1]   # one discordant pair
         z = x + r.normal(0, n / 3, n)
@@ -415,7 +421,8 @@ def gen_norm():
     sets = samples_1()
     sets += [r.normal(0, 1, n) for n in [3, 4, 5, 6, 9, 11, 12, 25, 100, 499, 5001]]
     sets += [r.exponential(1, 30), r.uniform(0, 1, 40), r.logistic(2, 3, 50), r.gumbel(1, 2, 45),
-             -r.gumbel(1, 2, 45), np.array([1.0, 2, 4]), np.array([1.0, 2, 2.5])]
+             -r.gumbel(1, 2, 45), np.array([1.0, 2, 4]), np.array([1.0, 2, 2.5]),
+             np.arange(1.0, 11.0), np.array([0.0, 1] * 5), np.array([0.0, 1] * 50), np.array([0.0, 1, 0, 1, 0, 1, 0, 1, 0, 9])]
     for x in sets:
         c.add("shapiro", [x], {}, lambda: dict(zip(["statistic", "pvalue"], st.shapiro(x))))
         for alt in ALTS:

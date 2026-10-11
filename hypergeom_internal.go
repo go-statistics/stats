@@ -1,13 +1,16 @@
 package stats
 
-import "math"
+import (
+	"math"
+
+	"github.com/go-statistics/stats/internal/dd"
+)
 
 // The hypergeometric distribution behind Fisher's exact test, computed
 // with Loader's saddle-point expansion (the method of R's dhyper and
-// dbinom_raw): every probability mass carries a relative error of a few
-// ulps whatever the size of the table, where products of binomial
+// dbinom_raw) carried out in double-double: products of binomial
 // coefficients or differences of log-gamma values lose accuracy in
-// proportion to the magnitude of the logarithms.
+// proportion to the magnitude of the logarithms, this does not.
 
 // stirlingErrTable is log(n!) - log(sqrt(2πn)·(n/e)^n) for n = 0..15
 // (mpmath, 50 digits).
@@ -56,52 +59,58 @@ func stirlingErr(n float64) float64 {
 	return (s0 - (s1-(s2-(s3-(s4-s5/nn)/nn)/nn)/nn)/nn) / n
 }
 
-// bd0 is the deviance term x·log(x/np) + np - x, by a series where the
-// direct formula cancels.
-func bd0(x, np float64) float64 {
-	if math.Abs(x-np) < 0.1*(x+np) {
-		v := (x - np) / (x + np)
-		s := (x - np) * v
-		ej := 2 * x * v
-		v *= v
+// bd0 is the deviance term x·log(x/np) + np - x in double-double, by its
+// series where the direct formula cancels (|x - np| < 0.1·(x + np)).
+func bd0(x float64, np dd.DD) dd.DD {
+	d := dd.Sub(dd.F(x), np)
+	s := dd.AddF(np, x)
+	if math.Abs(d.Hi) < 0.1*s.Hi {
+		v := dd.Div(d, s)
+		sum := dd.Mul(d, v)
+		ej := dd.MulF(v, 2*x)
+		v2 := dd.Mul(v, v)
 		for j := 1; j < 1000; j++ {
-			ej *= v
-			s1 := s + ej/float64(2*j+1)
-			if s1 == s {
-				return s1
+			ej = dd.Mul(ej, v2)
+			t := dd.DivF(ej, float64(2*j+1))
+			sum = dd.Add(sum, t)
+			if math.Abs(t.Hi) <= 0x1p-110*math.Abs(sum.Hi) {
+				break
 			}
-			s = s1
 		}
+		return sum
 	}
-	return x*math.Log(x/np) + np - x
+	return dd.Sub(dd.Mul(dd.F(x), dd.Sub(dd.Log(x), logDD(np))), d)
 }
 
-// binomRaw is the binomial probability C(n,x)·p^x·q^(n-x), q = 1-p given
-// separately (R's dbinom_raw), for 0 <= x <= n and 0 < p, q < 1.
-func binomRaw(x, n, p, q float64) float64 {
+// binomExp returns log of the binomial probability C(n,x)·p^x·q^(n-x)
+// (R's dbinom_raw, Loader's saddle-point form) in double-double, for
+// 0 <= x <= n, 0 < p, q < 1 (q = 1 - p).
+func binomExp(x, n float64, p, q dd.DD) dd.DD {
 	switch x {
 	case 0:
-		if n == 0 {
-			return 1
+		if p.Hi < 0.1 {
+			return dd.Sub(dd.Neg(bd0(n, dd.MulF(q, n))), dd.MulF(p, n))
 		}
-		if p < 0.1 {
-			return math.Exp(-bd0(n, n*q) - n*p)
-		}
-		return math.Exp(n * math.Log(q))
+		return dd.MulF(logDD(q), n)
 	case n:
-		if q < 0.1 {
-			return math.Exp(-bd0(n, n*p) - n*q)
+		if q.Hi < 0.1 {
+			return dd.Sub(dd.Neg(bd0(n, dd.MulF(p, n))), dd.MulF(q, n))
 		}
-		return math.Exp(n * math.Log(p))
+		return dd.MulF(logDD(p), n)
 	}
-	lc := stirlingErr(n) - stirlingErr(x) - stirlingErr(n-x) - bd0(x, n*p) - bd0(n-x, n*q)
-	lf := math.Log(2*math.Pi) + math.Log(x) + math.Log1p(-x/n)
-	return math.Exp(lc - 0.5*lf)
+	lc := dd.F(stirlingErr(n) - stirlingErr(x) - stirlingErr(n-x))
+	lc = dd.Sub(lc, dd.Add(bd0(x, dd.MulF(p, n)), bd0(n-x, dd.MulF(q, n))))
+	// log(2π·x·(n-x)/n)
+	lf := dd.Add(dd.Add(dd.Log(2*math.Pi), dd.Log(x)), dd.Sub(dd.Log(n-x), dd.Log(n)))
+	lf = dd.AddF(lf, 2.4492935982947064e-16/(2*math.Pi)) // 2π's rounding error
+	return dd.Sub(lc, dd.MulF(lf, 0.5))
 }
 
 // hypergeom is the distribution of the number of marked items in a draw
 // of nDraw items without replacement from total items of which marked
-// are marked: scipy.stats.hypergeom(M=total, n=marked, N=nDraw).
+// are marked: scipy.stats.hypergeom(M=total, n=marked, N=nDraw). The
+// probabilities are computed in double-double and rounded once, so that
+// Fisher's p-values carry errors of a few ulps whatever the table.
 type hypergeom struct {
 	total, marked, nDraw float64
 }
@@ -109,47 +118,51 @@ type hypergeom struct {
 func (h hypergeom) lo() float64 { return math.Max(0, h.nDraw-(h.total-h.marked)) }
 func (h hypergeom) hi() float64 { return math.Min(h.marked, h.nDraw) }
 
-// pmf is P(X = k), k an integer.
-func (h hypergeom) pmf(k float64) float64 {
+// pmfDD is P(X = k), k an integer (0 < nDraw < total: Fisher's test
+// returns before any empty margin reaches here).
+func (h hypergeom) pmfDD(k float64) dd.DD {
 	if k < h.lo() || k > h.hi() {
-		return 0
-	}
-	if h.nDraw == 0 || h.nDraw == h.total {
-		return 1
+		return dd.DD{}
 	}
 	b := h.total - h.marked
-	p := h.nDraw / h.total
-	q := (h.total - h.nDraw) / h.total
-	return binomRaw(k, h.marked, p, q) * binomRaw(h.nDraw-k, b, p, q) / binomRaw(h.nDraw, h.total, p, q)
+	// Any p works (it cancels in the ratio); q must be 1 - p.
+	p := dd.DivF(dd.F(h.nDraw), h.total)
+	q := dd.Sub(dd.F(1), p)
+	e := dd.Sub(dd.Add(binomExp(k, h.marked, p, q), binomExp(h.nDraw-k, b, p, q)), binomExp(h.nDraw, h.total, p, q))
+	m, x := dd.ExpMant(e)
+	return dd.Ldexp(m, x)
 }
 
+func (h hypergeom) pmf(k float64) float64 { return h.pmfDD(k).Float() }
+
 // ratioDown is pmf(k-1)/pmf(k).
-func (h hypergeom) ratioDown(k float64) float64 {
-	return k * (h.total - h.marked - h.nDraw + k) / ((h.marked - k + 1) * (h.nDraw - k + 1))
+func (h hypergeom) ratioDown(k float64) dd.DD {
+	num := dd.MulFF(k, h.total-h.marked-h.nDraw+k)
+	return dd.Div(num, dd.MulFF(h.marked-k+1, h.nDraw-k+1))
 }
 
 // lowerSum is Σ_{j <= k} pmf(j), summed downward from k.
 func (h hypergeom) lowerSum(k float64) float64 {
 	lo := h.lo()
-	t := h.pmf(k)
+	t := h.pmfDD(k)
 	s := t
-	for j := k; j > lo && t > 1e-17*s; j-- {
-		t *= h.ratioDown(j)
-		s += t
+	for j := k; j > lo && t.Hi > 1e-34*s.Hi; j-- {
+		t = dd.Mul(t, h.ratioDown(j))
+		s = dd.Add(s, t)
 	}
-	return s
+	return s.Float()
 }
 
 // upperSum is Σ_{j >= k} pmf(j), summed upward from k.
 func (h hypergeom) upperSum(k float64) float64 {
 	hi := h.hi()
-	t := h.pmf(k)
+	t := h.pmfDD(k)
 	s := t
-	for j := k; j < hi && t > 1e-17*s; j++ {
-		t /= h.ratioDown(j + 1)
-		s += t
+	for j := k; j < hi && t.Hi > 1e-34*s.Hi; j++ {
+		t = dd.Div(t, h.ratioDown(j+1))
+		s = dd.Add(s, t)
 	}
-	return s
+	return s.Float()
 }
 
 // mode is the most probable count.
@@ -171,15 +184,11 @@ func (h hypergeom) cdf(k float64) float64 {
 	return 1 - h.upperSum(k+1)
 }
 
-// sf is P(X > k), k an integer.
+// sf is P(X > k), k an integer, summed upward from k+1 (Fisher's test
+// asks for it at or above the mode only).
 func (h hypergeom) sf(k float64) float64 {
-	switch {
-	case k < h.lo():
-		return 1
-	case k >= h.hi():
+	if k >= h.hi() {
 		return 0
-	case k+1 > h.mode():
-		return h.upperSum(k + 1)
 	}
-	return 1 - h.lowerSum(k)
+	return h.upperSum(k + 1)
 }

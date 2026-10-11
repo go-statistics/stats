@@ -38,7 +38,7 @@ func RankData[D Data](x D, method RankMethod) (D, error) {
 	}
 	v := floats(x)
 	r, _ := rankWithTies(v, method, false)
-	if hasNaN(v) {
+	if anyNaN(v) {
 		for i := range r {
 			r[i] = qnan
 		}

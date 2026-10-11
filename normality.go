@@ -18,7 +18,7 @@ import (
 func ShapiroWilk[D Data](x D) (TestResult, error) {
 	v := floats(x)
 	n := len(v)
-	if n < 3 || hasNaN(v) {
+	if n < 3 || anyNaN(v) {
 		return TestResult{qnan, qnan}, nil
 	}
 	y := slices.Clone(v)
@@ -171,11 +171,7 @@ func AndersonDarling[D Data](x D, dist ADDist) (AndersonResult, error) {
 		sig = []float64{15, 10, 5, 2.5, 1}
 		crit = round3(adAvalsExpon, 1.0+0.6/n)
 	case ADLogistic:
-		var err error
-		loc, scale, err = fitLogisticAD(v, xbar)
-		if err != nil {
-			return bad, err
-		}
+		loc, scale = fitLogisticAD(v, xbar)
 		for i, t := range y {
 			w[i] = (t - loc) / scale
 			logcdf[i] = special.LogExpit(w[i])
@@ -184,7 +180,7 @@ func AndersonDarling[D Data](x D, dist ADDist) (AndersonResult, error) {
 		sig = []float64{25, 10, 5, 2.5, 1, 0.5}
 		crit = round3(adAvalsLogistic, 1.0+0.25/n)
 	default:
-		if hasNaN(v) || slices.ContainsFunc(v, func(t float64) bool { return math.IsInf(t, 0) }) {
+		if anyNaN(v) || slices.ContainsFunc(v, func(t float64) bool { return math.IsInf(t, 0) }) {
 			return bad, fmt.Errorf("%w: the data contain non-finite values", ErrData)
 		}
 		data := v
@@ -194,7 +190,7 @@ func AndersonDarling[D Data](x D, dist ADDist) (AndersonResult, error) {
 				data[i] = -t
 			}
 		}
-		l, s, err := fitGumbelR(data)
+		l, s, xmin, c, err := fitGumbelR(data)
 		if err != nil {
 			return bad, err
 		}
@@ -203,7 +199,12 @@ func AndersonDarling[D Data](x D, dist ADDist) (AndersonResult, error) {
 			loc = -l
 		}
 		for i, t := range y {
-			z := (t - loc) / scale
+			// (t - loc)/scale with loc = xmin - scale·c unrounded: data far
+			// from 0 would otherwise lose the digits of the rounded loc.
+			z := (t-xmin)/scale + c
+			if dist == ADGumbelL {
+				z = (t+xmin)/scale - c
+			}
 			if dist == ADGumbelR {
 				logcdf[i] = -math.Exp(-z)
 				logsf[i] = math.Log(-math.Expm1(-math.Exp(-z)))
@@ -257,7 +258,7 @@ func interpLinear(x float64, xp, fp []float64) float64 {
 // fitLogisticAD is the logistic fit of anderson(dist="logistic"): the
 // maximum-likelihood equations solved by fsolve from (mean, std) with
 // xtol 1e-5, as SciPy does.
-func fitLogisticAD(x []float64, xbar float64) (loc, scale float64, err error) {
+func fitLogisticAD(x []float64, xbar float64) (loc, scale float64) {
 	n := float64(len(x))
 	t1 := make([]float64, len(x))
 	t2 := make([]float64, len(x))
@@ -272,11 +273,10 @@ func fitLogisticAD(x []float64, xbar float64) (loc, scale float64, err error) {
 		out[0] = sum(t1) - 0.5*n
 		out[1] = sum(t2) + n
 	}
-	r, err := optimize.Fsolve(optimize.SystemProblem{Func: f}, []float64{xbar, math.Sqrt(variance(x, 1))}, &optimize.RootOptions{Xtol: 1e-5})
-	if err != nil {
-		return qnan, qnan, fmt.Errorf("%w: logistic fit: %v", ErrFit, err)
-	}
-	return r.X[0], r.X[1], nil
+	// Fsolve fails only on a malformed problem; non-convergence is in
+	// r.Status, which SciPy's anderson ignores too.
+	r, _ := optimize.Fsolve(optimize.SystemProblem{Func: f}, []float64{xbar, math.Sqrt(variance(x, 1))}, &optimize.RootOptions{Xtol: 1e-5})
+	return r.X[0], r.X[1]
 }
 
 // fitGumbelR is scipy.stats.gumbel_r.fit(data): the scale solving the
@@ -286,10 +286,11 @@ func fitLogisticAD(x []float64, xbar float64) (loc, scale float64, err error) {
 // deviations d = x - min(x), which leaves it unchanged mathematically but
 // removes the cancellation SciPy suffers between mean(x) and the weighted
 // mean when the data sit far from 0 (data near 1e8 leave SciPy's scale
-// with an error of about 1e-9).
-func fitGumbelR(data []float64) (loc, scale float64, err error) {
+// with an error of about 1e-9). It also returns min(x) and
+// c = logsumexp(-d/s) - log n, loc being min(x) - s·c.
+func fitGumbelR(data []float64) (loc, scale, xmin, c float64, err error) {
 	n := float64(len(data))
-	xmin := slices.Min(data)
+	xmin = slices.Min(data)
 	d := make([]float64, len(data))
 	for i, x := range data {
 		d[i] = x - xmin
@@ -321,14 +322,14 @@ func fitGumbelR(data []float64) (loc, scale float64, err error) {
 	}
 	r, err := optimize.Brentq(fn, lo, hi, &optimize.BracketOptions{Xtol: 1e-14, Rtol: 1e-14})
 	if err != nil {
-		return qnan, qnan, fmt.Errorf("%w: gumbel fit: %v", ErrFit, err)
+		return qnan, qnan, qnan, qnan, fmt.Errorf("%w: gumbel fit: %v", ErrFit, err)
 	}
 	scale = r.Root
 	for i, v := range d {
 		sd[i] = -v / scale
 	}
-	loc = xmin - scale*(special.LogSumExp(sd)-math.Log(n))
-	return loc, scale, nil
+	c = special.LogSumExp(sd) - math.Log(n)
+	return xmin - scale*c, scale, xmin, c, nil
 }
 
 // SkewTestOptions are the options of SkewTest and KurtosisTest. The zero
@@ -353,10 +354,10 @@ func SkewTest[D Data](x D, o *SkewTestOptions) (TestResult, error) {
 }
 
 func skewZ(a []float64) float64 {
-	if len(a) < 8 || hasNaN(a) {
+	if len(a) < 8 || anyNaN(a) {
 		return qnan
 	}
-	b2 := sampleSkew(a)
+	b2 := skewness(a, false)
 	n := float64(len(a))
 	y := b2 * math.Sqrt(((n+1)*(n+3))/(6.0*(n-2)))
 	beta2 := 3.0 * (n*n + 27*n - 70) * (n + 1) * (n + 3) / ((n - 2.0) * (n + 5) * (n + 7) * (n + 9))
@@ -386,10 +387,10 @@ func KurtosisTest[D Data](x D, o *SkewTestOptions) (TestResult, error) {
 }
 
 func kurtosisZ(a []float64) float64 {
-	if len(a) < 5 || hasNaN(a) {
+	if len(a) < 5 || anyNaN(a) {
 		return qnan
 	}
-	b2 := sampleKurtosis(a)
+	b2 := kurt(a, false, true)
 	n := float64(len(a))
 	e := 3.0 * (n - 1) / (n + 1)
 	varb2 := 24.0 * n * (n - 2) * (n - 3) / ((n + 1) * (n + 1.) * (n + 3) * (n + 5))
@@ -398,15 +399,9 @@ func kurtosisZ(a []float64) float64 {
 	A := 6.0 + 8.0/sqrtbeta1*(2.0/sqrtbeta1+math.Sqrt(1+4.0/(sqrtbeta1*sqrtbeta1)))
 	term1 := 1 - 2/(9.0*A)
 	denom := 1 + x*math.Sqrt(2/(A-4.0))
-	var term2 float64
-	switch {
-	case denom > 0:
-		term2 = math.Pow((1-2.0/A)/denom, 1.0/3)
-	case denom < 0:
-		term2 = -math.Pow((1-2.0/A)/-denom, 1.0/3)
-	default:
-		term2 = qnan
-	}
+	// sign(denom)·((1-2/A)/|denom|)^(1/3); denom/|denom| is NaN for
+	// denom = 0, where SciPy returns NaN too.
+	term2 := crPow((1-2.0/A)/math.Abs(denom), 1.0/3) * (denom / math.Abs(denom))
 	return (term1 - term2) / math.Sqrt(2/(9.0*A))
 }
 
@@ -427,7 +422,7 @@ func Normaltest[D Data](x D) (TestResult, error) {
 // an empty sample gives NaN, as in SciPy.
 func JarqueBera[D Data](x D) (TestResult, error) {
 	a := floats(x)
-	if len(a) == 0 || hasNaN(a) {
+	if len(a) == 0 || anyNaN(a) {
 		return TestResult{qnan, qnan}, nil
 	}
 	m := mean(a)
@@ -435,8 +430,8 @@ func JarqueBera[D Data](x D) (TestResult, error) {
 	for i, v := range a {
 		d[i] = v - m
 	}
-	s := sampleSkew(d)
-	k := sampleKurtosis(d) - 3
+	s := skewness(d, false)
+	k := kurt(d, false, false)
 	n := float64(len(a))
 	stat := n / 6 * (s*s + k*k/4)
 	return TestResult{stat, chi2SF(2, stat)}, nil

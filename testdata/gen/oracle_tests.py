@@ -524,7 +524,7 @@ def kstwo_sf_exact(n, d):
         return mp.mpf(0)
     if dd >= 0.5:
         return 2 * smirnov_exact(n, d)          # exact for d >= 1/2
-    if n * dd <= 40:
+    if n * dd <= 25:
         return 1 - kstwo_cdf_durbin(n, d)
     return None
 
@@ -682,7 +682,7 @@ def o_mannwhitneyu(c, data):
     if method == "exact":
         k = int(u)
         lo, hi = min(n1, n2), max(n1, n2)
-        if k * min(n1, n2) > 3_000_000:
+        if k * min(n1, n2) > 30_000_000:
             return out
         total = comb(n1 + n2, n1)
         kc = n1 * n2 - k

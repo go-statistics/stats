@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/go-numerics/special"
+	"github.com/go-statistics/stats/internal/dd"
 )
 
 // MannWhitneyUOptions are the options of MannWhitneyU. The zero value
@@ -49,7 +50,7 @@ func MannWhitneyU[D Data](x, y D, o *MannWhitneyUOptions) (RankTestResult, error
 		return nanRank, fmt.Errorf("%w: mannwhitneyu method %v", ErrParam, o.Method)
 	}
 	a, b := floats(x), floats(y)
-	if len(a) == 0 || len(b) == 0 || hasNaN(a, b) {
+	if len(a) == 0 || len(b) == 0 || anyNaN(a, b) {
 		return nanRank, nil
 	}
 	xy := make([]float64, 0, len(a)+len(b))
@@ -129,24 +130,28 @@ type mwu struct {
 
 func newMWU(a, b int) mwu { return mwu{min(a, b), max(a, b)} }
 
-// pmfs returns P(U = u) for u = 0..maxu.
+// pmfs returns P(U = u) for u = 0..maxu. The counts are accumulated in
+// double-double: beyond 2^53 the subtractions of the numerator factors
+// cancel, and float64 counts leave relative errors of ~1e-11 in the tail
+// for samples of a few hundred.
 func (m mwu) pmfs(maxu int) []float64 {
 	n1, n2 := m.n1, m.n2
-	c := make([]float64, maxu+1)
-	c[0] = 1
+	c := make([]dd.DD, maxu+1)
+	c[0] = dd.F(1)
 	for i := 1; i <= n1; i++ {
 		for u := i; u <= maxu; u++ { // divide by 1 - q^i
-			c[u] += c[u-i]
+			c[u] = dd.Add(c[u], c[u-i])
 		}
 		for u := maxu; u >= n2+i; u-- { // multiply by 1 - q^(n2+i)
-			c[u] -= c[u-n2-i]
+			c[u] = dd.Sub(c[u], c[u-n2-i])
 		}
 	}
 	total := special.Binom(float64(n1+n2), float64(n1))
+	p := make([]float64, maxu+1)
 	for i := range c {
-		c[i] /= total
+		p[i] = dd.DivF(c[i], total).Float()
 	}
-	return c
+	return p
 }
 
 // sf is P(U >= k), SciPy's _MWU.sf: the complement's CDF where it is
@@ -232,7 +237,7 @@ func Wilcoxon[D Data](x, y D, o *WilcoxonOptions) (RankTestResult, error) {
 			d[i] = a[i] - b[i]
 		}
 	}
-	if len(d) == 0 || hasNaN(d) {
+	if len(d) == 0 || anyNaN(d) {
 		return nanRank, nil
 	}
 	return wilcoxon(d, o), nil
@@ -442,7 +447,7 @@ func KruskalWallis[D Data](samples ...D) (TestResult, error) {
 	total := 0
 	for i, s := range samples {
 		groups[i] = floats(s)
-		if len(groups[i]) == 0 || hasNaN(groups[i]) {
+		if len(groups[i]) == 0 || anyNaN(groups[i]) {
 			return TestResult{qnan, qnan}, nil
 		}
 		total += len(groups[i])

@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-numerics/special"
+	"github.com/go-statistics/stats/internal/dd"
 )
 
 // The Cressie-Read power λ of PowerDivergence: SciPy's named lambda_
@@ -53,14 +54,14 @@ func PowerDivergence[D Data](observed D, lambda float64, o *ChiSquareOptions) (T
 		if len(exp) != len(obs) {
 			return TestResult{qnan, qnan}, fmt.Errorf("%w: %d expected frequencies for %d observed", ErrData, len(exp), len(obs))
 		}
-		if hasNaN(obs, exp) {
+		if anyNaN(obs, exp) {
 			return TestResult{qnan, qnan}, nil
 		}
 		so, se := sum(obs), sum(exp)
 		if rel := math.Abs(so-se) / math.Min(so, se); rel > 1.4901161193847656e-08 {
 			return TestResult{qnan, qnan}, fmt.Errorf("%w: the observed frequencies sum to %v and the expected ones to %v (relative difference %v > sqrt(eps))", ErrData, so, se, rel)
 		}
-	} else if hasNaN(obs) {
+	} else if anyNaN(obs) {
 		return TestResult{qnan, qnan}, nil
 	}
 	if math.IsNaN(lambda) {
@@ -90,12 +91,26 @@ func powerDivergence(obs, exp []float64, ddof, lambda float64) TestResult {
 		case -1:
 			terms[i] = 2 * special.Xlogy(e, e/f)
 		default:
-			terms[i] = f * (math.Pow(f/e, lambda) - 1) / (0.5 * lambda * (lambda + 1))
+			terms[i] = f * (crPow(f/e, lambda) - 1) / (0.5 * lambda * (lambda + 1))
 		}
 	}
-	stat := sum(terms)
+	stat := sumDD(terms)
 	df := float64(len(obs)) - 1 - ddof
 	return TestResult{stat, chi2SF(df, stat)}
+}
+
+// sumDD is Σ a accumulated in double-double and rounded once: the
+// p-value of a large statistic is sensitive to its last bits (the
+// relative error of the chi-squared tail grows like x/2 times that of x).
+func sumDD(a []float64) float64 {
+	var s dd.DD
+	for _, v := range a {
+		if math.IsInf(v, 0) || v != v {
+			return sum(a)
+		}
+		s = dd.AddF(s, v)
+	}
+	return s.Float()
 }
 
 // Chi2ContingencyOptions are the options of Chi2Contingency. The zero
@@ -170,7 +185,7 @@ func Chi2Contingency(observed *ndarray.Array, o *Chi2ContingencyOptions) (Chi2Co
 	if o.Lambda != nil {
 		lambda = *o.Lambda
 	}
-	if hasNaN(obs) {
+	if anyNaN(obs) {
 		res.Statistic, res.PValue = qnan, qnan
 		return res, nil
 	}
@@ -215,7 +230,7 @@ func balancedDivergence(obs, exp []float64, ddof, lambda float64) TestResult {
 			terms[i] = e * powExcess(t, lambda+1) / (0.5 * lambda * (lambda + 1))
 		}
 	}
-	stat := sum(terms)
+	stat := sumDD(terms)
 	df := float64(len(obs)) - 1 - ddof
 	return TestResult{stat, chi2SF(df, stat)}
 }

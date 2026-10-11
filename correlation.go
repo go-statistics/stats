@@ -103,7 +103,7 @@ func Pearsonr[D Data](x, y D, o *CorrelationOptions) (PearsonResult, error) {
 	}
 	n := float64(len(a))
 	res := PearsonResult{n: n, alt: o.Alternative}
-	if hasNaN(a, b) || isConstant(a) || isConstant(b) {
+	if anyNaN(a, b) || isConstant(a) || isConstant(b) {
 		res.Statistic, res.PValue = qnan, qnan
 		return res, nil
 	}
@@ -161,7 +161,7 @@ func Spearmanr[D Data](x, y D, o *CorrelationOptions) (TestResult, error) {
 	if err != nil {
 		return TestResult{qnan, qnan}, err
 	}
-	if len(a) <= 1 || hasNaN(a, b) {
+	if len(a) <= 1 || anyNaN(a, b) {
 		return TestResult{qnan, qnan}, nil
 	}
 	// The two rankings (each a sort) run concurrently.
@@ -181,11 +181,7 @@ func Spearmanr[D Data](x, y D, o *CorrelationOptions) (TestResult, error) {
 	sy := math.Sqrt(dotDD(ym, ym) / (n - 1))
 	rs := clipTo(cxy/sx/sy, -1, 1)
 	dof := n - 2
-	q := dof / ((rs + 1) * (1 - rs))
-	if q < 0 {
-		q = 0
-	}
-	t := rs * math.Sqrt(q)
+	t := rs * math.Sqrt(dof/((rs+1)*(1-rs)))
 	return TestResult{rs, pvalueSym(t, studentSF(dof), o.Alternative)}, nil
 }
 
@@ -234,7 +230,7 @@ func Kendalltau[D Data](x, y D, o *KendallOptions) (TestResult, error) {
 	if err != nil {
 		return TestResult{qnan, qnan}, err
 	}
-	if len(a) <= 1 || hasNaN(a, b) {
+	if len(a) <= 1 || anyNaN(a, b) {
 		return TestResult{qnan, qnan}, nil
 	}
 	return kendall(a, b, o)
@@ -487,7 +483,7 @@ func Linregress[D Data](x, y D, o *CorrelationOptions) (LinregressResult, error)
 	if err != nil {
 		return bad, err
 	}
-	if len(a) <= 1 || hasNaN(a, b) {
+	if len(a) <= 1 || anyNaN(a, b) {
 		return bad, nil
 	}
 	const tiny = 1.0e-20

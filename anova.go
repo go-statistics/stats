@@ -22,7 +22,7 @@ func groupsOf[D Data](samples []D) (g [][]float64, degenerate bool) {
 	g = make([][]float64, len(samples))
 	for i, s := range samples {
 		g[i] = floats(s)
-		if len(g[i]) == 0 || hasNaN(g[i]) {
+		if len(g[i]) == 0 || anyNaN(g[i]) {
 			degenerate = true
 		}
 	}
@@ -196,7 +196,7 @@ func Levene[D Data](o *LeveneOptions, samples ...D) (TestResult, error) {
 		var c float64
 		switch o.Center {
 		case CenterMean:
-			c = mean(g)
+			c = meanDD(g) // correctly rounded (data far from 0 are ill-conditioned)
 		case CenterTrimmed:
 			s := slices.Clone(g)
 			slices.Sort(s)
@@ -204,13 +204,12 @@ func Levene[D Data](o *LeveneOptions, samples ...D) (TestResult, error) {
 			if lc > len(s)-lc {
 				return TestResult{qnan, qnan}, fmt.Errorf("%w: proportion to cut %v too big", ErrParam, cut)
 			}
-			// The trimmed mean in double-double: SciPy averages the
+			// The trimmed mean correctly rounded: SciPy averages the
 			// middle of np.partition's output, whose order (and so
-			// rounding) cannot be reproduced; the correctly rounded mean
-			// is the better reference.
+			// rounding) cannot be reproduced.
 			c = meanDD(s[lc : len(s)-lc])
 		default:
-			c = medianOf(g)
+			c = median(g)
 		}
 		z[i] = make([]float64, len(g))
 		for j, v := range g {
@@ -251,15 +250,4 @@ func meanDD(a []float64) float64 {
 		s = dd.AddF(s, v)
 	}
 	return dd.DivF(s, float64(len(a))).Float()
-}
-
-// median is np.median.
-func medianOf(a []float64) float64 {
-	s := slices.Clone(a)
-	slices.Sort(s)
-	n := len(s)
-	if n%2 == 1 {
-		return s[n/2]
-	}
-	return (s[n/2-1] + s[n/2]) / 2
 }

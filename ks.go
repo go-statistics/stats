@@ -58,7 +58,7 @@ func KSTest1Samp[D Data](x D, cdf func(float64) float64, o *KSOptions) (KSResult
 		return nanKS, fmt.Errorf("%w: ks_1samp method %v", ErrParam, o.Method)
 	}
 	v := floats(x)
-	if len(v) == 0 || hasNaN(v) {
+	if len(v) == 0 || anyNaN(v) {
 		return nanKS, nil
 	}
 	s := slices.Clone(v)
@@ -121,7 +121,7 @@ func KSTest2Samp[D Data](a, b D, o *KSOptions) (KSResult, error) {
 		return nanKS, fmt.Errorf("%w: ks_2samp method %v", ErrParam, o.Method)
 	}
 	x, y := floats(a), floats(b)
-	if len(x) == 0 || len(y) == 0 || hasNaN(x, y) {
+	if len(x) == 0 || len(y) == 0 || anyNaN(x, y) {
 		return nanKS, nil
 	}
 	s1, s2 := slices.Clone(x), slices.Clone(y)

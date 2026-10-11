@@ -84,9 +84,6 @@ func smirnovSF(n int, x float64) float64 {
 		if t != 0 && 4*float64(last+1-j)*t < 0x1p-52*s.Hi && j != last {
 			break
 		}
-		if t == 0 && j > n/2 {
-			break
-		}
 	}
 	return clip01(dd.MulF(s, x).Float())
 }
@@ -167,10 +164,7 @@ func logNFactorialDivNPowN(n float64) float64 {
 func kolmogn(n int, x float64, cdf bool) float64 {
 	fn := float64(n)
 	t := fn * x
-	if t <= 1 {
-		if t <= 0.5 {
-			return selectProb(0, 1, cdf)
-		}
+	if t <= 1 { // 1/(2n) < x <= 1/n (kstwoSF handles x <= 1/(2n))
 		var prob float64
 		if n <= 140 {
 			prob = 1

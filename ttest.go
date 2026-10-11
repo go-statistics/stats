@@ -84,7 +84,7 @@ func TTest1Samp[D Data](x D, popmean float64, o *TTestOptions) (TTestResult, err
 }
 
 func ttest1(a []float64, popmean float64, alt Alternative) TTestResult {
-	if len(a) == 0 || hasNaN(a) {
+	if len(a) == 0 || anyNaN(a) {
 		return nanTTest()
 	}
 	n := float64(len(a))
@@ -140,7 +140,7 @@ func TTestInd[D Data](a, b D, o *TTestIndOptions) (TTestResult, error) {
 		return nanTTest(), fmt.Errorf("%w: trim %v outside [0, 0.5)", ErrParam, o.Trim)
 	}
 	x, y := floats(a), floats(b)
-	if len(x) == 0 || len(y) == 0 || hasNaN(x, y) {
+	if len(x) == 0 || len(y) == 0 || anyNaN(x, y) {
 		return nanTTest(), nil
 	}
 	var v1, v2, m1, m2, n1, n2 float64
