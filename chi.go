@@ -44,13 +44,15 @@ func (s chiStd) logpdf(x float64) float64 {
 	return dd.Add(gammaLogDensity(s.k, halfSquare(x)), dd.Log(x)).Float()
 }
 
-func (s chiStd) cdf(x float64) float64 { return special.GammaP(s.k, x*x/2) }
-func (s chiStd) sf(x float64) float64  { return special.GammaQ(s.k, x*x/2) }
+// The distribution functions are the gamma(k) ones at x²/2, the square
+// carried in double-double and its rounding corrected (igamma).
+func (s chiStd) cdf(x float64) float64 { return igamma(s.k, halfSquare(x), false) }
+func (s chiStd) sf(x float64) float64  { return igamma(s.k, halfSquare(x), true) }
 func (s chiStd) logcdf(x float64) float64 {
-	return logPQ(special.GammaP(s.k, x*x/2), special.GammaQ(s.k, x*x/2))
+	return logPQ(s.cdf(x), s.sf(x))
 }
 func (s chiStd) logsf(x float64) float64 {
-	return logPQ(special.GammaQ(s.k, x*x/2), special.GammaP(s.k, x*x/2))
+	return logPQ(s.sf(x), s.cdf(x))
 }
 func (s chiStd) ppf(p float64) float64 { return math.Sqrt(2 * special.GammaPInv(s.k, p)) }
 func (s chiStd) isf(q float64) float64 { return math.Sqrt(2 * special.GammaQInv(s.k, q)) }
