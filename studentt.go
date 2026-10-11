@@ -108,6 +108,15 @@ func (s tStd) logsf(t float64) float64 { return s.logcdf(-t) }
 func (s tStd) lowerQuantile(p float64) float64 {
 	nu := s.df
 	z := special.BetaIncInv(nu/2, 0.5, 2*p)
+	if z < 1e-280 {
+		// z = ν/(ν+t²) below the normal range of the incomplete beta
+		// inverse: I_z(ν/2, 1/2) = z^(ν/2) / ((ν/2) B(ν/2, 1/2)) to
+		// relative order z, so log z = (2/ν)(log 2p + log(ν/2) +
+		// log B(ν/2, 1/2)) and t = -√(ν/z) = -exp((log ν - log z)/2).
+		lz := dd.Add(dd.Log(2*p), dd.Log(nu/2))
+		lz = dd.DivF(dd.MulF(dd.AddF(lz, special.LogBeta(nu/2, 0.5)), 2), nu)
+		return -expDD(dd.MulF(dd.Sub(dd.Log(nu), lz), 0.5))
+	}
 	var x float64
 	if z < 0.5 {
 		x = 1 - z
