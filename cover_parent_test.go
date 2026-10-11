@@ -86,3 +86,9 @@ func TestCoverParent(t *testing.T) {
 		}
 	}
 }
+
+func TestMidpointZero(t *testing.T) {
+	if m := midpoint(0, 1); m != 0x1p-32 {
+		t.Errorf("midpoint(0, 1) = %v", m)
+	}
+}

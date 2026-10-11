@@ -330,6 +330,14 @@ func rvsCompare(t *testing.T, d momenter, in parityInstance) (n, diff int, maxUL
 				t.Fatal(err)
 			}
 			n++
+			if math.IsNaN(got[i]) && math.IsNaN(w) {
+				continue // SciPy draws NaN too (t with df = inf)
+			}
+			if math.IsNaN(got[i]) != math.IsNaN(w) {
+				diff++
+				maxULP = math.Inf(1)
+				continue
+			}
 			if math.Float64bits(got[i]) != math.Float64bits(w) {
 				diff++
 				maxULP = math.Max(maxULP, math.Abs(got[i]-w)/ulp(w))

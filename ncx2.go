@@ -143,7 +143,7 @@ func (s ncx2Std) tailSum(y float64, upper bool) float64 {
 	for j := j0; j >= 0; j-- {
 		t := term(j)
 		sum += t
-		if t <= sum*0x1p-60 && t <= prev && j < s.mu-10*math.Sqrt(s.mu+1) {
+		if sum > 0 && t <= sum*0x1p-60 && t <= prev && j < s.mu-10*math.Sqrt(s.mu+1) {
 			break
 		}
 		prev = t
@@ -164,7 +164,19 @@ func (s ncx2Std) cdf(x float64) float64 {
 	if s.mu == 0 {
 		return s.central().cdf(x)
 	}
+	if x < ncx2Tiny {
+		return expDD(s.logCDFTiny(x))
+	}
 	return math.Min(1, s.tailSum(x/2, false))
+}
+
+// ncx2Tiny is where x/2 nears the bottom of the normal range; below, the
+// cdf is its j = 0 term e^-μ (x/2)^k / Γ(1+k), to relative order x.
+const ncx2Tiny = 1e-280
+
+func (s ncx2Std) logCDFTiny(x float64) dd.DD {
+	l := dd.MulF(dd.Sub(dd.Log(x), ln2DD), s.k)
+	return dd.AddF(l, -s.mu-logGamma1p(s.k))
 }
 
 func (s ncx2Std) sf(x float64) float64 {
