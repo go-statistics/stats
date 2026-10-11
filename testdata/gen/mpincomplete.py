@@ -50,8 +50,8 @@ def _tiny_guard(*vals):
 
 def _guard(*vals):
     """Extra bits needed for log-gamma / exponent cancellation."""
-    m = max([abs(float(v)) for v in vals] + [2.0])
-    return 64 + int(math.log2(m))
+    m = max([abs(mpf(v)) for v in vals] + [mpf(2)])
+    return 64 + int(mp.log(m, 2))
 
 
 # ------------------------------------------------------------ gamma oracles

@@ -77,15 +77,8 @@ func (s gammaStd) skew() float64     { return 2 / math.Sqrt(s.a) }
 func (s gammaStd) kurtosis() float64 { return 6 / s.a }
 func (s gammaStd) median() float64   { return special.GammaPInv(s.a, 0.5) }
 
-// entropy is SciPy's: (1-a)ψ(a) + a + log Γ(a), and its asymptotic
-// expansion from a = 250 where that cancels.
-func (s gammaStd) entropy() float64 {
-	a := s.a
-	if a < 250 {
-		return special.Digamma(a)*(1-a) + a + special.LogGamma(a)
-	}
-	return 0.5*(1+math.Log(2*math.Pi)+math.Log(a)) - 1/(3*a) - math.Pow(a, -2)/12 - math.Pow(a, -3)/90 + math.Pow(a, -4)/120
-}
+// entropy is log Γ(a) - (a-1)ψ(a) + a (gammaEntropyPart).
+func (s gammaStd) entropy() float64 { return gammaEntropyPart(s.a) }
 
 // munp is the rising factorial a(a+1)...(a+n-1) (SciPy's poch(a, n)).
 func (s gammaStd) munp(n int) float64 { return poch(s.a, n) }
@@ -175,16 +168,11 @@ func fitGammaFixedLoc(v []float64, loc float64, fx map[string]float64) (Gamma, e
 // polished to full precision.
 func solveLogMinusDigamma(s float64) float64 {
 	a := (3 - s + math.Sqrt((s-3)*(s-3)+24*s)) / (12 * s)
-	for i := 0; i < 100; i++ {
-		f := math.Log(a) - special.Digamma(a) - s
+	for i, done := 0, false; i < 100 && !done; i++ {
+		f := logMinusDigamma(a) - s
 		fp := 1/a - special.Polygamma(1, a)
-		na := a - f/fp
-		if !(na > 0) {
-			na = a / 2
-		}
-		if math.Abs(na-a) <= 4e-16*a {
-			return na
-		}
+		na := math.Max(a-f/fp, a/8)
+		done = math.Abs(na-a) <= 4e-16*a
 		a = na
 	}
 	return a
@@ -197,14 +185,9 @@ func digammaInv(y float64) float64 {
 	if y < -2.22 {
 		a = -1 / (y - special.Digamma(1))
 	}
-	for i := 0; i < 100; i++ {
-		na := a - (special.Digamma(a)-y)/special.Polygamma(1, a)
-		if !(na > 0) {
-			na = a / 2
-		}
-		if math.Abs(na-a) <= 4e-16*a {
-			return na
-		}
+	for i, done := 0, false; i < 100 && !done; i++ {
+		na := math.Max(a-(special.Digamma(a)-y)/special.Polygamma(1, a), a/8)
+		done = math.Abs(na-a) <= 4e-16*a
 		a = na
 	}
 	return a
@@ -222,4 +205,31 @@ func skewOf(v []float64) float64 {
 	}
 	m2, m3 := mean(d2), mean(d3)
 	return m3 / math.Pow(m2, 1.5)
+}
+
+// igamma returns P(a, x) (or Q(a, x) when upper) at the double-double x:
+// the incomplete function at x.Hi plus the first-order correction
+// density·x.Lo (the gamma density being dP/dx).
+func igamma(a float64, x dd.DD, upper bool) float64 {
+	if upper {
+		q := special.GammaQ(a, x.Hi)
+		if x.Lo != 0 {
+			q -= gammaDensity(a, dd.F(x.Hi), dd.F(x.Lo))
+		}
+		return q
+	}
+	p := special.GammaP(a, x.Hi)
+	if x.Lo != 0 {
+		p += gammaDensity(a, dd.F(x.Hi), dd.F(x.Lo))
+	}
+	return p
+}
+
+// logMinusDigamma is log a - ψ(a), computed as 1/(2a) + R(a) from a = 30
+// (the difference cancels: it is about 1/(2a)).
+func logMinusDigamma(a float64) float64 {
+	if a < stirlingMin {
+		return math.Log(a) - special.Digamma(a)
+	}
+	return 0.5/a + digammaTail(a)
 }

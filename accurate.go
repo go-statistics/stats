@@ -3,6 +3,7 @@ package stats
 import (
 	"math"
 
+	"github.com/go-numerics/special"
 	"github.com/go-statistics/stats/internal/dd"
 )
 
@@ -106,4 +107,34 @@ func gammaRatioHalf(x float64) dd.DD {
 		s = dd.AddF(dd.Mul(s, r), gammaRatioHalfSeries[k])
 	}
 	return dd.Mul(dd.Mul(s, dd.Sqrt(y)), prod)
+}
+
+// zetaOverN[i] is ζ(i+2)/(i+2) (mpmath).
+var zetaOverN = [...]float64{
+	0.8224670334241132, 0.40068563438653143, 0.27058080842778454, 0.20738555102867398,
+	0.1695571769974082, 0.1440498967688461, 0.12550966952474304, 0.11133426586956469,
+	0.1000994575127818, 0.09095401714582904, 0.083353840546109, 0.0769325164113522,
+	0.07143294629536133, 0.06666870588242046, 0.06250095514121304, 0.058823978658684585,
+	0.055555767627403614, 0.05263167937961666, 0.05000004769810169, 0.047619070330142226,
+	0.04545455629320467, 0.04347826605304026, 0.04166666915034121, 0.04000000119214014,
+	0.03846153903467518, 0.037037037312989324, 0.035714285847333355, 0.034482758684919304,
+	0.03333333336437758, 0.03225806453115042,
+}
+
+// logGamma1p is log Γ(1+k) for 0 <= k, with full relative accuracy as k
+// goes to 0 (where log Γ(1+k) ≈ -γk): the Taylor series
+// -γk + Σ_{n>=2} (-1)^n ζ(n)/n k^n below k = 0.2, log Γ(1+k) beyond.
+func logGamma1p(k float64) float64 {
+	if k >= 0.2 {
+		return special.LogGamma(1 + k)
+	}
+	s := 0.0
+	for i := len(zetaOverN) - 1; i >= 0; i-- {
+		c := zetaOverN[i]
+		if i%2 == 1 { // n = i+2 odd: negative sign
+			c = -c
+		}
+		s = s*k + c
+	}
+	return k * (-0.5772156649015329 + k*s)
 }

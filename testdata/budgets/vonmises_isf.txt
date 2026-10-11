@@ -1,0 +1,3 @@
+lower 1.1
+core 4.7
+upper 1.5

@@ -83,9 +83,6 @@ func FitNormal[D Data](x D, o *FitOptions) (Normal, error) {
 	}
 	loc, haveLoc := fx["Loc"]
 	scale, haveScale := fx["Scale"]
-	if haveLoc && haveScale {
-		return Normal{}, errAllFixed
-	}
 	if !haveLoc {
 		loc = mean(v)
 	}
