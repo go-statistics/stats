@@ -68,12 +68,13 @@ func stirlingSeries(x float64) float64 {
 // double-double, so that the caller's np need not be rounded), as
 // M·g(u) with u = (x-M)/M and g(u) = (1+u) log(1+u) - u = u² - (1+u)·h(u),
 // h(u) = u - log(1+u) from log1pmx (accurate also for small u); for
-// x > 2M directly.
+// x > 2M and x < M/2 directly.
 func bd0(x float64, m dd.DD) dd.DD {
 	u := dd.Div(dd.AddF(dd.Neg(m), x), m)
-	if u.Hi > 1 {
-		// x > 2M: the direct form, without cancellation there (and without
-		// the overflow of u² for x/M beyond 1e154)
+	if u.Hi > 1 || u.Hi < -0.5 {
+		// x > 2M or x < M/2: the direct form, without cancellation there
+		// (and without the overflow of u² for x/M beyond 1e154, or the
+		// rounding of 1+u to 0 for x/M below 1e-16)
 		t := dd.Mul(dd.F(x), dd.Sub(dd.Log(x), logDD(m)))
 		return dd.AddF(dd.Add(t, m), -x)
 	}
