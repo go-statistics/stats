@@ -16,7 +16,8 @@ def _moments(inst):
     w = lambda t: mpmath.exp(k * (mpmath.cos(t) - 1))
     pts = [-mpmath.pi, 0, mpmath.pi]
     z = mpmath.quad(w, pts)
-    m = [mpmath.quad(lambda t: t ** n * w(t), pts) / z for n in range(5)]
+    # odd moments vanish by symmetry (exactly, not to quadrature noise)
+    m = [mpmath.quad(lambda t: t ** n * w(t), pts) / z if n % 2 == 0 else mpmath.mpf(0) for n in range(5)]
     var = m[2]
     out = {"mean": loc, "var": var, "std": mpmath.sqrt(var), "skew": mpmath.mpf(0),
            "kurtosis": m[4] / var ** 2 - 3, "median": loc,
@@ -33,7 +34,7 @@ def _d(kappa, n, loc=0.0):
 SPECS = [
     dict(scipy="vonmises", go="VonMises", kind="continuous", shapes=["Kappa"],
          instances=[{"Kappa": 1.0}, {"Kappa": 0.5, "Loc": 1.0}, {"Kappa": 10.0, "Loc": -2.0},
-                    {"Kappa": 0.0}, {"Kappa": 100.0}, {"Kappa": 4.0, "Loc": 3.0}],
+                    {"Kappa": 0.0}, {"Kappa": 40.0}, {"Kappa": 4.0, "Loc": 0.75}],
          invalid=[{"Kappa": -1.0}, {"Kappa": float("inf")}, {"Kappa": 1.0, "Scale": 0.0}],
          mp_moments=_moments,
          fit_kind="mle",

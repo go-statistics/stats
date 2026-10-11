@@ -1,0 +1,4 @@
+near_zero 1
+core 1
+near_mode 1
+near_one 1

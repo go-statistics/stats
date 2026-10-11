@@ -30,19 +30,12 @@ type Reciprocal struct {
 // same distribution as Reciprocal, under the name SciPy also gives it.
 type LogUniform = Reciprocal
 
-func (d Reciprocal) std() reciprocalStd {
-	s := reciprocalStd{a: d.A, b: d.B}
-	if s.valid() {
-		s.l = logRatio(s.b, s.a)
-	}
-	return s
-}
+func (d Reciprocal) std() reciprocalStd { return reciprocalStd{a: d.A, b: d.B} }
 
-// reciprocalStd carries l = log(b/a) in double-double.
-type reciprocalStd struct {
-	a, b float64
-	l    dd.DD
-}
+type reciprocalStd struct{ a, b float64 }
+
+// l is log(b/a) in double-double.
+func (s reciprocalStd) l() dd.DD { return logRatio(s.b, s.a) }
 
 func (s reciprocalStd) valid() bool {
 	return s.a > 0 && s.b > s.a && !math.IsInf(s.b, 1)
@@ -50,27 +43,27 @@ func (s reciprocalStd) valid() bool {
 func (s reciprocalStd) support() (lo, hi float64) { return s.a, s.b }
 
 func (s reciprocalStd) pdf(x float64) float64 {
-	return dd.Div(dd.F(1), dd.MulF(s.l, x)).Float()
+	return dd.Div(dd.F(1), dd.MulF(s.l(), x)).Float()
 }
 
 func (s reciprocalStd) logpdf(x float64) float64 {
-	return dd.Neg(dd.Add(dd.Log(x), logDD(s.l))).Float()
+	return dd.Neg(dd.Add(dd.Log(x), logDD(s.l()))).Float()
 }
 
-func (s reciprocalStd) cdfD(x float64) dd.DD { return dd.Div(logRatio(x, s.a), s.l) }
-func (s reciprocalStd) sfD(x float64) dd.DD  { return dd.Div(logRatio(s.b, x), s.l) }
+func (s reciprocalStd) cdfD(x float64) dd.DD { return dd.Div(logRatio(x, s.a), s.l()) }
+func (s reciprocalStd) sfD(x float64) dd.DD  { return dd.Div(logRatio(s.b, x), s.l()) }
 
 func (s reciprocalStd) cdf(x float64) float64    { return s.cdfD(x).Float() }
 func (s reciprocalStd) sf(x float64) float64     { return s.sfD(x).Float() }
 func (s reciprocalStd) logcdf(x float64) float64 { return logPair(s.cdfD(x), s.sfD(x)) }
 func (s reciprocalStd) logsf(x float64) float64  { return logPair(s.sfD(x), s.cdfD(x)) }
 
-func (s reciprocalStd) ppf(p float64) float64 { return expScaledR(dd.MulF(s.l, p), dd.F(s.a)) }
-func (s reciprocalStd) isf(q float64) float64 { return expScaledR(dd.MulF(s.l, -q), dd.F(s.b)) }
+func (s reciprocalStd) ppf(p float64) float64 { return expScaledR(dd.MulF(s.l(), p), dd.F(s.a)) }
+func (s reciprocalStd) isf(q float64) float64 { return expScaledR(dd.MulF(s.l(), -q), dd.F(s.b)) }
 
 // ratioMoment is E[(Y/a)^n] = expm1(n l)/(n l), n >= 1, in double-double.
 func (s reciprocalStd) ratioMoment(n int) dd.DD {
-	t := dd.MulF(s.l, float64(n))
+	t := dd.MulF(s.l(), float64(n))
 	return dd.Div(expm1D(t), t)
 }
 
@@ -107,7 +100,7 @@ func (s reciprocalStd) median() float64 { return s.ppf(0.5) }
 
 // entropy is log a + l/2 + log l.
 func (s reciprocalStd) entropy() float64 {
-	return dd.Add(dd.Add(dd.Log(s.a), dd.MulF(s.l, 0.5)), logDD(s.l)).Float()
+	return dd.Add(dd.Add(dd.Log(s.a), dd.MulF(s.l(), 0.5)), logDD(s.l())).Float()
 }
 
 // munp is (b^n - a^n)/(n l) = a^n expm1(n l)/(n l).

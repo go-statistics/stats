@@ -3,6 +3,7 @@ package stats
 import (
 	"fmt"
 	"math"
+	"sync/atomic"
 
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
@@ -39,20 +40,26 @@ type VonMises struct {
 	Kappa, Loc, Scale float64
 }
 
-func (d VonMises) std() vonmisesStd {
-	s := vonmisesStd{k: d.Kappa}
-	if s.valid() {
-		s.i0e = special.I0e(s.k)
-		s.c0 = dd.Div(dd.F(1), dd.MulF(twoPiDD, s.i0e))
-	}
-	return s
-}
+func (d VonMises) std() vonmisesStd { return vonmisesStd{k: d.Kappa} }
 
-// vonmisesStd carries the concentration k, I0e(k) and the density's
-// factor c0 = 1/(2π I0e(k)).
-type vonmisesStd struct {
-	k, i0e float64
-	c0     dd.DD
+type vonmisesStd struct{ k float64 }
+
+// c0 is the density's factor 1/(2π I0e(k)) (the density being
+// c0·exp(k(cos x - 1))).
+func (s vonmisesStd) c0() dd.DD { return dd.Div(dd.F(1), dd.MulF(twoPiDD, s.i0e())) }
+
+// vmI0e caches the last I0e(k) computed: special.I0e costs microseconds,
+// and a distribution is usually evaluated many times at one Kappa.
+var vmI0e atomic.Pointer[[2]float64]
+
+// i0e returns I0e(k), from the cache when k is the last one asked for.
+func (s vonmisesStd) i0e() float64 {
+	if c := vmI0e.Load(); c != nil && c[0] == s.k {
+		return c[1]
+	}
+	v := special.I0e(s.k)
+	vmI0e.Store(&[2]float64{s.k, v})
+	return v
 }
 
 func (s vonmisesStd) valid() bool             { return s.k >= 0 && !math.IsInf(s.k, 1) }
@@ -85,12 +92,12 @@ func vmCosm1(r dd.DD) dd.DD {
 
 func (s vonmisesStd) pdf(z float64) float64 {
 	r, _ := vmReduce(z)
-	return expScaledR(dd.MulF(vmCosm1(r), s.k), s.c0)
+	return expScaledR(dd.MulF(vmCosm1(r), s.k), s.c0())
 }
 
 func (s vonmisesStd) logpdf(z float64) float64 {
 	r, _ := vmReduce(z)
-	return dd.Sub(dd.MulF(vmCosm1(r), s.k), dd.Add(log2PiDD, dd.Log(s.i0e))).Float()
+	return dd.Sub(dd.MulF(vmCosm1(r), s.k), dd.Add(log2PiDD, dd.Log(s.i0e()))).Float()
 }
 
 // tsRule is the tanh-sinh rule with step 1/16 on [0, 1]: nodes
@@ -126,15 +133,16 @@ func tanhSinh(f func(t float64) float64, a, w float64, stride int) float64 {
 const vmCut = 50
 
 // expIntegral returns ∫_0^L exp(-Δ(τ)) dτ for an increasing Δ >= 0 with
-// Δ(0) = 0: the fine rule up to where Δ reaches vmCut (found by
-// bisection), a coarse one beyond, where the integrand is below e^-50.
+// Δ(0) = 0: the fine rule up to about where Δ reaches vmCut (found by a
+// short bisection: the split need not be exact), a coarse one beyond,
+// where the integrand is below e^-40.
 func expIntegral(delta func(t float64) float64, l float64) float64 {
 	f := func(t float64) float64 { return math.Exp(-delta(t)) }
 	if !(delta(l) > vmCut) {
 		return tanhSinh(f, 0, l, 1)
 	}
 	lo, hi := 0.0, l
-	for i := 0; i < 64; i++ {
+	for i := 0; i < 16; i++ {
 		m := (lo + hi) / 2
 		if delta(m) < vmCut {
 			lo = m
@@ -154,12 +162,21 @@ func (s vonmisesStd) lowerTail(x dd.DD) dd.DD {
 	if s.k == 0 {
 		return dd.Div(l, twoPiDD)
 	}
-	xh := x.Hi
+	// sin(τ/2 - x) = sin(τ/2) cos x - cos(τ/2) sin x, with sin x and cos x
+	// from x + π where x is near -π (exact there in double-double)
+	var sx, cx float64
+	if l.Hi < math.Pi/2 {
+		sx, cx = math.Sincos(l.Float())
+		sx, cx = -sx, -cx
+	} else {
+		sx, cx = math.Sincos(x.Hi)
+	}
 	k := s.k
 	j := expIntegral(func(t float64) float64 {
-		return 2 * k * math.Sin(t/2) * math.Sin(t/2-xh)
+		st, ct := math.Sincos(t / 2)
+		return 2 * k * st * (st*cx - ct*sx)
 	}, l.Float())
-	return dd.MulF(dd.Mul(expD(dd.MulF(vmCosm1(x), k)), s.c0), j)
+	return dd.MulF(dd.Mul(expD(dd.MulF(vmCosm1(x), k)), s.c0()), j)
 }
 
 // f0 returns the CDF within the period, for r in [-π, π].
@@ -205,31 +222,41 @@ func (s vonmisesStd) solveLower(p float64) float64 {
 	lo, hi := -math.Pi, 0.0
 	x := -math.Pi + 2*math.Pi*p
 	if s.k >= 2 {
-		if v := special.Ndtri(p) * s.i0e / sqrt2OverPi.Hi; v > -1 {
+		if v := special.Ndtri(p) * s.i0e() / sqrt2OverPi.Hi; v > -1 {
 			x = 2 * math.Asin(v)
 		}
 	}
 	lp := math.Log(p)
-	for i := 0; i < 100; i++ {
+	g := func(x float64) (float64, float64) {
 		f := s.lowerTail(dd.F(x))
-		g := logD(f).Float() - lp
-		if g > 0 {
+		return logD(f).Float() - lp, f.Float()
+	}
+	for i := 0; i < 100; i++ {
+		gx, f := g(x)
+		if gx > 0 {
 			hi = x
 		} else {
 			lo = x
 		}
-		if g == 0 {
-			return x
+		nx := x - gx*f/s.pdf(x)
+		if math.Abs(nx-x) <= 4*0x1p-52*math.Abs(x) {
+			x = nx
+			break
 		}
-		dx := -g * f.Float() / s.pdf(x)
-		nx := x + dx
 		if !(nx > lo && nx < hi) {
 			nx = lo + (hi-lo)/2
 		}
-		if math.Abs(nx-x) <= 0x1p-60*math.Abs(x) || nx == x {
-			return nx
-		}
 		x = nx
+	}
+	// polish: step to the neighbouring float while it is closer
+	gx, _ := g(x)
+	for i := 0; i < 8 && gx != 0; i++ {
+		y := math.Nextafter(x, math.Copysign(math.Inf(1), -gx))
+		gy, _ := g(y)
+		if !(math.Abs(gy) < math.Abs(gx)) {
+			break
+		}
+		x, gx = y, gy
 	}
 	return x
 }
@@ -243,39 +270,76 @@ func (s vonmisesStd) ppf(p float64) float64 {
 
 func (s vonmisesStd) isf(q float64) float64 { return -s.ppf(q) }
 
-// integral returns ∫_0^π exp(k(cos θ - 1)) g(θ) dθ by the quadrature of
-// lowerTail (Δ = 2k sin²(θ/2)).
-func (s vonmisesStd) integral(g func(t float64) float64) float64 {
+// moments returns ∫_0^π exp(k(cos θ - 1)) θ^n dθ for n = 0, 2, 4 and
+// ∫_0^π exp(k(cos θ - 1)) (1 - cos θ) dθ, by the quadrature of lowerTail
+// carried in double-double throughout (integrand, powers, products and
+// sums), so that the kurtosis, m0 m4/m2² - 3, keeps its digits where it
+// is small (at k = 100 it is 0.0102: the difference cancels 8 bits).
+func (s vonmisesStd) moments() (m0, m2, m4, c dd.DD) {
 	k := s.k
-	delta := func(t float64) float64 {
-		sn := math.Sin(t / 2)
-		return 2 * k * sn * sn
+	add := func(lo, w float64, stride int) {
+		for i := 0; i < len(tsNode); i += stride {
+			t := lo + w*tsNode[i]
+			sn, _ := sincosD(dd.F(t / 2))
+			om := dd.MulF(dd.Mul(sn, sn), 2) // 1 - cos t
+			f := dd.MulF(expD(dd.MulF(om, -k)), tsWeight[i]*w*float64(stride))
+			t2 := dd.MulFF(t, t)
+			m0 = dd.Add(m0, f)
+			f2 := dd.Mul(f, t2)
+			m2 = dd.Add(m2, f2)
+			m4 = dd.Add(m4, dd.Mul(f2, t2))
+			c = dd.Add(c, dd.Mul(f, om))
+		}
 	}
-	f := func(t float64) float64 { return math.Exp(-delta(t)) * g(t) }
-	if !(delta(math.Pi) > vmCut) {
-		return tanhSinh(f, 0, math.Pi, 1)
+	if !(2*k > vmCut) {
+		add(0, math.Pi, 1)
+		return
 	}
-	c := 2 * math.Asin(math.Sqrt(vmCut/(2*k)))
-	return tanhSinh(f, 0, c, 1) + tanhSinh(f, c, math.Pi-c, 4)
+	cut := 2 * math.Asin(math.Sqrt(vmCut/(2*k)))
+	add(0, cut, 1)
+	add(cut, math.Pi-cut, 4)
+	return
 }
 
 // munp is E[X^n] over [-π, π]: 0 for odd n, the ratio of quadratures
-// ∫ θ^n f / ∫ f for even n.
+// ∫ θ^n f / ∫ f for even n (n = 2 and 4 in double-double).
 func (s vonmisesStd) munp(n int) float64 {
-	if n%2 == 1 {
+	m0, m2, m4, _ := s.moments()
+	switch {
+	case n%2 == 1:
 		return 0
+	case n == 2:
+		return dd.Div(m2, m0).Float()
+	case n == 4:
+		return dd.Div(m4, m0).Float()
 	}
-	fn := float64(n)
-	return s.integral(func(t float64) float64 { return math.Pow(t, fn) }) /
-		s.integral(func(float64) float64 { return 1 })
+	k, fn := s.k, float64(n)
+	var num, den float64
+	f := func(lo, w float64, stride int) {
+		for i := 0; i < len(tsNode); i += stride {
+			t := lo + w*tsNode[i]
+			sn := math.Sin(t / 2)
+			e := math.Exp(-2*k*sn*sn) * tsWeight[i] * w * float64(stride)
+			num += e * math.Pow(t, fn)
+			den += e
+		}
+	}
+	if !(2*k > vmCut) {
+		f(0, math.Pi, 1)
+	} else {
+		cut := 2 * math.Asin(math.Sqrt(vmCut/(2*k)))
+		f(0, cut, 1)
+		f(cut, math.Pi-cut, 4)
+	}
+	return num / den
 }
 
 func (s vonmisesStd) mean() float64     { return 0 }
 func (s vonmisesStd) variance() float64 { return s.munp(2) }
 func (s vonmisesStd) skew() float64     { return 0 }
 func (s vonmisesStd) kurtosis() float64 {
-	v := s.munp(2)
-	return s.munp(4)/(v*v) - 3
+	m0, m2, m4, _ := s.moments()
+	return dd.AddF(dd.Div(dd.Mul(m4, m0), dd.Mul(m2, m2)), -3).Float()
 }
 func (s vonmisesStd) median() float64 { return 0 }
 
@@ -283,11 +347,8 @@ func (s vonmisesStd) median() float64 { return 0 }
 // 1 - I1/I0 = ∫ (1 - cos θ) f / ∫ f by quadrature (SciPy's
 // -k I1e/I0e + k cancels for large k).
 func (s vonmisesStd) entropy() float64 {
-	a := s.integral(func(t float64) float64 {
-		sn := math.Sin(t / 2)
-		return 2 * sn * sn
-	}) / s.integral(func(float64) float64 { return 1 })
-	return dd.Add(dd.F(s.k*a), dd.Add(log2PiDD, dd.Log(s.i0e))).Float()
+	m0, _, _, c := s.moments()
+	return dd.Add(dd.MulF(dd.Div(c, m0), s.k), dd.Add(log2PiDD, dd.Log(s.i0e()))).Float()
 }
 
 // rvs draws standard variates as SciPy's _rvs (numpy's vonmises(0, k));

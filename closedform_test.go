@@ -32,6 +32,17 @@ func init() {
 	// 6204 in the core): at c = 50, q = 0.999999 it is off by 5e-10
 	// relative.
 	parityPointTol["Lomax"] = 1e-8
+
+	// SciPy's von Mises CDF is a series truncated for 12 digits and, from
+	// kappa = 50, a normal approximation: at kappa = 100 its quantiles are
+	// off by 2e-5 relative (mpmath: CDF(SciPy's ppf(0.01)) = 0.0100005),
+	// and its SF, 1 - CDF, loses digits in the upper tail.
+	parityPointTol["VonMises"] = 1e-4
+	// go-ndarray's von Mises sampler differs from NumPy's in the last
+	// bits of about one draw in eight (its acos/cos round differently), and
+	// SciPy's wrap np.mod(x + π, 2π) - π magnifies a last-bit difference
+	// of x + π into up to a million ulps of a draw near 0.
+	rvsULP["VonMises"] = 1e6
 	// SciPy's Cauchy draws are Boost's -1/tan(π·U) with the C library's
 	// tan, which on the reference build is its sin/cos ratio and misrounds
 	// a third of its results by up to 3 ulp; ours rounds the same formula
