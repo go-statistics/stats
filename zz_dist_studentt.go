@@ -239,7 +239,8 @@ func (d StudentT) Moment(n int) float64 {
 	if !d.ok() {
 		return math.NaN()
 	}
-	return momentLocScale(n, d.Loc, d.Scale, d.std().munp)
+	s := d.std()
+	return momentLocScale(n, d.Loc, d.Scale, func(k int) float64 { return rawMoment(s, k) })
 }
 
 // Interval is the equal-tailed interval with the given probability mass:

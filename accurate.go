@@ -76,3 +76,34 @@ func log1pmxNeg(u dd.DD) dd.DD {
 	}
 	return dd.Sub(u, log1pDD(u))
 }
+
+// gammaRatioHalfSeries are the coefficients of S(y) in
+// Γ(y+1/2)/Γ(y) = √y · S(y), S(y) = Σ c_k y^-k (from the Stirling series:
+// log of the ratio = Σ (-1)^(k+1) (B_{k+1}(1/2) - B_{k+1}(0)) / (k(k+1) y^k),
+// exponentiated; mpmath). Twelve terms give 1e-20 relative from y = 25.
+var gammaRatioHalfSeries = [...]float64{
+	1, -0.125, 0.0078125, 0.0048828125, -0.000640869140625, -0.001522064208984375,
+	0.0002071857452392578, 0.0011719763278961182, -0.0001557529903948307,
+	-0.0016715728561393917, 0.00021717708659707569, 0.003820047111275926,
+	-0.0004892696652092354,
+}
+
+// gammaRatioHalf returns Γ(x+1/2)/Γ(x) for x > 0 as a double-double,
+// accurate to about 1e-20 relative: the asymptotic series at y = x + n >= 25
+// and, below, the exact recurrence Γ(x+1/2)/Γ(x) = Γ(y+1/2)/Γ(y) ·
+// Π_{i<n} (x+i)/(x+i+1/2), all in double-double (y included, so that x+i
+// is not rounded).
+func gammaRatioHalf(x float64) dd.DD {
+	y := dd.F(x)
+	prod := dd.F(1)
+	for y.Hi < 25 {
+		prod = dd.Mul(prod, dd.Div(y, dd.AddF(y, 0.5)))
+		y = dd.AddF(y, 1)
+	}
+	r := dd.Div(dd.F(1), y)
+	s := dd.F(gammaRatioHalfSeries[len(gammaRatioHalfSeries)-1])
+	for k := len(gammaRatioHalfSeries) - 2; k >= 0; k-- {
+		s = dd.AddF(dd.Mul(s, r), gammaRatioHalfSeries[k])
+	}
+	return dd.Mul(dd.Mul(s, dd.Sqrt(y)), prod)
+}

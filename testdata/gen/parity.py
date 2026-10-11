@@ -1,6 +1,7 @@
 """SciPy parity fixtures for the distributions: testdata/scipy/dist_<name>.json.gz.
 
-    uv run --with mpmath==1.4.1 --with scipy==1.18.1 --with numpy==2.5.4 \
+    uv run --python cpython-3.12-macos-x86_64-none \
+        --with mpmath==1.4.1 --with scipy==1.18.1 --with numpy==2.5.4 \
         python testdata/gen/parity.py [scipy-name ...]
 
 The ULP fixtures (gen.py) measure accuracy against mpmath in standard form.
@@ -19,6 +20,10 @@ Each parity_*.py module exposes SPECS, a list of dicts:
     invalid    list of {field: value} that SciPy rejects
     fit        list of {"data": [...], "fixed": {field: value}}  (optional)
     rvs_sizes  list of sizes to draw (default [None, 1000, [3, 4]])
+    mp_moments optional function(instance dict) -> {name: mpf} giving exact
+               values (mpmath) for moments SciPy computes inaccurately
+               ("mean", "var", "std", "skew", "kurtosis", "entropy", ...);
+               the Go test then holds ours to those, not to SciPy's.
 """
 
 import glob
@@ -100,6 +105,10 @@ def instance(spec, inst):
                    logsf=f(fr.logsf(x)))
         pts.append(row)
     out["points"] = pts
+    if "mp_moments" in spec:
+        import mpmath
+        with mpmath.workprec(256):
+            out["mpmath"] = {k: f(float(v)) for k, v in spec["mp_moments"](full(spec, inst)).items()}
     out["quantiles"] = [{"p": f(p), "ppf": f(fr.ppf(p)), "isf": f(fr.isf(p))} for p in PROBS]
     rv = []
     for seed in SEEDS:

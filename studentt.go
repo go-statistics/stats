@@ -33,15 +33,7 @@ func (s tStd) support() (lo, hi float64) { return math.Inf(-1), math.Inf(1) }
 
 // tConst returns c(ν) = Γ((ν+1)/2) / (Γ(ν/2) √(νπ)) as a double-double.
 func tConst(nu float64) dd.DD {
-	if nu < 100 {
-		r := dd.Div(dd.F(special.Gamma((nu+1)/2)), dd.F(special.Gamma(nu/2)))
-		return dd.Div(r, dd.Sqrt(dd.Mul(dd.F(nu), dd.DD{Hi: math.Pi, Lo: 1.2246467991473532e-16})))
-	}
-	// Γ(x+1/2)/Γ(x) = √x·S(x), x = ν/2, so c = S(x)/√(2π).
-	x := nu / 2
-	r := 1 / x
-	sx := 1 + r*(-0.125+r*(0.0078125+r*(0.0048828125+r*(-0.000640869140625+r*(-0.001522064208984375+r*(0.0002071857452392578+r*(0.0011719763278961182+r*(-0.0001557529903948307))))))))
-	return dd.MulF(invSqrt2Pi, sx)
+	return dd.Div(gammaRatioHalf(nu/2), dd.Sqrt(dd.Mul(dd.F(nu), dd.DD{Hi: math.Pi, Lo: 1.2246467991473532e-16})))
 }
 
 // tLogKernel returns -(ν+1)/2 · log(1 + t²/ν) as a double-double.
