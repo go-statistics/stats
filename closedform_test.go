@@ -16,6 +16,10 @@ func init() {
 	// library's (1 draw in 9000 differs, by 1 ulp).
 	rvsULP["Laplace"] = 1
 	rvsULP["Gumbel"] = 1 // -log(-log U), the C library's log misrounding
+	// pow(-log1p(-U), 1/c) with SciPy's own log1p reproduced exactly, the
+	// power correctly rounded where the C library's misrounds a few in a
+	// thousand (2 ulp after the shift of an instance with Loc).
+	rvsULP["Weibull"] = 2
 	// SciPy's Cauchy draws are Boost's -1/tan(π·U) with the C library's
 	// tan, which on the reference build is its sin/cos ratio and misrounds
 	// a third of its results by up to 3 ulp; ours rounds the same formula
