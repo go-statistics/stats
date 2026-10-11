@@ -1,0 +1,6 @@
+core 1
+left 1
+right 1
+far_right 1
+tiny 1
+far_left 1

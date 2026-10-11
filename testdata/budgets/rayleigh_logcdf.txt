@@ -1,0 +1,4 @@
+tiny 1
+core 1
+right 1.1
+tail 1

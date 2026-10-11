@@ -12,7 +12,10 @@
 // is returned by a hand-written method std(). Each directive produces
 // zz_<name>.go with the constructor, Validate, and the methods of
 // Continuous or Discrete, which apply loc, scale and the boundary rules
-// before calling the standard form.
+// before calling the standard form. A source file that defines the
+// distribution's Rvs method itself (func (d Name) Rvs(...), for a
+// distribution whose draws SciPy post-processes after loc and scale, as
+// vonmises wraps them onto the circle) gets no generated Rvs.
 //
 // Run from the module root:
 //
@@ -41,6 +44,7 @@ type dist struct {
 	Params            []param
 	File              string
 	HasFit            bool
+	HasRvs            bool // Rvs is hand-written in the source file
 }
 
 func (d dist) Lower() string { return strings.ToLower(d.Name) }
@@ -130,6 +134,7 @@ func main() {
 				d.Params = append(d.Params, param{arg, field, typ})
 			}
 			d.HasFit = strings.Contains(string(src), "func Fit"+d.Name+"[")
+			d.HasRvs = strings.Contains(string(src), "func (d "+d.Name+") Rvs(")
 			ds = append(ds, d)
 		}
 	}
@@ -178,8 +183,11 @@ import (
 	"fmt"
 	"math"
 
+{{- if not .HasRvs}}
+
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
+{{- end}}
 )
 
 var _ {{if eq .Kind "continuous"}}Continuous{{else}}Discrete{{end}} = {{.Name}}{}
@@ -457,6 +465,8 @@ func (d {{.Name}}) Support() (lo, hi float64) {
 	return float64(a*d.Scale) + d.Loc, float64(b*d.Scale) + d.Loc
 }
 
+{{- if not .HasRvs}}
+
 // Rvs draws random variates of the given shape:
 // scipy.stats.{{.SciPy}}.rvs({{.SciArgs}}, size=size, random_state=g).
 func (d {{.Name}}) Rvs(g *random.Generator, size ...int) (*ndarray.Array, error) {
@@ -469,6 +479,7 @@ func (d {{.Name}}) Rvs(g *random.Generator, size ...int) (*ndarray.Array, error)
 	}
 	return locScaleDraws(a, d.Loc, d.Scale), nil
 }
+{{- end}}
 `))
 
 var discTmpl = template.Must(template.New("d").Parse(header + `

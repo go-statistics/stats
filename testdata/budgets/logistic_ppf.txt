@@ -1,0 +1,4 @@
+lower 1
+core 1
+upper 1
+half 1
