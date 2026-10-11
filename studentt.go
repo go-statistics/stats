@@ -72,14 +72,9 @@ func (s tStd) tail(t float64) float64 {
 	z := dd.Div(t2, den)       // t²/(ν+t²)
 	w := dd.Div(dd.F(nu), den) // ν/(ν+t²)
 	if nu > 2*h {
-		p := special.BetaIncC(0.5, nu/2, z.Hi)
-		if z.Lo != 0 {
-			p -= betaDensity(0.5, nu/2, z.Hi, w.Hi, dd.F(z.Lo))
-		}
-		return p / 2
+		return ibeta(0.5, nu/2, z, w, true) / 2
 	}
-	p := special.BetaInc(nu/2, 0.5, w.Hi)
-	return (p + betaDensity(nu/2, 0.5, w.Hi, z.Hi, dd.F(w.Lo))) / 2
+	return ibeta(nu/2, 0.5, w, z, false) / 2
 }
 
 func (s tStd) cdf(t float64) float64 {

@@ -83,13 +83,15 @@ def evaluate(fn, args):
         try:
             with mp.workprec(prec):
                 v = fn(*args)
+                if v is None:
+                    return None  # the oracle found no root/bracket: dropped
                 if isinstance(v, float):
                     vals.append(v)
                 else:
                     vals.append(mpf(v) if not isinstance(v, mpf) else +v)
         except Timeout:
             return "timeout"
-        except (mpmath.libmp.libhyper.NoConvergence, ZeroDivisionError, ValueError):
+        except (mpmath.libmp.libhyper.NoConvergence, ZeroDivisionError, ValueError, TypeError):
             return None  # counted as dropped: the oracle could not decide
         finally:
             signal.alarm(0)

@@ -49,13 +49,13 @@ func ibeta(a, b float64, x, y dd.DD, upper bool) float64 {
 	if upper {
 		p := special.BetaIncC(a, b, x.Hi)
 		if x.Lo != 0 {
-			p -= betaDensity(a, b, x.Hi, y.Hi, dd.F(x.Lo))
+			p -= betaDensity(a, b, dd.F(x.Hi), dd.AddF(y, x.Lo), dd.F(x.Lo))
 		}
 		return p
 	}
 	p := special.BetaInc(a, b, x.Hi)
 	if x.Lo != 0 {
-		p += betaDensity(a, b, x.Hi, y.Hi, dd.F(x.Lo))
+		p += betaDensity(a, b, dd.F(x.Hi), dd.AddF(y, x.Lo), dd.F(x.Lo))
 	}
 	return p
 }
@@ -66,7 +66,7 @@ func (s fStd) pdf(x float64) float64 {
 	}
 	z, w := s.args(x)
 	// f(x) = beta_pdf(z; m/2, n/2) · dz/dx, dz/dx = m·n/(n+v)² = z·w/x.
-	return betaDensity(s.m/2, s.n/2, z.Hi, w.Hi, dd.Div(dd.Mul(z, w), dd.F(x)))
+	return betaDensity(s.m/2, s.n/2, z, w, dd.Div(dd.Mul(z, w), dd.F(x)))
 }
 
 func (s fStd) logpdf(x float64) float64 {
@@ -74,7 +74,7 @@ func (s fStd) logpdf(x float64) float64 {
 		return math.Log(s.pdf(0))
 	}
 	z, w := s.args(x)
-	l := betaLogDensity(s.m/2, s.n/2, z.Hi, w.Hi)
+	l := betaLogDensity(s.m/2, s.n/2, z, w)
 	return dd.Add(l, dd.Sub(dd.Add(logDD(z), logDD(w)), dd.Log(x))).Float()
 }
 

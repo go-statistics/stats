@@ -75,3 +75,9 @@ SPECS = [
          fit_kind="mle",
          fit=[{"data": _d(_r.f, 5.0, 12.0), "fixed": {"Loc": 0.0, "Scale": 1.0}}]),
 ]
+
+SPECS.append(
+    dict(scipy="ncx2", go="NoncentralChiSquared", kind="continuous", shapes=["Df", "Nc"],
+         instances=[{"Df": 3.0, "Nc": 2.0}, {"Df": 0.7, "Nc": 15.0, "Loc": 1.0, "Scale": 2.0},
+                    {"Df": 20.0, "Nc": 300.0}, {"Df": 4.0, "Nc": 0.0}],
+         invalid=[{"Df": 0.0, "Nc": 1.0}, {"Df": 1.0, "Nc": -1.0}]))

@@ -29,8 +29,11 @@ func (s invGammaStd) pdf(x float64) float64 {
 	if x == 0 {
 		return 0
 	}
-	// g(1/x)/x², 1/x and 1/x² in double-double
-	return gammaDensity(s.a, dd.Div(dd.F(1), dd.F(x)), dd.Div(dd.F(1), dd.MulFF(x, x)))
+	// g(y)·y² with y = 1/x in double-double, the factor y² taken into the
+	// exponent (it underflows long before the density does)
+	y := dd.Div(dd.F(1), dd.F(x))
+	e, c := gammaExponent(s.a, y)
+	return expScaled(dd.Sub(e, dd.MulF(dd.Log(x), 2)), c)
 }
 
 func (s invGammaStd) logpdf(x float64) float64 {
