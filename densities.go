@@ -134,3 +134,38 @@ func oneMinus(x float64) dd.DD {
 	h, l := dd.TwoSum(1, -x)
 	return dd.DD{Hi: h, Lo: l}
 }
+
+// logUpperGamma is log Q(a, y) for y > a + 1 (the upper tail, where Q may
+// underflow): log of the gamma density at y plus log y plus the log of
+// Legendre's continued fraction Γ(a,y) = e^-y y^a · 1/(y+1-a- 1(1-a)/(y+3-a-
+// 2(2-a)/(y+5-a- ...))) (modified Lentz). Below y = a + 1 it is log Q.
+func logUpperGamma(a, y float64) dd.DD {
+	if !(y > a+1) {
+		return dd.F(math.Log(special.GammaQ(a, y)))
+	}
+	const tiny = 1e-300
+	b := y + 1 - a
+	c := 1 / tiny
+	d := 1 / b
+	h := d
+	for i := 1.0; i < 1000; i++ {
+		an := -i * (i - a)
+		b += 2
+		d = an*d + b
+		if math.Abs(d) < tiny {
+			d = tiny
+		}
+		c = b + an/c
+		if math.Abs(c) < tiny {
+			c = tiny
+		}
+		d = 1 / d
+		del := d * c
+		h *= del
+		if math.Abs(del-1) < 1e-17 {
+			break
+		}
+	}
+	// Γ(a,y)/Γ(a) = [y^(a-1) e^-y / Γ(a)] · y · h
+	return dd.Add(gammaLogDensity(a, dd.F(y)), dd.Add(dd.Log(y), dd.Log(h)))
+}

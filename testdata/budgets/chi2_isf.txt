@@ -1,0 +1,12 @@
+small_lower 1
+small_core 1
+small_upper 1
+mid_lower 1
+mid_core 2.4000000000000004
+mid_upper 1
+large_lower 1
+large_core 1
+large_upper 1
+huge_lower 1
+huge_core 1
+huge_upper 1

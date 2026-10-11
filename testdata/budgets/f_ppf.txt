@@ -1,0 +1,12 @@
+small_lower 1.7000000000000002
+small_core 2.2
+small_upper 1.5
+mid_lower 1.6
+mid_core 2.4000000000000004
+mid_upper 1.8
+large_lower 2
+large_core 2.1
+large_upper 1.6
+mixed_lower 2.3000000000000003
+mixed_core 3.3000000000000003
+mixed_upper 1.8

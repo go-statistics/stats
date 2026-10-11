@@ -1,0 +1,5 @@
+small_core 5.2
+small_upper 4.7
+mid_core 2
+mid_upper 2.6
+large_upper 1

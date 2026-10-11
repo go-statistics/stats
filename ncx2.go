@@ -172,11 +172,44 @@ func (s ncx2Std) sf(x float64) float64 {
 	if s.mu == 0 {
 		return s.central().sf(x)
 	}
-	return math.Min(1, s.tailSum(x/2, true))
+	v := s.tailSum(x/2, true)
+	if v < 1e-280 {
+		return expDD(s.logSFDeep(x / 2))
+	}
+	return math.Min(1, v)
 }
 
 func (s ncx2Std) logcdf(x float64) float64 { return logPQ(s.cdf(x), s.sf(x)) }
-func (s ncx2Std) logsf(x float64) float64  { return logPQ(s.sf(x), s.cdf(x)) }
+
+func (s ncx2Std) logsf(x float64) float64 {
+	if s.mu != 0 {
+		if v := s.tailSum(x/2, true); v < 1e-280 {
+			return s.logSFDeep(x / 2).Float()
+		}
+	}
+	return logPQ(s.sf(x), s.cdf(x))
+}
+
+// logSFDeep is log Σ w_j Q(k+j, y) in the far upper tail, where the
+// terms underflow: each term in logarithms (logUpperGamma), summed by
+// log-sum-exp from j = 0 until the Poisson weights end it.
+func (s ncx2Std) logSFDeep(y float64) dd.DD {
+	var terms []dd.DD
+	best := math.Inf(-1)
+	for j := 0.0; ; j++ {
+		l := dd.Add(s.poissonLog(j), logUpperGamma(s.k+j, y))
+		terms = append(terms, l)
+		best = math.Max(best, l.Hi)
+		if l.Hi < best-40 && j > s.mu {
+			break
+		}
+	}
+	sum := 0.0
+	for _, l := range terms {
+		sum += expDD(dd.AddF(l, -best))
+	}
+	return dd.Add(dd.F(best), logDD(dd.F(sum)))
+}
 
 func (s ncx2Std) guess(p float64) float64 {
 	// Pearson's three-moment chi-squared approximation through the normal
