@@ -11,6 +11,7 @@ quantiles, the answer) exceeds 1e4 (each generic quantile call sums every mass u
 """
 
 import math
+import signal
 
 import mpmath
 import scipy.stats as st
@@ -61,12 +62,28 @@ def _guard_x(f):
 
 
 def _guard_p(f, upper):
+    """SciPy's generic quantile, skipped where the answer is beyond
+    KMAX_SCIPY and bounded to 10 s: its isf(q) is ppf(1 - q), and where
+    1 - q rounds to 1 (or its summed cdf never reaches p) the bisection
+    never ends."""
     def g(p, a):
         q = p if upper else 1 - p
-        if not (_estimate(max(q, 1e-300), a) <= KMAX_SCIPY):
+        if not (_estimate(max(q, 1e-300), a) <= KMAX_SCIPY) or (upper and 1 - q == 1):
             raise ValueError("SciPy cannot sum this far")
-        return f(p, a)
+        old = signal.signal(signal.SIGALRM, _alarm)
+        left = signal.alarm(10)  # the oracle's own alarm, if one is set
+        try:
+            return f(p, a)
+        finally:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, old)
+            if left:
+                signal.alarm(left)
     return g
+
+
+def _alarm(signum, frame):
+    raise ValueError("SciPy did not finish")
 
 
 def xcases(name, fn):
@@ -105,4 +122,5 @@ _sp["ppf"] = _guard_p(st.zipf.ppf, False)
 _sp["isf"] = _guard_p(st.zipf.isf, True)
 
 FIXTURES = discfix.make("zipf", dict(dist=st.zipf, logpmf=logpmf, cdfsf=cdfsf, support=support,
-                                     xcases=xcases, pcases=pcases, spfns=_sp))
+                                     xcases=xcases, pcases=pcases, spfns=_sp,
+                                     guess=lambda q, a: _estimate(max(q, 1e-300), a)))

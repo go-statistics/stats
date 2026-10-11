@@ -106,6 +106,8 @@ def make(name, d):
                    cdf/sf oracle returns an exact 0 for a tail (the incomplete
                    gamma/beta quadrature gives up below e^-3000), that tail
                    is summed from its first mass instead
+         guess     optional (q, *shapes) -> k with sf(k) near q, the starting
+                   point of the quantile oracle where SciPy gives none
          spfns     optional {fn: callable} replacing SciPy's method for the
                    SciPy column (and the quantile oracle's starting guess),
                    e.g. to skip arguments where SciPy cannot finish
@@ -121,14 +123,20 @@ def make(name, d):
 
         def ok(k):
             return k >= hi or float(d["cdfsf"](k, *sh)[0]) >= p
-        return mpf(smallest_k(ok, _scipy(spf["ppf"], p, sh), lo, hi))
+        k0 = _scipy(spf["ppf"], p, sh)
+        if k0 is None and "guess" in d:
+            k0 = d["guess"](1 - p, *sh)
+        return mpf(smallest_k(ok, k0, lo, hi))
 
     def isf(q, *sh):
         lo, hi = d["support"](*sh)
 
         def ok(k):
             return k >= hi or float(d["cdfsf"](k, *sh)[1]) <= q
-        return mpf(smallest_k(ok, _scipy(spf["isf"], q, sh), lo, hi))
+        k0 = _scipy(spf["isf"], q, sh)
+        if k0 is None and "guess" in d:
+            k0 = d["guess"](q, *sh)
+        return mpf(smallest_k(ok, k0, lo, hi))
 
     def cdfsf(k, *sh):
         c, s = d["cdfsf"](k, *sh)
