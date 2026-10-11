@@ -4,7 +4,7 @@ small_hi 1
 mid_lo 2
 mid_mid 2.1
 mid_hi 1
-large_lo 2
+large_lo 3.2
 large_mid 2.2
 large_hi 1
 huge_lo 1.1

@@ -52,7 +52,7 @@ func invertCDF(target float64, upper bool, f, pdf func(float64) float64, x0, lo,
 		step *= 2
 	}
 	x = midpoint(a, b) // x0 is now an end of the bracket
-	for i := 0; i < 200; i++ {
+	for i := 0; i < 400; i++ {
 		v := f(x)
 		gx := v - target
 		if upper {
@@ -94,6 +94,9 @@ func midpoint(a, b float64) float64 {
 	}
 	if math.IsInf(a, -1) {
 		return math.Min(2*b, -1)
+	}
+	if a == 0 && b > 0 {
+		return b * 0x1p-32 // a root near 0 may be 1e-300: shrink geometrically
 	}
 	if a > 0 && b/a > 4 {
 		return math.Sqrt(a) * math.Sqrt(b)

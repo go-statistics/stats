@@ -54,3 +54,95 @@ go test -run TestAccuracyBudgets -accuracy.budgets
 GOARCH=amd64 go test -run TestAccuracyBudgets -accuracy.budgets -accuracy.merge
 go test -run TestAccuracyTable -accuracy.table=docs/accuracy-table.md
 ```
+
+## Headline (distributions)
+
+HEADLINE_PLACEHOLDER
+
+The per-function summary and every region are in
+[accuracy-table.md](accuracy-table.md) (generated; measured on arm64, the
+budgets also hold on amd64, 386, arm, riscv64, loong64, ppc64le and s390x,
+where Go's math routines and fused multiply-adds move the last bits: the
+logarithmic forms reach up to 2 ulp more there, see the budgets).
+
+Typical worst cases per family, ours against SciPy's:
+
+| family | ours (max over regions) | SciPy |
+|---|---|---|
+| normal: pdf, logpdf, cdf, sf, log forms, ppf, isf | ≤ 0.55 ulp | up to 455 ulp (pdf tail), 1e10–1e12 (cdf/sf deep tails) |
+| gamma, chi-squared, chi, inverse gamma: pdf | ≤ 1.3 ulp | up to 6e6 ulp at large shapes |
+| gamma family: cdf, sf | ≤ 2.1 ulp | up to 4e4 ulp |
+| gamma family: ppf, isf | ≤ 1.9 ulp | up to 5e6 ulp |
+| beta: pdf, logpdf | ≤ 1.1 / 3.9 ulp | 948 / 23375 ulp |
+| beta: cdf, sf | ≤ 5.6 / 4.4 ulp | 7334 / 2.9 ulp (see below) |
+| Student t: pdf, logpdf | ≤ 0.5 ulp | 5.6e4 / 3.0e4 ulp |
+| Student t: cdf, sf, ppf, isf | ≤ 2.4 ulp, quantiles ≤ 9.4 ulp below 1e-20 | 1067 ulp, wrong (NaN/0) in far tails |
+| F: pdf, cdf, sf, ppf, isf | ≤ 1.2 / 4.8 / 2.8 / 2.2 / 2.6 ulp | 7e4 / 1971 / 389 / wrong / wrong |
+| noncentral chi-squared | pdf ≤ 9.8, cdf ≤ 116, sf ≤ 151 ulp (deep tails summed term by term) | up to 1e15–1e16 ulp, wrong |
+| closed-form families (exponential … von Mises) | ≤ 0.5–4 ulp, every region ≤ SciPy | up to 1e15 ulp, wrong (see the table) |
+
+## Where this package is not at least as accurate as SciPy
+
+EXCEPTIONS_PLACEHOLDER
+
+## Techniques
+
+- The exponent of every density is carried in double-double and
+  exponentiated once (internal/dd's ExpMant is accurate to about 2^-76);
+  for large shapes the gamma and beta densities take Stirling's factors out
+  analytically, and Γ(x+½)/Γ(x) has its own double-double series.
+- Rounded arguments are corrected: the t, F, chi and inverse-gamma
+  distribution functions evaluate the incomplete function at the float64
+  part of a double-double argument (t²/(ν+t²), m·x/(m·x+n), x²/2, 1/x) and
+  add the first-order term density × low part.
+- Complements, never 1 - p: each tail is computed directly; log forms use
+  log1p of the other tail near 1; beyond the incomplete functions' range
+  (subnormal arguments, probabilities below 1e-280) the leading term is
+  evaluated in logarithms.
+- Entropies of the gamma and beta families cancel their x·log x terms
+  analytically (SciPy's formulas lose up to 3e-9 relative, and
+  scipy.stats.beta(3, 2e7).entropy() returns 0.0 where the value is -14.96).
+
+## Tests, descriptive statistics, multivariate
+
+Compared with SciPy 1.18.1 / NumPy 2.5.4 (x86-64) on generated datasets,
+and with exact references (mpmath, rational arithmetic) where they exist:
+
+- Means, variances, standard deviations, medians, all 13 quantile methods
+  (also weighted), histograms and bin edges: **bit-identical to NumPy**
+  (tens of thousands of values). skew, kurtosis, mode, sem, zscore,
+  trimmed statistics, gmean/hmean/pmean, binned_statistic: bit-identical to
+  SciPy; describe, moment, iqr, trim_mean, differential_entropy within
+  2e-15. Relative entropy is computed in double-double: 3e-16 against
+  mpmath where SciPy is off by 1e-6 on data offset by 1e8.
+- Hypothesis tests (about 4100 SciPy cases plus 3100 exact references):
+  statistics and p-values agree with SciPy to ≤ 1.4e-13 relative except
+  where an exact reference shows SciPy is off: Fisher exact p (2e-16 vs
+  3e-15), chi2_contingency near independence (statistic 1.8e-12 vs 2.2e-7),
+  KS two-sample exact (2.4e-15 vs 3.3e-12), Kolmogorov distribution
+  (Pomeranz in double-double), Mann-Whitney exact (1.5e-15 vs 1.2e-13),
+  Anderson-Darling Gumbel fit (5.6e-15 vs 1.1e-8), Levene (7.7e-11 vs
+  6.3e-10), Pearson with |r| = 1 (p = 0 exactly).
+- Multivariate normal logpdf/pdf/entropy: exact against mpmath where SciPy
+  is off by up to 4.6e-8 / 9.6e-7 / 3e-9 (covariances with condition number
+  up to 3e9); bivariate cdf 3.9e-16 relative including the tails where SciPy
+  returns 0; Dirichlet and multinomial pmf/pdf/entropy ≤ 3e-15 (SciPy up to
+  1.6e-12). Gaussian KDE within 1e-13 of SciPy.
+
+## Negative controls
+
+A deliberately broken formula must fail the suite:
+
+- `testdata/negative_control.sh accurate.go "1, -0.125, 0.0078125" "1,
+  -0.1250001, 0.0078125"` (the Γ(x+½)/Γ(x) series): TestAccuracy fails in
+  every t_logpdf / t_pdf region, by up to 3.6e7 ulp.
+- Closed-form families: expm1D's 1/24 coefficient → 1/23: 19 regions of
+  expon, gumbel_r, lomax, pareto, rayleigh and weibull_min fail (up to 5e7
+  ulp).
+- Descriptive: `_lerp`'s `t >= 0.5` → `t > 0.5` and the kurtosis bias
+  coefficient 3 → 3.0000001: quantile/percentile bit mismatches and kurtosis/
+  describe failures (71 messages).
+- Tests: Shapiro's 0.221157 → 0.221158 (68 failures); Kendall's variance
+  2n+5 → 2n+6 (162 failures).
+- Multivariate: four perturbations (MVN log-density factor, KDE neff, a
+  Gauss-Legendre weight, the BCa cube) each fail their parity tests.

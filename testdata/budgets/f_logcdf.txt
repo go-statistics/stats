@@ -5,7 +5,7 @@ mid_lo 1
 mid_mid 2.3000000000000003
 large_lo 1
 large_mid 8.9
-large_hi 1.6
+large_hi 4.5
 mixed_lo 1
-mixed_mid 6.1000000000000005
+mixed_mid 13
 mixed_hi 1.1

@@ -1,5 +1,5 @@
 small_lo 1
-small_mid 3.8000000000000003
+small_mid 3.6
 small_hi 51
 mid_lo 1
 mid_mid 7.5

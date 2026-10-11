@@ -153,7 +153,7 @@ func rankWithTies(x []float64, method RankMethod, ties bool) (ranks, t []float64
 func tieTerm(t []float64) float64 {
 	d := make([]float64, len(t))
 	for i, c := range t {
-		d[i] = c*c*c - c
+		d[i] = float64(c*c*c) - c // no fused multiply-add: NumPy rounds the product
 	}
 	return sum(d)
 }

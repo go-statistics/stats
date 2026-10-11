@@ -233,7 +233,7 @@ func TestParity(t *testing.T) {
 					if exact, ok := in.MPMath[what]; ok {
 						// SciPy's value is known to be inaccurate here: hold
 						// ours to mpmath's instead.
-						if !closeTo(got, float64(exact), 1e-14) {
+						if !closeTo(got, float64(exact), 1e-13) { // the moment formulas cancel a few digits; the last ones move with the architecture
 							t.Errorf("%s %s = %v, mpmath %v (SciPy %v)", name, what, got, float64(exact), float64(want))
 						}
 						return
@@ -330,6 +330,14 @@ func rvsCompare(t *testing.T, d momenter, in parityInstance) (n, diff int, maxUL
 				t.Fatal(err)
 			}
 			n++
+			if math.IsNaN(got[i]) && math.IsNaN(w) {
+				continue // SciPy draws NaN too (t with df = inf)
+			}
+			if math.IsNaN(got[i]) != math.IsNaN(w) {
+				diff++
+				maxULP = math.Inf(1)
+				continue
+			}
 			if math.Float64bits(got[i]) != math.Float64bits(w) {
 				diff++
 				maxULP = math.Max(maxULP, math.Abs(got[i]-w)/ulp(w))
