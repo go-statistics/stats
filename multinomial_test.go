@@ -171,4 +171,3 @@ func TestMultinomialEdges(t *testing.T) {
 		}
 	}
 }
-
