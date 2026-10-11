@@ -110,7 +110,7 @@ func TestBootstrapParity(t *testing.T) {
 	// ULP or two (special.Ndtri(0.025000000000000022) is correctly
 	// rounded, SciPy's is not): a few ULP in the interval.
 	if nDiff > 0 || ci.v > 0 || se.v > 0 || ciBCa.v > 16 {
-		t.Errorf("not SciPy's: %d values differ, interval %g ULP (BootstrapBCa %g), standard error %g ULP", nDiff, ci.v, ciBCa.v, se.v)
+		t.Errorf("not SciPy's: %d values differ, interval %g ULP (BCa %g), standard error %g ULP", nDiff, ci.v, ciBCa.v, se.v)
 	}
 }
 
