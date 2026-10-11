@@ -115,8 +115,8 @@ func BinnedStatistic[D, V Data](x D, values V, o *BinnedOptions) (BinnedResult, 
 	for i := 1; i < len(edges); i++ {
 		dmin = min(dmin, edges[i]-edges[i-1])
 	}
-	if dmin == 0 {
-		return BinnedResult{}, fmt.Errorf("%w: BinnedStatistic: the smallest edge difference is 0", ErrParam)
+	if !(dmin > 0 && dmin < math.Inf(1)) {
+		return BinnedResult{}, fmt.Errorf("%w: BinnedStatistic: the smallest edge difference is %v", ErrParam, dmin)
 	}
 	nbin := len(edges) + 1
 	last := edges[len(edges)-1]
@@ -219,11 +219,9 @@ func binStat(bins []int, vs []float64, nbin int, s BinStatistic) []float64 {
 	return res
 }
 
-// crLog10 returns log10(x) correctly rounded (barring a near-tie).
+// crLog10 returns log10(x) correctly rounded (barring a near-tie), for
+// finite x > 0.
 func crLog10(x float64) float64 {
-	if !(x > 0) || math.IsInf(x, 1) {
-		return math.Log10(x)
-	}
 	return dd.Div(dd.LogAccurate(x), dd.LogAccurate(10)).Float()
 }
 

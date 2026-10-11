@@ -270,7 +270,7 @@ func relEntropyDD(p, q []float64) (float64, bool) {
 		}
 		sp, sq = dd.AddF(sp, t), dd.AddF(sq, u)
 	}
-	if len(p) == 0 || math.IsInf(sp.Hi, 0) || math.IsInf(sq.Hi, 0) {
+	if len(p) == 0 || !(sp.Hi < math.Inf(1) && sq.Hi < math.Inf(1)) {
 		return 0, false
 	}
 	logOf := func(a dd.DD) dd.DD { return dd.AddF(dd.LogAccurate(a.Hi), a.Lo/a.Hi) }

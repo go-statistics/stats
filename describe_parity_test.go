@@ -175,6 +175,9 @@ type describeStat struct {
 	cases, values, identical, closerExact, errNaN int
 	maxRel                                        float64
 	exact                                         bool
+	// against the exact (mpmath) value, where the fixture has it
+	exactCount             int
+	oursExactErr, sciExact float64
 }
 
 func relDiff(got, want float64) float64 {
@@ -267,14 +270,18 @@ func TestDescribeParity(t *testing.T) {
 	}
 	sort.Strings(names)
 	var b strings.Builder
-	fmt.Fprintf(&b, "| function | reference | cases | values | bit-identical | max rel. diff | closer to exact than SciPy | error where SciPy gives NaN |\n|---|---|---|---|---|---|---|---|\n")
+	fmt.Fprintf(&b, "| function | reference | cases | values | bit-identical | max rel. diff | closer to exact than SciPy | error where SciPy gives NaN | vs exact: values | ours max rel. err. | SciPy max rel. err. |\n|---|---|---|---|---|---|---|---|---|---|---|\n")
 	for _, k := range names {
 		s := stats[k]
 		ref := "SciPy " + df.SciPy
 		if s.exact {
 			ref = "NumPy " + df.NumPy + " (bit for bit)"
 		}
-		fmt.Fprintf(&b, "| %s | %s | %d | %d | %d | %.3g | %d | %d |\n", k, ref, s.cases, s.values, s.identical, s.maxRel, s.closerExact, s.errNaN)
+		ex := "| - | - | - |"
+		if s.exactCount > 0 {
+			ex = fmt.Sprintf("| %d | %.3g | %.3g |", s.exactCount, s.oursExactErr, s.sciExact)
+		}
+		fmt.Fprintf(&b, "| %s | %s | %d | %d | %d | %.3g | %d | %d %s\n", k, ref, s.cases, s.values, s.identical, s.maxRel, s.closerExact, s.errNaN, ex)
 	}
 	t.Log("\n" + b.String())
 	if *describeTable != "" {
@@ -387,6 +394,11 @@ func compareDescribe(t *testing.T, name string, c describeCase, got, want any, s
 	var bad error
 	cmp := func(key string, g, w float64) {
 		st.values++
+		if ex, ok := mpFor(c, key, n); ok && ex == ex && w == w && !math.IsInf(ex, 0) {
+			st.exactCount++
+			st.oursExactErr = math.Max(st.oursExactErr, relDiff(g, ex))
+			st.sciExact = math.Max(st.sciExact, relDiff(w, ex))
+		}
 		if sameBits(g, w) {
 			st.identical++
 			return

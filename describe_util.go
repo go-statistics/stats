@@ -20,11 +20,9 @@ func crLog(x float64) float64 {
 	return dd.LogAccurate(x).Float()
 }
 
-// crLog2 returns log2(x) correctly rounded (barring a near-tie).
+// crLog2 returns log2(x) correctly rounded (barring a near-tie), for
+// finite x > 0.
 func crLog2(x float64) float64 {
-	if !(x > 0) || math.IsInf(x, 1) {
-		return math.Log2(x)
-	}
 	if f, e := math.Frexp(x); f == 0.5 {
 		return float64(e - 1)
 	}
@@ -35,7 +33,8 @@ func crLog2(x float64) float64 {
 func crExp(x float64) float64 { return dd.Exp(dd.F(x)) }
 
 // crPow returns x**y correctly rounded (barring a near-tie), with the
-// special cases of math.Pow (which agree with C's pow).
+// special cases of math.Pow (which agree with C's pow). A negative x needs
+// an integer y.
 func crPow(x, y float64) float64 {
 	switch {
 	case y == 0 || x == 1:
@@ -52,10 +51,7 @@ func crPow(x, y float64) float64 {
 		return math.Pow(x, y)
 	}
 	neg := false
-	if x < 0 {
-		if y != math.Trunc(y) {
-			return math.NaN()
-		}
+	if x < 0 { // y is an integer here (the callers' contract)
 		x = -x
 		neg = math.Mod(y, 2) != 0
 	}
@@ -140,9 +136,12 @@ func pyMod(a, b float64) float64 {
 // others: NumPy's sort and partition order NaN after every number.
 func nanLast(a []float64) int {
 	j := 0
-	for i, t := range a {
-		if t == t {
-			a[i], a[j] = a[j], a[i]
+	for j < len(a) && a[j] == a[j] {
+		j++
+	}
+	for i := j + 1; i < len(a); i++ {
+		if t := a[i]; t == t {
+			a[i], a[j] = a[j], t
 			j++
 		}
 	}
@@ -151,67 +150,112 @@ func nanLast(a []float64) int {
 
 // selectKs rearranges a (free of NaN) so that a[k] is the k-th smallest for
 // every k of ks (sorted, distinct, within a), with smaller elements before it
-// and larger after. It is introselect: quickselect with a median-of-three
-// pivot and a three-way partition, falling back to a sort when the
-// recursion goes too deep or the indices are dense.
+// and larger after: the middle index by Floyd and Rivest's selection, then
+// the indices on each side within their part.
 func selectKs(a []float64, ks []int) {
-	multiSelect(a, 0, len(a), ks, 2*bits.Len(uint(len(a))))
+	multiSelect(a, 0, len(a), ks)
 }
 
-func multiSelect(a []float64, lo, hi int, ks []int, depth int) {
+func multiSelect(a []float64, lo, hi int, ks []int) {
 	for len(ks) > 0 {
-		if hi-lo <= 16 || len(ks) > (hi-lo)/8 || depth == 0 {
+		// an index at an end of the range is its minimum or maximum: one
+		// scan (the second of the two neighbours a quantile interpolates)
+		if ks[0] == lo {
+			m := lo
+			for i := lo + 1; i < hi; i++ {
+				if a[i] < a[m] {
+					m = i
+				}
+			}
+			a[lo], a[m] = a[m], a[lo]
+			lo, ks = lo+1, ks[1:]
+			continue
+		}
+		if ks[len(ks)-1] == hi-1 {
+			m := hi - 1
+			for i := lo; i < hi-1; i++ {
+				if a[i] > a[m] {
+					m = i
+				}
+			}
+			a[hi-1], a[m] = a[m], a[hi-1]
+			hi, ks = hi-1, ks[:len(ks)-1]
+			continue
+		}
+		if hi-lo <= 16 || len(ks) > (hi-lo)/8 {
 			slices.Sort(a[lo:hi])
 			return
 		}
-		depth--
-		lt, gt := partition3(a, lo, hi)
-		// a[lo:lt] < pivot, a[lt:gt] == pivot, a[gt:hi] > pivot
-		i := 0
-		for i < len(ks) && ks[i] < lt {
-			i++
-		}
-		j := i
-		for j < len(ks) && ks[j] < gt {
-			j++
-		}
-		left, right := ks[:i], ks[j:]
-		// recurse on the smaller side, loop on the larger
-		if lt-lo < hi-gt {
-			multiSelect(a, lo, lt, left, depth)
-			lo, ks = gt, right
+		m := len(ks) / 2
+		k := ks[m]
+		floydRivest(a, lo, hi-1, k, 2*bits.Len(uint(hi-lo))+8)
+		left, right := ks[:m], ks[m+1:]
+		if k-lo < hi-k {
+			multiSelect(a, lo, k, left)
+			lo, ks = k+1, right
 		} else {
-			multiSelect(a, gt, hi, right, depth)
-			hi, ks = lt, left
+			multiSelect(a, k+1, hi, right)
+			hi, ks = k, left
 		}
 	}
 }
 
-// partition3 partitions a[lo:hi] around a median-of-three pivot.
-func partition3(a []float64, lo, hi int) (lt, gt int) {
-	m := lo + (hi-lo)/2
-	x, y, z := a[lo], a[m], a[hi-1]
-	p := y
-	if (x < y) != (x < z) {
-		p = x
-	} else if (z < x) != (z < y) {
-		p = z
-	}
-	lt, i, gt := lo, lo, hi
-	for i < gt {
-		switch v := a[i]; {
-		case v < p:
-			a[lt], a[i] = a[i], a[lt]
-			lt++
+// floydRivest places the k-th smallest of a[left..right] at a[k], smaller
+// elements before and larger after (Floyd and Rivest, "Algorithm 489: the
+// algorithm SELECT", CACM 18(3), 1975): the pivot is chosen by selecting,
+// recursively, within a sample bracketing k, so that a partition pass
+// leaves a short range around k. After budget passes it sorts the range
+// left (a guard against adversarial inputs).
+func floydRivest(a []float64, left, right, k, budget int) {
+	for right > left {
+		if budget == 0 {
+			slices.Sort(a[left : right+1])
+			return
+		}
+		budget--
+		if right-left > 600 {
+			n := float64(right - left + 1)
+			i := float64(k - left + 1)
+			z := math.Log(n)
+			sm := 0.5 * math.Exp(2*z/3)
+			sd := 0.5 * math.Sqrt(z*sm*(n-sm)/n)
+			if i < n/2 {
+				sd = -sd
+			}
+			nl := max(left, int(float64(k)-i*sm/n+sd))
+			nr := min(right, int(float64(k)+(n-i)*sm/n+sd))
+			floydRivest(a, nl, nr, k, budget)
+		}
+		t := a[k]
+		i, j := left, right
+		a[left], a[k] = a[k], a[left]
+		if a[right] > t {
+			a[right], a[left] = a[left], a[right]
+		}
+		for i < j {
+			a[i], a[j] = a[j], a[i]
 			i++
-		case v > p:
-			gt--
-			a[gt], a[i] = a[i], a[gt]
-		default:
-			i++
+			j--
+			for a[i] < t {
+				i++
+			}
+			for a[j] > t {
+				j--
+			}
+		}
+		if a[left] == t {
+			a[left], a[j] = a[j], a[left]
+		} else {
+			j++
+			a[j], a[right] = a[right], a[j]
+		}
+		if j <= k {
+			left = j + 1
+		}
+		if k <= j {
+			right = j - 1
 		}
 	}
-	return lt, gt
 }
 
 // orderStats returns a copy of v (NaNs moved last) in which the order

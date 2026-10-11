@@ -236,10 +236,44 @@ func shapeData(x []float64, o *ShapeOptions, name string) ([]float64, *ShapeOpti
 
 // skewness is scipy.stats.skew on a non-empty sample.
 func skewness(v []float64, unbiased bool) float64 {
-	n := float64(len(v))
 	m := mean(v)
-	m2 := moment(v, 2, m)
-	m3 := moment(v, 3, m)
+	c := centralMoments(v, m, 3)
+	return skewOfMoments(float64(len(v)), m, c[2], c[3], unbiased)
+}
+
+// centralMoments returns the means of (v - m)^k for k = 2 .. upto (index
+// k), one buffer reused: the pairwise sums of _moment, to the bit.
+func centralMoments(v []float64, m float64, upto int) [5]float64 {
+	var r [5]float64
+	d := make([]float64, len(v))
+	for k := 2; k <= upto; k++ {
+		for i, t := range v {
+			e := t - m
+			switch k {
+			case 2:
+				d[i] = float64(e * e)
+			default:
+				d[i] = powIntSigned(e, k)
+			}
+		}
+		r[k] = mean(d)
+	}
+	return r
+}
+
+// powIntSigned is crPow(e, k) for k = 3 or 4.
+func powIntSigned(e float64, k int) float64 {
+	r := powIntDD(math.Abs(e), k)
+	if !(r < 0x1p1000 && r > 0x1p-960) {
+		return crPow(e, float64(k))
+	}
+	if e < 0 && k == 3 {
+		return -r
+	}
+	return r
+}
+
+func skewOfMoments(n, m, m2, m3 float64, unbiased bool) float64 {
 	if m2 <= float64(eps*m)*float64(eps*m) {
 		return math.NaN()
 	}
@@ -255,10 +289,12 @@ const eps = 0x1p-52
 
 // kurt is scipy.stats.kurtosis on a non-empty sample.
 func kurt(v []float64, unbiased, pearson bool) float64 {
-	n := float64(len(v))
 	m := mean(v)
-	m2 := moment(v, 2, m)
-	m4 := moment(v, 4, m)
+	c := centralMoments(v, m, 4)
+	return kurtOfMoments(float64(len(v)), m, c[2], c[4], unbiased, pearson)
+}
+
+func kurtOfMoments(n, m, m2, m4 float64, unbiased, pearson bool) float64 {
 	val := math.NaN()
 	if !(m2 <= float64(eps*m)*float64(eps*m)) {
 		m22 := float64(m2 * m2)
@@ -328,13 +364,14 @@ func Describe[D Data](x D, o *ShapeOptions) (DescribeResult, error) {
 		r.Max = max(r.Max, t)
 	}
 	r.Mean = mean(v)
-	r.Variance = moment(v, 2, r.Mean)
+	c := centralMoments(v, r.Mean, 4)
+	fn := float64(n)
+	r.Variance = c[2]
 	if ddof != 0 {
-		fn := float64(n)
 		r.Variance *= fn / (fn - ddof)
 	}
-	r.Skewness = skewness(v, o.Unbiased)
-	r.Kurtosis = kurt(v, o.Unbiased, false)
+	r.Skewness = skewOfMoments(fn, r.Mean, c[2], c[3], o.Unbiased)
+	r.Kurtosis = kurtOfMoments(fn, r.Mean, c[2], c[4], o.Unbiased, false)
 	return r, nil
 }
 
