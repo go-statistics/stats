@@ -3,6 +3,7 @@ package stats
 import (
 	"math"
 
+	"github.com/go-numerics/optimize"
 	"github.com/go-statistics/stats/internal/dd"
 )
 
@@ -121,4 +122,23 @@ func logD(a dd.DD) dd.DD {
 		return dd.DD{Hi: math.Inf(-1)}
 	}
 	return logDD(a)
+}
+
+// logPair returns log p for a probability p whose complement is q, both
+// double-doubles: log1p(-q) when p > 1/2, where log p would cancel.
+func logPair(p, q dd.DD) float64 {
+	if p.Hi > 0.5 {
+		return log1pDD(dd.Neg(q)).Float()
+	}
+	return logD(p).Float()
+}
+
+// brentRoot finds a root of f in the bracket [a, b] (f(a), f(b) of
+// opposite signs) with Brent's method, to full float64 precision.
+func brentRoot(f func(float64) float64, a, b float64) (float64, bool) {
+	r, err := optimize.Brentq(f, a, b, &optimize.BracketOptions{Xtol: 1e-300, Rtol: 4 * 0x1p-52, MaxIter: 500})
+	if err != nil || !r.Converged {
+		return math.NaN(), false
+	}
+	return r.Root, true
 }

@@ -13,7 +13,7 @@ mp.prec = 300
 def dd(v):
     hi = float(v)
     lo = float(v - mpf(hi))
-    return "{%r, %r}" % (hi, lo)
+    return "{Hi: %r, Lo: %r}" % (hi, lo)
 
 
 def table(name, fn, n, doc):
