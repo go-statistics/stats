@@ -25,7 +25,7 @@ KMAX_SCIPY = 1e6
 
 def logpmf(k, a):
     a = mpf(a)
-    return -a * mpmath.log(k) - mpmath.log(mpmath.zeta(a))
+    return -a * mpmath.log(k) - mpmath.log1p(mpmath.zeta(a, 2))
 
 
 def cdfsf(k, a):

@@ -66,7 +66,12 @@ func (s zipfStd) pmf(k float64) float64 {
 
 func (s zipfStd) logpmf(k float64) float64 { return dd.Sub(s.mlog(k), s.lz()).Float() }
 
-func (s zipfStd) sf(k float64) float64 { return dd.Div(zetaTail(s.a, k+1), s.z).Float() }
+// sf is (k+1)^-a R / ζ(a), R = zetaTailScaled, rounded once (also where
+// it is subnormal).
+func (s zipfStd) sf(k float64) float64 {
+	q := k + 1
+	return expScaled(dd.MulF(dd.Log(q), -s.a), dd.Div(zetaTailScaled(s.a, q), s.z))
+}
 
 func (s zipfStd) cdf(k float64) float64 {
 	if sf := s.sf(k); sf < 0.5 {
@@ -82,16 +87,15 @@ func (s zipfStd) logcdf(k float64) float64 {
 	return dd.Sub(logDD(zetaPartial(s.a, k)), s.lz()).Float()
 }
 
-// logsf is log SF, and below the normal range -a log(k+1) - log ζ(a) plus
-// the log of Σ_j ((k+1)/(k+1+j))^a, summed by ratios.
+// logsf is log1p(-CDF) where SF > 1/2, otherwise -a log(k+1) + log R -
+// log ζ(a), accurate also where SF underflows.
 func (s zipfStd) logsf(k float64) float64 {
-	return logCDFFrom(s.sf(k), s.cdf(k), func() (float64, dd.DD, bool) {
-		q := k + 1
-		sum, ok := ratioSum(q, 1, math.Inf(1), tailBudget, func(j float64) dd.DD {
-			return dd.F(math.Pow(j/(j+1), s.a))
-		})
-		return s.logpmf(q), sum, ok
-	})
+	if s.sf(k) > 0.5 {
+		return log1pDD(dd.Neg(dd.Div(zetaPartial(s.a, k), s.z))).Float()
+	}
+	q := k + 1
+	l := dd.Add(dd.MulF(dd.Log(q), -s.a), logDD(zetaTailScaled(s.a, q)))
+	return dd.Sub(l, s.lz()).Float()
 }
 
 // guess inverts SF(k) ≈ k^(1-a) / ((a-1) ζ(a)) at q, within [1, 2^62].
@@ -231,27 +235,38 @@ func zetaPartial(a, k float64) dd.DD {
 	return dd.AddF(dd.Add(s, integral), corr)
 }
 
-// zetaTail returns ζ(a, q) = Σ_{j>=q} j^-a for a > 1 and an integer q >= 1,
-// as a double-double, without allocating: the terms one by one until they
-// fall below 2^-64 of the sum (for large a, a few) or j reaches
+// zetaTail returns ζ(a, q) = Σ_{j>=q} j^-a as a double-double (it
+// underflows with q^-a; see zetaTailScaled).
+func zetaTail(a, q float64) dd.DD {
+	r := zetaTailScaled(a, q)
+	m, e := dd.ExpMant(dd.MulF(dd.Log(q), -a))
+	return dd.Ldexp(dd.Mul(m, r), e)
+}
+
+// zetaTailScaled returns R = q^a ζ(a, q) = Σ_{j>=q} (j/q)^-a for a > 1 and
+// an integer q >= 1, as a double-double, without allocating and without
+// underflow (R lies between 1 and 1 + q/(a-1)): the terms one by one until
+// they fall below 2^-64 of the sum (for large a, a few) or j reaches
 // max(20, 4(a+11)), then Euler-Maclaurin from there, where the first
 // omitted correction (B_12 f^(11)) is below 2^-55 of the tail.
-func zetaTail(a, q float64) dd.DD {
+func zetaTailScaled(a, q float64) dd.DD {
 	jm := math.Max(emStart, 4*(a+11))
+	lq := dd.Log(q)
 	s := dd.F(0)
 	j := q
 	for ; j < jm; j++ {
-		t := expDD2(dd.MulF(dd.Log(j), -a))
+		t := expDD2(dd.MulF(dd.Sub(dd.Log(j), lq), -a))
 		s = dd.Add(s, t)
 		if t.Hi < s.Hi*0x1p-64 {
 			return s
 		}
 	}
-	// ∫_j^∞ x^-a dx + f(j)/2 - Σ B_2i/(2i)! f^(2i-1)(j)
-	fj := expDD2(dd.MulF(dd.Log(j), -a))
-	tail := dd.Add(dd.DivF(dd.MulF(fj, j), a-1), dd.MulF(fj, 0.5))
+	// f(j) (∫_j^∞ x^-a dx / f(j) + 1/2 - Σ B_2i/(2i)! f^(2i-1)(j)/f(j)),
+	// f(j) = (j/q)^-a here
+	fj := expDD2(dd.MulF(dd.Sub(dd.Log(j), lq), -a))
+	tail := dd.AddF(dd.DivF(dd.F(j), a-1), 0.5)
 	corr := 0.0
-	d := fj.Hi
+	d := 1.0
 	for i, w := range bernoulliEM {
 		r := float64(2*i + 1)
 		if i == 0 {
@@ -261,7 +276,7 @@ func zetaTail(a, q float64) dd.DD {
 		}
 		corr -= w * d
 	}
-	return dd.Add(s, dd.AddF(tail, corr))
+	return dd.Add(s, dd.Mul(fj, dd.AddF(tail, corr)))
 }
 
 // zetaLogSum returns Σ_{j>=2} log j / j^a = -ζ'(a): the first terms one by
