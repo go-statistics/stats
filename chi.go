@@ -87,8 +87,6 @@ func (s chiStd) logsf(x float64) float64 {
 // chiTiny is where x²/2 nears the bottom of the normal range.
 const chiTiny = 1e-150
 
-var ln2DD = dd.DD{Hi: 0.6931471805599453, Lo: 2.3190468138462996e-17}
-
 // logCDFTiny is k·(2 log x - log 2) - log Γ(1+k).
 func (s chiStd) logCDFTiny(x float64) dd.DD {
 	l := dd.Sub(dd.MulF(dd.Log(x), 2), ln2DD)
