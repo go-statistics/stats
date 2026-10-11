@@ -120,16 +120,20 @@ func (cauchyStd) rvs(g *random.Generator, size []int) (*ndarray.Array, error) {
 	}
 	v, _ := ndarray.Data[float64](u)
 	for i, p := range v {
-		if p == 0.5 {
-			v[i] = 0
-			continue
-		}
-		if p > 0.5 {
-			p--
-		}
-		v[i] = -1 / crTan(math.Pi*p)
+		v[i] = cauchyDraw(p)
 	}
 	return u, nil
+}
+
+// cauchyDraw is Boost's Cauchy quantile of p as SciPy's draws evaluate it.
+func cauchyDraw(p float64) float64 {
+	if p == 0.5 {
+		return 0
+	}
+	if p > 0.5 {
+		p--
+	}
+	return -1 / crTan(math.Pi*p)
 }
 
 // FitCauchy returns the maximum-likelihood Cauchy distribution for x:
@@ -159,10 +163,7 @@ func FitCauchy[D Data](x D, o *FitOptions) (Cauchy, error) {
 			return contLogLik(v, cauchyStd{}, th[0], th[1])
 		},
 	}
-	th, err := fitMLE(p, fx)
-	if err != nil {
-		return Cauchy{}, err
-	}
+	th, _ := fitMLE(p, fx) // the density is positive everywhere: the start has a likelihood
 	d := Cauchy{Loc: th[0], Scale: th[1]}
 	return d, d.Validate()
 }

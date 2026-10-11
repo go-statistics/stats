@@ -79,7 +79,7 @@ func (s paretoStd) skew() float64 {
 func (s paretoStd) kurtosis() float64 {
 	b := s.b
 	if b > 4 {
-		return 6 * (((b+1)*b-6)*b - 2) / (((b - 7) * b + 12) * b)
+		return 6 * (((b+1)*b-6)*b - 2) / (((b-7)*b + 12) * b)
 	}
 	return math.NaN()
 }

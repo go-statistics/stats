@@ -54,6 +54,7 @@ func (s gumbelStd) logpdf(x float64) float64 {
 func (s gumbelStd) cdf(x float64) float64    { return expR(dd.Neg(s.e(x))) }
 func (s gumbelStd) sf(x float64) float64     { return dd.Neg(expm1D(dd.Neg(s.e(x)))).Float() }
 func (s gumbelStd) logcdf(x float64) float64 { return -s.e(x).Float() }
+
 // logsf is log(1 - exp(-e)); for e below 2^-26 it is
 // log e + log1p(-e/2 + e²/6 - ...) = -x - e/2 to well below the
 // rounding, which keeps full accuracy also where e is subnormal.

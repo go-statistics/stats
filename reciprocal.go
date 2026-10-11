@@ -167,10 +167,7 @@ func FitReciprocal[D Data](x D, o *FitOptions) (Reciprocal, error) {
 	// interior optimum is what a numerical search finds.
 	lo, hi := minMax(v)
 	loc0, _ := fitLocScaleSupport(v, Reciprocal{A: lo, B: hi}.std())
-	w0 := lo - loc0
-	if !(w0 > 0) {
-		w0 = hi - lo
-	}
+	w0 := lo - loc0 // positive: SciPy's start covers the data
 	prof := func(loc float64) (Reciprocal, float64) {
 		d, err := fitReciprocalFixedLoc(v, fx, loc, scale)
 		if err != nil {

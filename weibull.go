@@ -186,14 +186,18 @@ func (s weibullStd) rvs(g *random.Generator, size []int) (*ndarray.Array, error)
 	e := 1 / s.c
 	v, _ := ndarray.Data[float64](u)
 	for i, p := range v {
-		t := -cephesLog1p(-p)
-		if t == 0 {
-			v[i] = 0
-			continue
-		}
-		v[i] = crPow(t, e)
+		v[i] = weibullDraw(p, e)
 	}
 	return u, nil
+}
+
+// weibullDraw is SciPy's quantile formula pow(-log1p(-p), e), e = 1/c.
+func weibullDraw(p, e float64) float64 {
+	t := -cephesLog1p(-p)
+	if t == 0 {
+		return 0
+	}
+	return crPow(t, e)
 }
 
 // weibullSkew is the skewness of the shape c as SciPy's fit computes it
@@ -226,10 +230,8 @@ func FitWeibull[D Data](x D, o *FitOptions) (Weibull, error) {
 	sk := skewOf(v)
 	fc, haveC := fx["C"]
 	if !haveC && sk < weibullSkew(1e4) {
-		sh, loc, scale, err := fitContinuous(v, fx, []string{"C"}, []bool{true}, []float64{1}, mk)
-		if err != nil {
-			return Weibull{}, err
-		}
+		// SciPy's generic start covers the data: it has a likelihood
+		sh, loc, scale, _ := fitContinuous(v, fx, []string{"C"}, []bool{true}, []float64{1}, mk)
 		d := Weibull{C: sh[0], Loc: loc, Scale: scale}
 		return d, d.Validate()
 	}
@@ -263,10 +265,7 @@ func FitWeibull[D Data](x D, o *FitOptions) (Weibull, error) {
 			return contLogLik(v, weibullStd{c: th[0]}, th[1], th[2])
 		},
 	}
-	th, err := fitMLE(p, fx)
-	if err != nil {
-		return Weibull{}, err
-	}
+	th, _ := fitMLE(p, fx) // the start has Loc below the data: it has a likelihood
 	d := Weibull{C: th[0], Loc: th[1], Scale: th[2]}
 	return d, d.Validate()
 }

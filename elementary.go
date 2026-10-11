@@ -151,16 +151,15 @@ func ldexpRound(m dd.DD, k int) float64 {
 	if math.Abs(r) >= 0x1p-1022 || r != r {
 		return r
 	}
-	// In units of the smallest subnormal: hs exact, the rounding of the
-	// sum to an integer decided on the exact remainder.
+	// In units of the smallest subnormal, hs is exact and the low part
+	// (at most half an ulp of hs) can only break a tie of hs's rounding.
 	hs := math.Ldexp(m.Hi, k+1074)
 	ls := math.Ldexp(m.Lo, k+1074)
 	n := math.RoundToEven(hs)
-	f := (hs - n) + ls
-	switch {
-	case f > 0.5:
+	switch d := hs - n; {
+	case d == 0.5 && ls > 0:
 		n++
-	case f < -0.5:
+	case d == -0.5 && ls < 0:
 		n--
 	}
 	return math.Ldexp(n, -1074)

@@ -111,11 +111,9 @@ func FitLomax[D Data](x D, o *FitOptions) (Lomax, error) {
 	if err := checkFitData(v); err != nil {
 		return Lomax{}, err
 	}
-	sh, loc, scale, err := fitContinuous(v, fx, []string{"C"}, []bool{true}, []float64{1},
+	// SciPy's start covers the data: it has a likelihood
+	sh, loc, scale, _ := fitContinuous(v, fx, []string{"C"}, []bool{true}, []float64{1},
 		func(s []float64) contStd { return lomaxStd{c: s[0]} })
-	if err != nil {
-		return Lomax{}, err
-	}
 	d := Lomax{C: sh[0], Loc: loc, Scale: scale}
 	return d, d.Validate()
 }

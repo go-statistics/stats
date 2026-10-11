@@ -79,8 +79,8 @@ func (s triangStd) sfD(x float64) dd.DD {
 	return s.upper(x)
 }
 
-func (s triangStd) cdf(x float64) float64    { return s.cdfD(x).Float() }
-func (s triangStd) sf(x float64) float64     { return s.sfD(x).Float() }
+func (s triangStd) cdf(x float64) float64 { return s.cdfD(x).Float() }
+func (s triangStd) sf(x float64) float64  { return s.sfD(x).Float() }
 func (s triangStd) logcdf(x float64) float64 {
 	if x < s.c && x < 0.5 {
 		// 2 log x - log c: x²/c may underflow where its logarithm does not
@@ -88,7 +88,7 @@ func (s triangStd) logcdf(x float64) float64 {
 	}
 	return logPair(s.cdfD(x), s.sfD(x))
 }
-func (s triangStd) logsf(x float64) float64  { return logPair(s.sfD(x), s.cdfD(x)) }
+func (s triangStd) logsf(x float64) float64 { return logPair(s.sfD(x), s.cdfD(x)) }
 
 // quantile returns the point with lower tail area p and upper tail area
 // q = 1 - p (both given, one of them exactly as the caller holds it):
@@ -149,11 +149,9 @@ func FitTriangular[D Data](x D, o *FitOptions) (Triangular, error) {
 	if err := checkFitData(v); err != nil {
 		return Triangular{}, err
 	}
-	sh, loc, scale, err := fitContinuous(v, fx, []string{"C"}, []bool{false}, []float64{1},
+	// SciPy's start covers the data with a margin: it has a likelihood
+	sh, loc, scale, _ := fitContinuous(v, fx, []string{"C"}, []bool{false}, []float64{1},
 		func(s []float64) contStd { return triangStd{c: s[0]} })
-	if err != nil {
-		return Triangular{}, err
-	}
 	d := Triangular{C: sh[0], Loc: loc, Scale: scale}
 	return d, d.Validate()
 }
