@@ -33,6 +33,9 @@ func (s chiStd) pdf(x float64) float64 {
 		// x^(2k-1): +Inf below k = 1/2, 0 above, √(2/π) at k = 1/2.
 		return gammaAtZero(2*s.k, 0.7978845608028654)
 	}
+	if x < chiTiny {
+		return expDD(s.logPDFTiny(x))
+	}
 	return gammaDensity(s.k, halfSquare(x), dd.F(x))
 }
 
@@ -40,22 +43,76 @@ func (s chiStd) logpdf(x float64) float64 {
 	if x == 0 {
 		return math.Log(s.pdf(0))
 	}
+	if x < chiTiny {
+		return s.logPDFTiny(x).Float()
+	}
 	// log x + (k-1) log(x²/2) - x²/2 - log Γ(k), via the gamma form
 	return dd.Add(gammaLogDensity(s.k, halfSquare(x)), dd.Log(x)).Float()
 }
 
 // The distribution functions are the gamma(k) ones at x²/2, the square
 // carried in double-double and its rounding corrected (igamma).
-func (s chiStd) cdf(x float64) float64 { return igamma(s.k, halfSquare(x), false) }
-func (s chiStd) sf(x float64) float64  { return igamma(s.k, halfSquare(x), true) }
+//
+// Below chiTiny, x²/2 would leave the normal range: there P(k, x²/2) is
+// its first series term (x²/2)^k / Γ(1+k), relative error x², evaluated in
+// logarithms.
+func (s chiStd) cdf(x float64) float64 {
+	if x < chiTiny {
+		return expDD(s.logCDFTiny(x))
+	}
+	return igamma(s.k, halfSquare(x), false)
+}
+
+func (s chiStd) sf(x float64) float64 {
+	if x < chiTiny {
+		return -math.Expm1(s.logCDFTiny(x).Float())
+	}
+	return igamma(s.k, halfSquare(x), true)
+}
+
 func (s chiStd) logcdf(x float64) float64 {
+	if x < chiTiny {
+		return s.logCDFTiny(x).Float()
+	}
 	return logPQ(s.cdf(x), s.sf(x))
 }
+
 func (s chiStd) logsf(x float64) float64 {
+	if x < chiTiny {
+		return -s.cdf(x)
+	}
 	return logPQ(s.sf(x), s.cdf(x))
 }
-func (s chiStd) ppf(p float64) float64 { return math.Sqrt(2 * special.GammaPInv(s.k, p)) }
-func (s chiStd) isf(q float64) float64 { return math.Sqrt(2 * special.GammaQInv(s.k, q)) }
+
+// chiTiny is where x²/2 nears the bottom of the normal range.
+const chiTiny = 1e-150
+
+var ln2DD = dd.DD{Hi: 0.6931471805599453, Lo: 2.3190468138462996e-17}
+
+// logCDFTiny is k·(2 log x - log 2) - log Γ(1+k).
+func (s chiStd) logCDFTiny(x float64) dd.DD {
+	l := dd.Sub(dd.MulF(dd.Log(x), 2), ln2DD)
+	return dd.AddF(dd.MulF(l, s.k), -logGamma1p(s.k))
+}
+func (s chiStd) ppf(p float64) float64 {
+	if p <= s.cdf(chiTiny) {
+		return s.tinyQuantile(dd.Log(p))
+	}
+	return math.Sqrt(2 * special.GammaPInv(s.k, p))
+}
+
+func (s chiStd) isf(q float64) float64 {
+	if q >= 0.5 && 1-q <= s.cdf(chiTiny) {
+		return s.tinyQuantile(dd.Log(1 - q))
+	}
+	return math.Sqrt(2 * special.GammaQInv(s.k, q))
+}
+
+// tinyQuantile inverts logCDFTiny: log x = ((log p + log Γ(1+k))/k + log 2)/2.
+func (s chiStd) tinyQuantile(lp dd.DD) float64 {
+	t := dd.DivF(dd.AddF(lp, logGamma1p(s.k)), s.k)
+	return expDD(dd.MulF(dd.Add(t, ln2DD), 0.5))
+}
 
 // moments returns the mean, variance, skewness and excess kurtosis from
 // SciPy's formulas, μ = √2·Γ(k+1/2)/Γ(k), μ2 = df - μ², ..., evaluated in
@@ -143,4 +200,14 @@ func FitChi[D Data](x D, o *FitOptions) (Chi, error) {
 	}
 	d := Chi{Df: sh[0], Loc: loc, Scale: scale}
 	return d, d.Validate()
+}
+
+// logPDFTiny is log(x^(2k-1) / (2^(k-1) Γ(k))) (e^(-x²/2) = 1 here):
+// (2k-1) log x - (k-1) log 2 - log Γ(1+k) + log k.
+func (s chiStd) logPDFTiny(x float64) dd.DD {
+	h, l := dd.TwoSum(2*s.k, -1)
+	e := dd.Mul(dd.DD{Hi: h, Lo: l}, dd.Log(x))
+	h, l = dd.TwoSum(s.k, -1)
+	e = dd.Sub(e, dd.Mul(dd.DD{Hi: h, Lo: l}, ln2DD))
+	return dd.Add(dd.AddF(e, -logGamma1p(s.k)), dd.Log(s.k))
 }

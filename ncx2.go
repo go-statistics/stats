@@ -64,10 +64,17 @@ func (s ncx2Std) mixture(start float64, logTerm func(j float64) dd.DD, ratio fun
 	if !(t0 > 0) {
 		return 0 // every term underflows
 	}
+	// walk away from the largest term by the exact ratios, re-anchoring on
+	// a direct evaluation every 8 steps so that rounding does not
+	// accumulate along the walk
 	sum := t0
 	t := t0
 	for i := j; i > 0; i-- {
-		t /= ratio(i - 1)
+		if math.Mod(j-i+1, 8) == 0 {
+			t = expDD(logTerm(i - 1))
+		} else {
+			t /= ratio(i - 1)
+		}
 		sum += t
 		if t < sum*0x1p-60 {
 			break
@@ -75,7 +82,11 @@ func (s ncx2Std) mixture(start float64, logTerm func(j float64) dd.DD, ratio fun
 	}
 	t = t0
 	for i := j; ; i++ {
-		t *= ratio(i)
+		if math.Mod(i-j+1, 8) == 0 {
+			t = expDD(logTerm(i + 1))
+		} else {
+			t *= ratio(i)
+		}
 		sum += t
 		if t < sum*0x1p-60 || t == 0 {
 			break
@@ -104,7 +115,14 @@ func (s ncx2Std) pdf(x float64) float64 {
 	b := s.k + 1
 	start := (-b + math.Sqrt(b*b-4*(s.k-s.mu*y))) / 2
 	return s.mixture(start, func(j float64) dd.DD {
-		return dd.Add(s.poissonLog(j), dd.AddF(gammaLogDensity(s.k+j, dd.F(y)), -math.Ln2))
+		// the shape k+j is rounded; d/da log g_a(y) = log y - ψ(a)
+		// corrects the rounding to first order
+		a, da := dd.TwoSum(s.k, j)
+		l := dd.Add(s.poissonLog(j), dd.AddF(gammaLogDensity(a, dd.F(y)), -math.Ln2))
+		if da != 0 {
+			l = dd.AddF(l, da*(math.Log(y)-special.Digamma(a)))
+		}
+		return l
 	}, func(j float64) float64 {
 		return s.mu * y / ((j + 1) * (s.k + j))
 	})
