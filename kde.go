@@ -10,6 +10,7 @@ import (
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/linalg"
 	"github.com/go-ndarray/ndarray/random"
+	"github.com/go-statistics/stats/internal/dd"
 )
 
 // BandwidthRule is a rule of thumb for the bandwidth factor of a
@@ -125,11 +126,13 @@ func NewGaussianKDE[D Data](dataset D, o *GaussianKDEOptions) (*GaussianKDE, err
 			k.weights[i] = 1 / float64(k.n)
 		}
 	}
-	sq := make([]float64, k.n)
-	for i, w := range k.weights {
-		sq[i] = float64(w * w)
+	// neff = 1/Σw², correctly rounded: SciPy's int(neff) (the default
+	// resample size) must not drop to 999 for 1000 equal weights.
+	var sq dd.DD
+	for _, w := range k.weights {
+		sq = dd.Add(sq, dd.MulFF(w, w))
 	}
-	k.neff = 1 / sum(sq)
+	k.neff = dd.Div(dd.F(1), sq).Float()
 	if k.d > k.n {
 		return nil, fmt.Errorf("%w: %d dimensions but only %d points (gaussian_kde reads each column as a point)", ErrData, k.d, k.n)
 	}
@@ -449,13 +452,17 @@ func (k *GaussianKDE) sum1D(t float64) (a0, s float64) {
 	r := math.Sqrt(2 * cut)
 	lo := sort.SearchFloat64s(z, t-r)
 	hi := sort.SearchFloat64s(z, math.Nextafter(t+r, math.Inf(1)))
+	// Kahan summation suffices: every term is positive.
 	var c float64
-	for i := lo; i < hi; i++ {
-		u := z[i] - t
-		v := k.ew[i] * math.Exp(a0-u*u/2)
-		s, c = neumaier(s, c, v)
+	w := k.ew[lo:hi]
+	for i, zi := range z[lo:hi] {
+		u := zi - t
+		y := w[i]*math.Exp(a0-u*u/2) - c
+		tt := s + y
+		c = (tt - s) - y
+		s = tt
 	}
-	return a0, s + c
+	return a0, s
 }
 
 // sumND is sum1D for d > 1, over every point, relative to the largest

@@ -378,7 +378,7 @@ def gen_kde():
                                     for a, b in ((-1.0, 0.5), (0.0, np.inf), (3.0, 5.0), (-np.inf, -2.5), (2.0, 1.0))]
                 if d <= 2:
                     blo, bhi = mean - 1.0, mean + 0.5
-                    row["box"] = [H(blo), H(bhi), H(kde.integrate_box(blo, bhi))]
+                    row["box"] = {"lo": H(blo), "hi": H(bhi), "value": H(kde.integrate_box(blo, bhi))}
                 rs = []
                 for seed in (0, 42):
                     r = kde.resample(size=6, seed=np.random.default_rng(seed))
