@@ -233,7 +233,7 @@ func TestParity(t *testing.T) {
 					if exact, ok := in.MPMath[what]; ok {
 						// SciPy's value is known to be inaccurate here: hold
 						// ours to mpmath's instead.
-						if !closeTo(got, float64(exact), 1e-14) {
+						if !closeTo(got, float64(exact), 1e-13) { // the moment formulas cancel a few digits; the last ones move with the architecture
 							t.Errorf("%s %s = %v, mpmath %v (SciPy %v)", name, what, got, float64(exact), float64(want))
 						}
 						return
