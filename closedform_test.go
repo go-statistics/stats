@@ -81,5 +81,6 @@ func has(m map[string]float64, k string) bool { _, ok := m[k]; return ok }
 
 func TestExactFits(t *testing.T) {
 	exactFits(t, "lognorm", func(f map[string]float64) bool { return has(f, "Loc") })
+	exactFits(t, "rayleigh", func(f map[string]float64) bool { return has(f, "Loc") })
 	exactFits(t, "pareto", func(f map[string]float64) bool { return has(f, "Loc") || has(f, "Scale") })
 }
