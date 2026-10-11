@@ -294,21 +294,7 @@ func edgeCounts(a, w, edges []float64) []float64 {
 	cum := make([]float64, len(edges))
 	for start := 0; start < len(a); start += 65536 {
 		end := min(start+65536, len(a))
-		idx := make([]int, end-start)
-		for i := range idx {
-			idx[i] = start + i
-		}
-		sort.SliceStable(idx, func(i, j int) bool { return lessNaN(a[idx[i]], a[idx[j]]) })
-		sa := make([]float64, len(idx))
-		cw := make([]float64, len(idx)+1)
-		for i, k := range idx {
-			sa[i] = a[k]
-			if w == nil {
-				cw[i+1] = float64(i + 1)
-			} else {
-				cw[i+1] = cw[i] + w[k]
-			}
-		}
+		sa, cw := sortedCumWeights(a[start:end], subOrNil(w, start, end), lessNaN)
 		for j, e := range edges {
 			var pos int
 			if j < len(edges)-1 {
@@ -467,21 +453,7 @@ func scipyHistogram(a []float64, o *FreqOptions, density, cumulative bool, name 
 	}
 	edges := linspace(lo, hi, nb+1)
 	n := len(a)
-	idx := make([]int, n)
-	for i := range idx {
-		idx[i] = i
-	}
-	sort.SliceStable(idx, func(i, j int) bool { return a[idx[i]] < a[idx[j]] })
-	sa := make([]float64, n)
-	cw := make([]float64, n+1)
-	for i, k := range idx {
-		sa[i] = a[k]
-		if w == nil {
-			cw[i+1] = float64(i + 1)
-		} else {
-			cw[i+1] = cw[i] + w[k]
-		}
-	}
+	sa, cw, sw := sortedCumWeightsW(a, w)
 	pos := make([]int, len(edges))
 	for j, e := range edges {
 		pos[j] = sort.SearchFloat64s(sa, e)
@@ -501,7 +473,7 @@ func scipyHistogram(a []float64, o *FreqOptions, density, cumulative bool, name 
 		at := make([]float64, n)
 		for i, t := range sa {
 			if t == top {
-				at[i] = w[idx[i]]
+				at[i] = sw[i]
 			}
 		}
 		hist[nb-1] += sum(at)
@@ -535,4 +507,56 @@ func scipyHistogram(a []float64, o *FreqOptions, density, cumulative bool, name 
 	}
 	r.Freq = hist
 	return r, nil
+}
+
+func subOrNil(w []float64, i, j int) []float64 {
+	if w == nil {
+		return nil
+	}
+	return w[i:j]
+}
+
+// sortedCumWeights returns the data sorted (stably, by less) and the
+// cumulative weights in that order, from 0 (counts without weights).
+func sortedCumWeights(a, w []float64, less func(x, y float64) bool) (sa, cw []float64) {
+	sa, cw, _ = sortedBy(a, w, less)
+	return sa, cw
+}
+
+func sortedCumWeightsW(a, w []float64) (sa, cw, sw []float64) {
+	return sortedBy(a, w, func(x, y float64) bool { return x < y })
+}
+
+func sortedBy(a, w []float64, less func(x, y float64) bool) (sa, cw, sw []float64) {
+	n := len(a)
+	cw = make([]float64, n+1)
+	cmp := func(x, y float64) int {
+		switch {
+		case less(x, y):
+			return -1
+		case less(y, x):
+			return 1
+		}
+		return 0
+	}
+	if w == nil {
+		sa = slices.Clone(a)
+		slices.SortFunc(sa, cmp)
+		for i := range sa {
+			cw[i+1] = float64(i + 1)
+		}
+		return sa, cw, nil
+	}
+	type pair struct{ v, w float64 }
+	p := make([]pair, n)
+	for i := range p {
+		p[i] = pair{a[i], w[i]}
+	}
+	slices.SortStableFunc(p, func(x, y pair) int { return cmp(x.v, y.v) })
+	sa, sw = make([]float64, n), make([]float64, n)
+	for i, e := range p {
+		sa[i], sw[i] = e.v, e.w
+		cw[i+1] = cw[i] + e.w
+	}
+	return sa, cw, sw
 }
