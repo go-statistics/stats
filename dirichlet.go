@@ -39,7 +39,7 @@ func NewDirichlet(alpha []float64) (*Dirichlet, error) {
 	for _, a := range alpha {
 		d.lnB = dd.Add(d.lnB, lgammaDD(a))
 	}
-	d.lnB = dd.Sub(d.lnB, lgammaDDAt(sumDD(alpha)))
+	d.lnB = dd.Sub(d.lnB, lgammaDDAt(mvSumDD(alpha)))
 	return d, nil
 }
 
@@ -197,7 +197,7 @@ func (d *Dirichlet) Cov() *ndarray.Array {
 // double-double (with double-double log-gamma and digamma values for
 // large α), since they nearly cancel when the concentrations are large.
 func (d *Dirichlet) Entropy() float64 {
-	a0 := sumDD(d.alpha)
+	a0 := mvSumDD(d.alpha)
 	k := float64(len(d.alpha))
 	s := dd.Add(d.lnB, dd.Mul(dd.AddF(a0, -k), digammaDDAt(a0)))
 	for _, a := range d.alpha {

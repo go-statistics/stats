@@ -48,8 +48,8 @@ func digammaDDAt(a dd.DD) dd.DD {
 	return dd.AddF(digammaDD(a.Hi), a.Lo/a.Hi)
 }
 
-// sumDD is the double-double sum of v.
-func sumDD(v []float64) dd.DD {
+// mvSumDD is the double-double sum of v.
+func mvSumDD(v []float64) dd.DD {
 	var s dd.DD
 	for _, x := range v {
 		s = dd.AddF(s, x)

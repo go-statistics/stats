@@ -51,10 +51,10 @@ func (m *Multinomial) P() []float64 { return append([]float64(nil), m.p...) }
 // n = 1000): with Stirling's formula log m! = m log m - m + log(2πm)/2 +
 // δ(m), the large terms cancel exactly and
 //
-//	log pmf = δ(n) - Σδ(xᵢ) - Σ bd0(xᵢ, npᵢ) + n(Σpᵢ - 1)
+//	log pmf = δ(n) - Σδ(xᵢ) - Σ mnBd0(xᵢ, npᵢ) + n(Σpᵢ - 1)
 //	          + (log n - Σ log xᵢ - (r-1)·log 2π)/2
 //
-// over the r positive counts, with the deviance terms bd0(x, np) =
+// over the r positive counts, with the deviance terms mnBd0(x, np) =
 // x log(x/np) + np - x ≥ 0.
 func (m *Multinomial) logPMF(x []float64) float64 {
 	t := 0.0
@@ -77,14 +77,14 @@ func (m *Multinomial) logPMF(x []float64) float64 {
 	for i, v := range x {
 		p := m.p[i]
 		if v == 0 {
-			s -= n * p // bd0(0, np) = np
+			s -= n * p // mnBd0(0, np) = np
 			continue
 		}
 		if p == 0 {
 			return math.Inf(-1)
 		}
 		r++
-		s -= stirlerr(v) + bd0(v, n*p)
+		s -= stirlerr(v) + mnBd0(v, n*p)
 		logs -= 0.5 * math.Log(v)
 	}
 	return s + logs - float64(r-1)*0.9189385332046728
@@ -172,7 +172,7 @@ func (m *Multinomial) Cov() *ndarray.Array {
 // n = 1000); with Stirling's formula for each log m! the large parts cancel
 // exactly, leaving
 //
-//	Σᵢ E[bd0(Xᵢ, npᵢ) + (log(2πXᵢ)/2 + δ(Xᵢ))·[Xᵢ > 0]] - log(2πn)/2 - δ(n)
+//	Σᵢ E[mnBd0(Xᵢ, npᵢ) + (log(2πXᵢ)/2 + δ(Xᵢ))·[Xᵢ > 0]] - log(2πn)/2 - δ(n)
 //
 // of moderate, mostly positive terms, summed with compensation, and
 // binomial probabilities by Loader's saddle-point algorithm.
@@ -190,7 +190,7 @@ func (m *Multinomial) Entropy() float64 {
 		s, c = neumaier(s, c, binomPMF(0, m.n, p)*np)
 		for x := 1; x <= m.n; x++ {
 			fx := float64(x)
-			t := bd0(fx, np) + 0.5*math.Log(2*math.Pi*fx) + stirlerr(fx)
+			t := mnBd0(fx, np) + 0.5*math.Log(2*math.Pi*fx) + stirlerr(fx)
 			s, c = neumaier(s, c, binomPMF(x, m.n, p)*t)
 		}
 	}
@@ -233,7 +233,7 @@ func binomPMF(x, n int, p float64) float64 {
 		return math.Exp(float64(n) * math.Log(p))
 	}
 	fx, fn := float64(x), float64(n)
-	lc := stirlerr(fn) - stirlerr(fx) - stirlerr(fn-fx) - bd0(fx, fn*p) - bd0(fn-fx, fn*q)
+	lc := stirlerr(fn) - stirlerr(fx) - stirlerr(fn-fx) - mnBd0(fx, fn*p) - mnBd0(fn-fx, fn*q)
 	lf := math.Log(2*math.Pi) + math.Log(fx) + math.Log1p(-fx/fn)
 	return math.Exp(lc - 0.5*lf)
 }
@@ -268,7 +268,7 @@ var stirlerrTable = [15]float64{0.08106146679532726, 0.0413406959554093, 0.02767
 
 // bd0 is the deviance term x log(x/np) + np - x, computed without
 // cancellation when x is close to np.
-func bd0(x, np float64) float64 {
+func mnBd0(x, np float64) float64 {
 	if math.Abs(x-np) < 0.1*(x+np) {
 		v := (x - np) / (x + np)
 		s := (x - np) * v

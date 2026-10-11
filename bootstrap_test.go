@@ -92,7 +92,7 @@ func TestBootstrapParity(t *testing.T) {
 			}
 		}
 		// Every value, through its exact sum (math.fsum in the fixture).
-		if s := sumDD(r.BootstrapDistribution).Float(); s != float64(c.Sum) {
+		if s := mvSumDD(r.BootstrapDistribution).Float(); s != float64(c.Sum) {
 			t.Errorf("%s: sum of the distribution %v, SciPy %v", w, s, float64(c.Sum))
 		}
 		m := &ci
