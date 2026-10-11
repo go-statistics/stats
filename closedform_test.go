@@ -20,6 +20,7 @@ func init() {
 	// power correctly rounded where the C library's misrounds a few in a
 	// thousand (2 ulp after the shift of an instance with Loc).
 	rvsULP["Weibull"] = 2
+	rvsULP["Pareto"] = 1 // pow(1-U, -1/b), the C library's pow misrounding
 	// SciPy's Cauchy draws are Boost's -1/tan(π·U) with the C library's
 	// tan, which on the reference build is its sin/cos ratio and misrounds
 	// a third of its results by up to 3 ulp; ours rounds the same formula
@@ -69,4 +70,5 @@ func has(m map[string]float64, k string) bool { _, ok := m[k]; return ok }
 
 func TestExactFits(t *testing.T) {
 	exactFits(t, "lognorm", func(f map[string]float64) bool { return has(f, "Loc") })
+	exactFits(t, "pareto", func(f map[string]float64) bool { return has(f, "Loc") || has(f, "Scale") })
 }

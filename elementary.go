@@ -178,3 +178,13 @@ func expScaledR(a, c dd.DD) float64 {
 	m, k := dd.ExpMant(a)
 	return ldexpRound(dd.Mul(m, c), k)
 }
+
+// log1mexpSmall returns log(1 - exp(-t)) for a double-double t > 0
+// rounded: log t - t/2 below t = 2^-26 (the next term, t²/24, is below
+// the rounding), which stays exact where t is subnormal; log1mexpD above.
+func log1mexpSmall(t dd.DD) float64 {
+	if t.Hi < 0x1p-26 {
+		return dd.AddF(logD(t), -0.5*t.Hi).Float()
+	}
+	return log1mexpD(t).Float()
+}
