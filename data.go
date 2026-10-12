@@ -161,3 +161,13 @@ func sumProd(x, w []float64) float64 {
 		}
 	})
 }
+
+// sumSub is sum of the differences a[i] - m (each rounded), without the
+// array of them.
+func sumSub(a []float64, m float64) float64 {
+	return sumTerms(len(a), func(d []float64, lo int) {
+		for i, v := range a[lo : lo+len(d)] {
+			d[i] = v - m
+		}
+	})
+}

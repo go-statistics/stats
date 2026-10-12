@@ -65,20 +65,12 @@ func FOneway[D Data](o *FOnewayOptions, samples ...D) (TestResult, error) {
 	var f, dfn, dfd float64
 	if !o.Welch {
 		offset := mean(all)
-		ad := make([]float64, len(all))
-		for i, v := range all {
-			ad[i] = v - offset
-		}
-		s := sum(ad)
+		s := sumSub(all, offset)
 		normSS := s * s / bign
-		sstot := dotDD(ad, ad) - normSS
+		sstot := devDot(all, all, offset, offset) - normSS
 		ssbn := 0.0
 		for _, g := range groups {
-			d := make([]float64, len(g))
-			for i, v := range g {
-				d[i] = v - offset
-			}
-			t := sum(d)
+			t := sumSub(g, offset)
 			ssbn += t * t / float64(len(g))
 		}
 		ssbn -= normSS
