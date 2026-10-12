@@ -103,6 +103,15 @@ func powerDivergence(obs, exp []float64, ddof, lambda float64) TestResult {
 // p-value of a large statistic is sensitive to its last bits (the
 // relative error of the chi-squared tail grows like x/2 times that of x).
 func sumDD(a []float64) float64 {
+	if y, ok := sumFast(a); ok {
+		return y
+	}
+	return sumDDExact(a)
+}
+
+// sumDDExact is sumDD's double-double sum (Σ through sum where a holds an
+// infinity or a NaN).
+func sumDDExact(a []float64) float64 {
 	var s dd.DD
 	for _, v := range a {
 		if math.IsInf(v, 0) || v != v {

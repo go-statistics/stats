@@ -148,3 +148,67 @@ func TestDotDevIdentity(t *testing.T) {
 		t.Errorf("fast path left %d data sets undecided", u)
 	}
 }
+
+func TestExpLogPowFastPath(t *testing.T) {
+	r := rand.New(rand.NewPCG(5, 6))
+	bad := 0
+	ys := []float64{-1 / 2.5, 1 / 1.7, 2.5, -1.5, 0.3, 1e-3, -7.25, 100.5, 1000.1}
+	fastpathArgs(*fastpathN/10, func(x float64) {
+		for _, y := range ys {
+			if s := math.Abs(math.Log(x) * y); s > 700 {
+				continue
+			}
+			want := dd.Exp(dd.Mul(dd.LogAccurate(x), dd.F(y)))
+			if got := expLogPow(x, y); math.Float64bits(got) != math.Float64bits(want) {
+				if bad++; bad < 10 {
+					t.Errorf("expLogPow(%v, %v) = %v, accurate path %v", x, y, got, want)
+				}
+			}
+		}
+		y := (r.Float64() - 0.5) * 40
+		if want, got := dd.Exp(dd.Mul(dd.LogAccurate(x), dd.F(y))), expLogPow(x, y); math.Float64bits(got) != math.Float64bits(want) {
+			if bad++; bad < 10 {
+				t.Errorf("expLogPow(%v, %v) = %v, accurate path %v", x, y, got, want)
+			}
+		}
+	})
+}
+
+func TestSumFastIdentity(t *testing.T) {
+	r := rand.New(rand.NewPCG(7, 8))
+	undecided := 0
+	sets := *fastpathN / 100
+	for s := range sets {
+		n := 1 + r.IntN(3000)
+		a := make([]float64, n)
+		for i := range a {
+			switch s % 3 {
+			case 0:
+				a[i] = r.ExpFloat64() * 10
+			case 1:
+				a[i] = math.Ldexp(r.NormFloat64(), r.IntN(80)-40)
+			case 2:
+				a[i] = math.Floor(r.Float64()*100) / 8
+			}
+		}
+		want := sumDDExact(a)
+		got, ok := sumFast(a)
+		if !ok {
+			undecided++
+		} else if math.Float64bits(got) != math.Float64bits(want) {
+			t.Errorf("n=%d: sumFast %v, double-double %v", n, got, want)
+		}
+		if g := sumDD(a); math.Float64bits(g) != math.Float64bits(want) {
+			t.Errorf("sumDD %v, want %v", g, want)
+		}
+	}
+	for _, a := range [][]float64{{1, math.Inf(1)}, {math.NaN()}, {}, {0, 0}, {1e300, 1e300, -1e300}} {
+		if g, w := sumDD(a), sumDDExact(a); math.Float64bits(g) != math.Float64bits(w) && !(g != g && w != w) {
+			t.Errorf("sumDD(%v) = %v, want %v", a, g, w)
+		}
+	}
+	t.Logf("undecided: %d of %d", undecided, sets)
+	if undecided > sets/50 {
+		t.Errorf("sumFast left %d of %d undecided", undecided, sets)
+	}
+}

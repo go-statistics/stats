@@ -40,6 +40,7 @@ const (
 	tagBetaLog
 	tagTConst
 	tagTLogConst
+	tagZipfEta
 )
 
 // shapeMemo returns f(a, b), from the table when it holds it.

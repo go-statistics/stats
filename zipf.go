@@ -37,8 +37,15 @@ func (d Zipf) std() zipfStd {
 	if !(d.A > 1) || math.IsInf(d.A, 1) {
 		return zipfStd{a: d.A}
 	}
-	eta := zetaTail(d.A, 2)
+	r := shapeMemo(tagZipfEta, d.A, 0, zipfEta)
+	eta := dd.DD{Hi: r[0], Lo: r[1]}
 	return zipfStd{a: d.A, z: dd.AddF(eta, 1), eta: eta}
+}
+
+// zipfEta is η(a) = ζ(a, 2), for shapeMemo.
+func zipfEta(a, _ float64) [4]float64 {
+	e := zetaTail(a, 2)
+	return [4]float64{e.Hi, e.Lo}
 }
 
 // zipfStd holds a, ζ(a) and η(a) = ζ(a) - 1 = ζ(a, 2) (the latter accurate

@@ -135,3 +135,47 @@ func subMean(a []float64, m float64) []float64 {
 	}
 	return d
 }
+
+// sumFast returns sumDDExact(a) and true when its compensated sum (Sum2 on
+// two accumulators, with a running bound on its error) can vouch for the
+// rounding of the exact sum, and for the double-double sum's (AddF,
+// relative error 2u² per step) rounding there too; as dotDev.
+func sumFast(a []float64) (float64, bool) {
+	n := len(a)
+	var s0, c0, s1, c1, ea, pa float64
+	i := 0
+	for ; i+1 < n; i += 2 {
+		p0, p1 := a[i], a[i+1]
+		t0 := s0 + p0
+		t1 := s1 + p1
+		v0 := t0 - s0
+		v1 := t1 - s1
+		f0 := (s0 - (t0 - v0)) + (p0 - v0)
+		f1 := (s1 - (t1 - v1)) + (p1 - v1)
+		s0, s1 = t0, t1
+		c0 += f0
+		c1 += f1
+		ea += math.Abs(f0) + math.Abs(f1)
+		pa += math.Abs(p0) + math.Abs(p1)
+	}
+	if i < n {
+		p0 := a[i]
+		t0 := s0 + p0
+		v0 := t0 - s0
+		f0 := (s0 - (t0 - v0)) + (p0 - v0)
+		s0 = t0
+		c0 += f0
+		ea += math.Abs(f0)
+		pa += math.Abs(p0)
+	}
+	fn := float64(n)
+	if !(pa < 0x1p1000 && pa > 0x1p-900) || fn*u53 > 0x1p-20 {
+		return 0, false
+	}
+	h, l := dd.TwoSum(s0, s1)
+	l2 := l + c0 + c1
+	errFast := 4.4*fn*u53*ea + 2.2*u53*(math.Abs(l)+math.Abs(c0)+math.Abs(c1))
+	errDD := 2.2 * fn * u53 * u53 * pa
+	y, rem := dd.TwoSum(h, l2)
+	return y, decidedAbs(y, rem, errFast+errDD)
+}

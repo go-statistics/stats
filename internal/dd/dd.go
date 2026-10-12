@@ -201,6 +201,15 @@ func ExpMant(a DD) (m DD, k int) {
 	return Mul(e, expTable[j]), k
 }
 
+// ExpReductionMargin returns how far a.Hi is, in units of ln2/64, from
+// changing the reduction ExpMant makes (the nearest multiple of ln2/64):
+// two arguments within that distance of each other get the same k and the
+// same table entry.
+func ExpReductionMargin(x float64) float64 {
+	v := x*(1/ln2o64Hi) + 0.5
+	return math.Abs(v - math.Round(v))
+}
+
 // Ldexp returns a * 2^k for a double-double (both parts scaled).
 func Ldexp(a DD, k int) DD {
 	return DD{math.Ldexp(a.Hi, k), math.Ldexp(a.Lo, k)}

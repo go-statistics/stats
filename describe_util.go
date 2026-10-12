@@ -89,15 +89,35 @@ func crPow(x, y float64) float64 {
 			r = dd.Div(dd.F(1), powDD(x, int(-y))).Float()
 		}
 		if !(r < 0x1p1000 && r > 0x1p-960) {
-			r = dd.Exp(dd.Mul(dd.LogAccurate(x), dd.F(y)))
+			r = expLogPow(x, y)
 		}
 	} else {
-		r = dd.Exp(dd.Mul(dd.LogAccurate(x), dd.F(y)))
+		r = expLogPow(x, y)
 	}
 	if neg {
 		return -r
 	}
 	return r
+}
+
+// expLogPow returns dd.Exp(y · dd.LogAccurate(x)) for x > 0, bit for bit,
+// by Ziv's strategy: the exponent from dd.Log (2^-72) decides the rounding
+// of the mantissa ExpMant forms unless it lies within the two paths' error
+// bounds of a midpoint (or the argument within 2^-30 of changing ExpMant's
+// reduction); then the accurate exponent is computed.
+func expLogPow(x, y float64) float64 {
+	e := dd.Mul(dd.Log(x), dd.F(y))
+	if a := math.Abs(e.Hi); a < 1e6 && dd.ExpReductionMargin(e.Hi) > 0x1p-30 {
+		m, k := dd.ExpMant(e)
+		mm, rem := dd.FastTwoSum(m.Hi, m.Lo)
+		// m <= 2.02: the mantissas of both paths are within 2^-75.9 + the
+		// exponent's error (2^-72·|e| here, 2^-103·|e| for LogAccurate)
+		// of the exact one, relative
+		if decidedAbs(mm, rem, 2.1*(0x1p-73+0x1p-69*a)) {
+			return math.Ldexp(mm, k)
+		}
+	}
+	return dd.Exp(dd.Mul(dd.LogAccurate(x), dd.F(y)))
 }
 
 // powDD returns x**n (n >= 2) in double-double.
