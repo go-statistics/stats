@@ -281,7 +281,7 @@ type TrimmedOptions struct {
 }
 
 // trimmedData applies OmitNaN and checks that observations remain within
-// the limits; it returns the data and the count of those kept (keepTrim).
+// the limits; it returns the data and the count of those kept (keepMask).
 func trimmedData(x []float64, o *TrimmedOptions, name string) (v []float64, lim *Limits, n int, err error) {
 	if o == nil {
 		o = &TrimmedOptions{}
@@ -294,9 +294,11 @@ func trimmedData(x []float64, o *TrimmedOptions, name string) (v []float64, lim 
 		return nil, nil, 0, fmt.Errorf("%w: %s of no observations", ErrData, name)
 	}
 	lim = o.Limits
-	for _, t := range v {
-		if keepTrim(lim, t) {
-			n++
+	if lim == nil {
+		n = len(v)
+	} else {
+		for _, t := range v {
+			n += int(keepMask(lim, t) & 1)
 		}
 	}
 	if n == 0 {
@@ -305,9 +307,19 @@ func trimmedData(x []float64, o *TrimmedOptions, name string) (v []float64, lim 
 	return v, lim, n, nil
 }
 
-// keepTrim reports whether t is within the limits (nil: no limits).
-func keepTrim(l *Limits, t float64) bool {
-	return l == nil || !(t < l.Lower || t > l.Upper || (l.LowerExclusive && t == l.Lower) || (l.UpperExclusive && t == l.Upper))
+// keepMask is all ones when t is within the limits (NaN is: no comparison
+// excludes it), zero otherwise, computed without branches (the data fall on
+// either side at random).
+func keepMask(l *Limits, t float64) uint64 {
+	out := b2u(t < l.Lower) | b2u(t > l.Upper) | b2u(l.LowerExclusive)&b2u(t == l.Lower) | b2u(l.UpperExclusive)&b2u(t == l.Upper)
+	return out - 1
+}
+
+func b2u(b bool) uint64 {
+	if b {
+		return 1
+	}
+	return 0
 }
 
 // trimmedSum is the pairwise sum of the kept observations, those outside
@@ -318,10 +330,7 @@ func trimmedSum(v []float64, lim *Limits) float64 {
 	}
 	return sumTerms(len(v), func(d []float64, lo int) {
 		for i, t := range v[lo : lo+len(d)] {
-			d[i] = 0
-			if keepTrim(lim, t) {
-				d[i] = t
-			}
+			d[i] = math.Float64frombits(math.Float64bits(t) & keepMask(lim, t))
 		}
 	})
 }
@@ -360,11 +369,8 @@ func tvar(x []float64, o *TrimmedOptions, name string) (v, n float64, err error)
 	} else {
 		ss = sumTerms(len(z), func(d []float64, lo int) {
 			for i, t := range z[lo : lo+len(d)] {
-				d[i] = 0
-				if keepTrim(lim, t) {
-					e := t - m
-					d[i] = float64(e * e)
-				}
+				e := t - m
+				d[i] = math.Float64frombits(math.Float64bits(float64(e*e)) & keepMask(lim, t))
 			}
 		})
 	}
