@@ -541,7 +541,9 @@ func sortedBy(a, w []float64, less func(x, y float64) bool) (sa, cw, sw []float6
 	}
 	if w == nil {
 		sa = slices.Clone(a)
-		slices.SortFunc(sa, cmp)
+		if len(sa) < radixMin || !radixSortFloats(sa) {
+			slices.SortFunc(sa, cmp)
+		}
 		for i := range sa {
 			cw[i+1] = float64(i + 1)
 		}
@@ -552,7 +554,9 @@ func sortedBy(a, w []float64, less func(x, y float64) bool) (sa, cw, sw []float6
 	for i := range p {
 		p[i] = pair{a[i], w[i]}
 	}
-	slices.SortStableFunc(p, func(x, y pair) int { return cmp(x.v, y.v) })
+	if !radixSortPairs(p, func(e pair) float64 { return e.v }) {
+		slices.SortStableFunc(p, func(x, y pair) int { return cmp(x.v, y.v) })
+	}
 	sa, sw = make([]float64, n), make([]float64, n)
 	for i, e := range p {
 		sa[i], sw[i] = e.v, e.w

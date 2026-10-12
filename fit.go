@@ -3,7 +3,6 @@ package stats
 import (
 	"fmt"
 	"math"
-	"sort"
 	"strings"
 
 	"github.com/go-numerics/optimize"
@@ -230,6 +229,6 @@ func fitContinuous(v []float64, fixed map[string]float64, names []string, positi
 // sortedCopy returns a sorted copy of v.
 func sortedCopy(v []float64) []float64 {
 	s := append([]float64(nil), v...)
-	sort.Float64s(s)
+	sortFloats(s)
 	return s
 }

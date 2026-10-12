@@ -3,7 +3,6 @@ package stats
 import (
 	"fmt"
 	"math"
-	"sort"
 
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
@@ -147,7 +146,7 @@ func Bootstrap[D Data](samples []D, statistic func(samples ...[]float64) float64
 		pl, ph = b.bcaLevels(theta, alpha)
 	}
 	sorted := append([]float64(nil), theta...)
-	sort.Float64s(sorted)
+	sortFloats(sorted)
 	nan := false
 	for _, t := range theta {
 		nan = nan || math.IsNaN(t)

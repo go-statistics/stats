@@ -199,7 +199,7 @@ func Levene[D Data](o *LeveneOptions, samples ...D) (TestResult, error) {
 			c = meanDD(g) // correctly rounded (data far from 0 are ill-conditioned)
 		case CenterTrimmed:
 			s := slices.Clone(g)
-			slices.Sort(s)
+			sortFloats(s)
 			lc := int(cut * float64(len(s)))
 			if lc > len(s)-lc {
 				return TestResult{qnan, qnan}, fmt.Errorf("%w: proportion to cut %v too big", ErrParam, cut)

@@ -125,23 +125,23 @@ func sumSqDev(a []float64, m float64) float64 {
 
 // sumTerms is sum of the n terms fill writes, without an array of them:
 // the pairwise recursion of sum splits [0, n) exactly as it splits an array
-// of length n, and each leaf (at most 128 terms) is filled into a buffer on
-// the stack by fill(dst, lo), which sets dst[i] to term lo+i. The result is
+// of length n, and each leaf (at most 128 terms) is filled into one reused
+// buffer by fill(dst, lo), which sets dst[i] to term lo+i. The result is
 // sum's, bit for bit.
 func sumTerms(n int, fill func(dst []float64, lo int)) float64 {
-	return sumTermsAt(0, n, fill)
+	buf := make([]float64, min(n, 128))
+	return sumTermsAt(0, n, buf, fill)
 }
 
-func sumTermsAt(lo, n int, fill func(dst []float64, lo int)) float64 {
+func sumTermsAt(lo, n int, buf []float64, fill func(dst []float64, lo int)) float64 {
 	if n <= 128 {
-		var buf [128]float64
 		b := buf[:n]
 		fill(b, lo)
 		return sum(b)
 	}
 	n2 := n / 2
 	n2 -= n2 % 8
-	return sumTermsAt(lo, n2, fill) + sumTermsAt(lo+n2, n-n2, fill)
+	return sumTermsAt(lo, n2, buf, fill) + sumTermsAt(lo+n2, n-n2, buf, fill)
 }
 
 // variance is np.var(a, ddof=ddof) to the bit.

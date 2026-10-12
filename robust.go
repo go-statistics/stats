@@ -38,7 +38,7 @@ func Mode[D Data](x D, o *NaNOptions) (ModeResult, error) {
 	}
 	a := slices.Clone(v)
 	n := nanLast(a)
-	slices.Sort(a[:n])
+	sortFloats(a[:n])
 	best := ModeResult{Mode: a[0]}
 	for i := 0; i < n; {
 		j := i + 1
@@ -280,46 +280,60 @@ type TrimmedOptions struct {
 	OmitNaN bool
 }
 
-// trimmedMask returns the data with the observations outside the limits
-// zeroed in place, and the count of those kept (SciPy's
-// _put_val_to_limits).
-func trimmedMask(x []float64, o *TrimmedOptions, name string) (z []float64, kept []bool, n int, err error) {
+// trimmedData applies OmitNaN and checks that observations remain within
+// the limits; it returns the data and the count of those kept (keepTrim).
+func trimmedData(x []float64, o *TrimmedOptions, name string) (v []float64, lim *Limits, n int, err error) {
 	if o == nil {
 		o = &TrimmedOptions{}
 	}
-	v := x
+	v = x
 	if o.OmitNaN {
 		v = dropNaN(v)
 	}
 	if len(v) == 0 {
 		return nil, nil, 0, fmt.Errorf("%w: %s of no observations", ErrData, name)
 	}
-	z = make([]float64, len(v))
-	kept = make([]bool, len(v))
-	for i, t := range v {
-		out := false
-		if l := o.Limits; l != nil {
-			out = t < l.Lower || t > l.Upper || (l.LowerExclusive && t == l.Lower) || (l.UpperExclusive && t == l.Upper)
-		}
-		if !out {
-			z[i], kept[i] = t, true
+	lim = o.Limits
+	for _, t := range v {
+		if keepTrim(lim, t) {
 			n++
 		}
 	}
 	if n == 0 {
 		return nil, nil, 0, fmt.Errorf("%w: %s: no observation within the limits", ErrData, name)
 	}
-	return z, kept, n, nil
+	return v, lim, n, nil
+}
+
+// keepTrim reports whether t is within the limits (nil: no limits).
+func keepTrim(l *Limits, t float64) bool {
+	return l == nil || !(t < l.Lower || t > l.Upper || (l.LowerExclusive && t == l.Lower) || (l.UpperExclusive && t == l.Upper))
+}
+
+// trimmedSum is the pairwise sum of the kept observations, those outside
+// the limits counted as zeros in place (SciPy's masked sum).
+func trimmedSum(v []float64, lim *Limits) float64 {
+	if lim == nil {
+		return sum(v)
+	}
+	return sumTerms(len(v), func(d []float64, lo int) {
+		for i, t := range v[lo : lo+len(d)] {
+			d[i] = 0
+			if keepTrim(lim, t) {
+				d[i] = t
+			}
+		}
+	})
 }
 
 // TMean returns the mean of the observations within the limits:
 // scipy.stats.tmean(x, limits, inclusive).
 func TMean[D Data](x D, o *TrimmedOptions) (float64, error) {
-	z, _, n, err := trimmedMask(floats(x), o, "TMean")
+	v, lim, n, err := trimmedData(floats(x), o, "TMean")
 	if err != nil {
 		return math.NaN(), err
 	}
-	return sum(z) / float64(n), nil
+	return trimmedSum(v, lim) / float64(n), nil
 }
 
 // TVar returns the variance (ddof 1 by default) of the observations within
@@ -330,7 +344,7 @@ func TVar[D Data](x D, o *TrimmedOptions) (float64, error) {
 }
 
 func tvar(x []float64, o *TrimmedOptions, name string) (v, n float64, err error) {
-	z, kept, k, err := trimmedMask(x, o, name)
+	z, lim, k, err := trimmedData(x, o, name)
 	if err != nil {
 		return math.NaN(), 0, err
 	}
@@ -339,14 +353,22 @@ func tvar(x []float64, o *TrimmedOptions, name string) (v, n float64, err error)
 		ddof = *o.Ddof
 	}
 	n = float64(k)
-	m := sum(z) / n
-	for i, t := range z {
-		if kept[i] {
-			e := t - m
-			z[i] = float64(e * e)
-		}
+	m := trimmedSum(z, lim) / n
+	var ss float64
+	if lim == nil {
+		ss = sumSqDev(z, m)
+	} else {
+		ss = sumTerms(len(z), func(d []float64, lo int) {
+			for i, t := range z[lo : lo+len(d)] {
+				d[i] = 0
+				if keepTrim(lim, t) {
+					e := t - m
+					d[i] = float64(e * e)
+				}
+			}
+		})
 	}
-	return sum(z) / n * scipyFactor(n, ddof), n, nil
+	return ss / n * scipyFactor(n, ddof), n, nil
 }
 
 // TStd returns the square root of TVar: scipy.stats.tstd.
@@ -396,14 +418,30 @@ func tbound(x []float64, limit float64, o *BoundOptions, side float64, name stri
 	if hasNaN(x) {
 		return math.NaN(), nil
 	}
+	// x holds no NaN: "beyond the limit" and "better" are plain comparisons
+	// (strict, so that of equal values, -0 and +0 included, the first stays)
 	best, found := 0.0, false
-	for _, t := range x {
-		d := side * (t - limit) // > 0 beyond the limit
-		if d > 0 || (o.Exclusive && t == limit) {
-			continue
+	if side < 0 {
+		best = math.Inf(1)
+		for _, t := range x {
+			if t < limit || (o.Exclusive && t == limit) {
+				continue
+			}
+			found = true
+			if t < best {
+				best = t
+			}
 		}
-		if !found || side*(t-best) > 0 {
-			best, found = t, true
+	} else {
+		best = math.Inf(-1)
+		for _, t := range x {
+			if t > limit || (o.Exclusive && t == limit) {
+				continue
+			}
+			found = true
+			if t > best {
+				best = t
+			}
 		}
 	}
 	if !found {

@@ -187,7 +187,7 @@ func TTestInd[D Data](a, b D, o *TTestIndOptions) (TTestResult, error) {
 // length, g = floor(n·trim).
 func trimmedStats(a []float64, trim float64) (v, m, n float64) {
 	s := slices.Clone(a)
-	slices.Sort(s)
+	sortFloats(s)
 	g := int(float64(len(s)) * trim)
 	if g == 0 {
 		v = varDdof(s, 1)

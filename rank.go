@@ -75,6 +75,9 @@ func sortedPairs(x []float64, stable bool) []rankPair {
 			lo++
 		}
 	}
+	if radixSortPairs(p[:lo], func(r rankPair) float64 { return r.v }) {
+		return p // stable, and equal values are equal bits
+	}
 	if stable {
 		// (value, position) is a total order: an unstable sort under it
 		// is stable.

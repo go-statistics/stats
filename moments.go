@@ -239,17 +239,20 @@ func shapeData(x []float64, o *ShapeOptions, name string) ([]float64, *ShapeOpti
 // skewness is scipy.stats.skew on a non-empty sample.
 func skewness(v []float64, unbiased bool) float64 {
 	m := mean(v)
-	c := centralMoments(v, m, 3)
+	c := centralMoments(v, m, 2, 3)
 	return skewOfMoments(float64(len(v)), m, c[2], c[3], unbiased)
 }
 
-// centralMoments returns the means of (v - m)^k for k = 2 .. upto (index
-// k), one buffer reused: the pairwise sums of _moment, to the bit.
-func centralMoments(v []float64, m float64, upto int) [5]float64 {
+// centralMoments returns the means of (v - m)^k for the given orders k in
+// 2 .. 4 (index k): the pairwise sums of _moment, to the bit.
+func centralMoments(v []float64, m float64, orders ...int) [5]float64 {
 	var r [5]float64
 	fn := float64(len(v))
-	r[2] = sumSqDev(v, m) / fn
-	for k := 3; k <= upto; k++ {
+	for _, k := range orders {
+		if k == 2 {
+			r[2] = sumSqDev(v, m) / fn
+			continue
+		}
 		r[k] = sumTerms(len(v), func(d []float64, lo int) {
 			for i, t := range v[lo : lo+len(d)] {
 				d[i] = powIntSigned(t-m, k)
@@ -288,7 +291,7 @@ const eps = 0x1p-52
 // kurt is scipy.stats.kurtosis on a non-empty sample.
 func kurt(v []float64, unbiased, pearson bool) float64 {
 	m := mean(v)
-	c := centralMoments(v, m, 4)
+	c := centralMoments(v, m, 2, 4)
 	return kurtOfMoments(float64(len(v)), m, c[2], c[4], unbiased, pearson)
 }
 
@@ -362,7 +365,7 @@ func Describe[D Data](x D, o *ShapeOptions) (DescribeResult, error) {
 		r.Max = max(r.Max, t)
 	}
 	r.Mean = mean(v)
-	c := centralMoments(v, r.Mean, 4)
+	c := centralMoments(v, r.Mean, 2, 3, 4)
 	fn := float64(n)
 	r.Variance = c[2]
 	if ddof != 0 {

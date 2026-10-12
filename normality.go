@@ -22,7 +22,7 @@ func ShapiroWilk[D Data](x D) (TestResult, error) {
 		return TestResult{qnan, qnan}, nil
 	}
 	y := slices.Clone(v)
-	slices.Sort(y)
+	sortFloats(y)
 	c := v[n/2] // SciPy subtracts x[n//2] of the unsorted data (gh-15777)
 	for i := range y {
 		y[i] -= c
@@ -132,7 +132,7 @@ func AndersonDarling[D Data](x D, dist ADDist) (AndersonResult, error) {
 		return bad, fmt.Errorf("%w: anderson needs at least one observation", ErrData)
 	}
 	y := slices.Clone(v)
-	slices.Sort(y)
+	sortFloats(y)
 	n := float64(len(y))
 	xbar := mean(v)
 	w := make([]float64, len(y))

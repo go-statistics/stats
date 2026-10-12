@@ -4,6 +4,7 @@ import (
 	"flag"
 	"math"
 	"math/rand/v2"
+	"slices"
 	"testing"
 
 	"github.com/go-statistics/stats/internal/dd"
@@ -210,5 +211,64 @@ func TestSumFastIdentity(t *testing.T) {
 	t.Logf("undecided: %d of %d", undecided, sets)
 	if undecided > sets/50 {
 		t.Errorf("sumFast left %d of %d undecided", undecided, sets)
+	}
+}
+
+func TestRadixSortIdentity(t *testing.T) {
+	r := rand.New(rand.NewPCG(9, 10))
+	gen := []func() float64{
+		func() float64 { return r.NormFloat64() },
+		func() float64 { return math.Round(r.NormFloat64() * 3) }, // ties, zeros of one sign
+		func() float64 { return -math.Round(r.Float64() * 3) },    // -0 only
+		func() float64 { return math.Float64frombits(r.Uint64()) }, // every pattern, NaNs included
+		func() float64 {
+			return []float64{math.Inf(1), math.Inf(-1), math.MaxFloat64, -math.SmallestNonzeroFloat64, 1}[r.IntN(5)]
+		},
+		func() float64 { return []float64{math.Copysign(0, -1), 0, 1}[r.IntN(3)] }, // both zeros: fallback
+	}
+	for s := range 300 {
+		n := radixMin + r.IntN(5000)
+		if s%7 == 0 {
+			n = r.IntN(radixMin)
+		}
+		g := gen[s%len(gen)]
+		a := make([]float64, n)
+		for i := range a {
+			a[i] = g()
+		}
+		want := slices.Clone(a)
+		slices.Sort(want)
+		got := slices.Clone(a)
+		sortFloats(got)
+		for i := range want {
+			if math.Float64bits(got[i]) != math.Float64bits(want[i]) && !(got[i] != got[i] && want[i] != want[i]) {
+				t.Fatalf("set %d (n=%d): sortFloats[%d] = %v, slices.Sort %v", s, n, i, got[i], want[i])
+			}
+		}
+		type pr struct {
+			v float64
+			i int
+		}
+		p := make([]pr, n)
+		for i, v := range a {
+			p[i] = pr{v, i}
+		}
+		wp := slices.Clone(p)
+		slices.SortStableFunc(wp, func(x, y pr) int {
+			switch {
+			case x.v < y.v:
+				return -1
+			case x.v > y.v:
+				return 1
+			}
+			return 0
+		})
+		if radixSortPairs(p, func(e pr) float64 { return e.v }) {
+			for i := range wp {
+				if p[i].i != wp[i].i {
+					t.Fatalf("set %d: radixSortPairs differs from the stable sort at %d", s, i)
+				}
+			}
+		}
 	}
 }
