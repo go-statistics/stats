@@ -6,6 +6,14 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 
 | function | points | regions | ours max | SciPy max | regions where ours <= SciPy |
 |---|--:|--:|--:|--:|--:|
+| **bernoulli_cdf** | 740 | 3 | 0.50 | 0.50 | 3/3 |
+| **bernoulli_isf** | 747 | 3 | 0 | wrong | 3/3 |
+| **bernoulli_logcdf** | 728 | 3 | 0.50 | 9.0e+15 | 3/3 |
+| **bernoulli_logpmf** | 740 | 3 | 0.50 | 1.85 | 3/3 |
+| **bernoulli_logsf** | 731 | 3 | 0.50 | 0.50 | 3/3 |
+| **bernoulli_pmf** | 741 | 3 | 0.50 | 27 | 3/3 |
+| **bernoulli_ppf** | 747 | 3 | 0 | 0 | 3/3 |
+| **bernoulli_sf** | 740 | 3 | 0 | 0 | 3/3 |
 | **beta_cdf** | 390 | 11 | 5.64 | 7335 | 11/11 |
 | **beta_isf** | 486 | 12 | 2.76 | wrong | 12/12 |
 | **beta_logcdf** | 395 | 12 | 2.04 | 1287 | 12/12 |
@@ -14,6 +22,14 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | **beta_pdf** | 402 | 11 | 1.10 | 1754 | 11/11 |
 | beta_ppf | 487 | 12 | 1.24 | wrong | 11/12 |
 | beta_sf | 388 | 12 | 4.42 | 2.92 | 7/12 |
+| **binom_cdf** | 1620 | 7 | 9.47 | 7.0e+07 | 7/7 |
+| **binom_isf** | 1120 | 5 | 0 | 3.4e+17 | 5/5 |
+| **binom_logcdf** | 1870 | 8 | 9.83 | wrong | 8/8 |
+| **binom_logpmf** | 1620 | 7 | 0.50 | 1.8e+15 | 7/7 |
+| **binom_logsf** | 1870 | 8 | 8.81 | wrong | 8/8 |
+| **binom_pmf** | 1370 | 6 | 0.50 | 3.4e+07 | 6/6 |
+| **binom_ppf** | 1119 | 5 | 0 | 1.8e+13 | 5/5 |
+| **binom_sf** | 1620 | 7 | 6.30 | 1.7e+07 | 7/7 |
 | **cauchy_cdf** | 1000 | 4 | 0.50 | 1.40 | 4/4 |
 | **cauchy_isf** | 739 | 3 | 0.50 | 99 | 3/3 |
 | **cauchy_logcdf** | 1000 | 4 | 0.50 | 2.29 | 4/4 |
@@ -62,6 +78,14 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | **gamma_pdf** | 522 | 12 | 1.23 | 9.5e+06 | 12/12 |
 | **gamma_ppf** | 548 | 10 | 0.62 | 2616 | 10/10 |
 | **gamma_sf** | 520 | 12 | 1.24 | 35824 | 12/12 |
+| **geom_cdf** | 1182 | 4 | 0.60 | 1.17 | 4/4 |
+| **geom_isf** | 900 | 3 | 2.00 | wrong | 3/3 |
+| **geom_logcdf** | 1183 | 4 | 0.58 | 9.0e+15 | 4/4 |
+| **geom_logpmf** | 1180 | 4 | 0.50 | 1.81 | 4/4 |
+| **geom_logsf** | 1192 | 4 | 0.54 | 1.17 | 4/4 |
+| **geom_pmf** | 1182 | 4 | 0.57 | 3.2e+15 | 4/4 |
+| **geom_ppf** | 900 | 3 | 1.00 | 3.8e+13 | 3/3 |
+| **geom_sf** | 1185 | 4 | 0.52 | 639 | 4/4 |
 | **gumbel_r_cdf** | 1250 | 5 | 0.50 | 379 | 5/5 |
 | **gumbel_r_isf** | 739 | 3 | 0.50 | 30 | 3/3 |
 | **gumbel_r_logcdf** | 1500 | 6 | 0.50 | 0.50 | 6/6 |
@@ -78,6 +102,14 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | **halfnorm_pdf** | 1000 | 4 | 0.50 | 466 | 4/4 |
 | **halfnorm_ppf** | 734 | 3 | 1.10 | wrong | 3/3 |
 | **halfnorm_sf** | 1000 | 4 | 1.00 | 2.0e+13 | 4/4 |
+| **hypergeom_cdf** | 1347 | 6 | 0.51 | 5.0e+07 | 6/6 |
+| **hypergeom_isf** | 850 | 4 | 0 | 4.3e+16 | 4/4 |
+| **hypergeom_logcdf** | 1600 | 7 | 0.50 | 1.7e+09 | 7/7 |
+| **hypergeom_logpmf** | 1350 | 6 | 0.50 | 2.0e+08 | 6/6 |
+| **hypergeom_logsf** | 1595 | 7 | 0.53 | 1.1e+09 | 7/7 |
+| **hypergeom_pmf** | 1095 | 5 | 0.50 | 8.6e+07 | 5/5 |
+| **hypergeom_ppf** | 850 | 4 | 0 | 1.8e+13 | 4/4 |
+| **hypergeom_sf** | 1346 | 6 | 0.50 | 1.4e+08 | 6/6 |
 | **invgamma_cdf** | 519 | 12 | 1.49 | 81266 | 12/12 |
 | **invgamma_isf** | 497 | 12 | 1.90 | 1160 | 12/12 |
 | **invgamma_logcdf** | 518 | 12 | 1.91 | 17311 | 12/12 |
@@ -118,6 +150,14 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | **lomax_pdf** | 750 | 3 | 0.50 | 1.1e+08 | 3/3 |
 | **lomax_ppf** | 745 | 3 | 0.50 | 312 | 3/3 |
 | **lomax_sf** | 750 | 3 | 0.50 | 410 | 3/3 |
+| **nbinom_cdf** | 1620 | 7 | 8.71 | 1.7e+06 | 7/7 |
+| **nbinom_isf** | 869 | 4 | 0 | 1.1e+14 | 4/4 |
+| **nbinom_logcdf** | 1870 | 8 | 10 | wrong | 8/8 |
+| **nbinom_logpmf** | 1620 | 7 | 0.50 | 1.4e+13 | 7/7 |
+| **nbinom_logsf** | 1870 | 8 | 6.67 | wrong | 8/8 |
+| **nbinom_pmf** | 1370 | 6 | 0.50 | 2.0e+06 | 6/6 |
+| **nbinom_ppf** | 870 | 4 | 0 | 2.8e+14 | 4/4 |
+| **nbinom_sf** | 1620 | 7 | 11 | 2.7e+06 | 7/7 |
 | **ncx2_cdf** | 208 | 9 | 116 | 7.1e+15 | 9/9 |
 | **ncx2_isf** | 144 | 7 | 4.06 | 1.9e+14 | 7/7 |
 | **ncx2_logcdf** | 207 | 9 | 271 | wrong | 9/9 |
@@ -142,6 +182,22 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | **pareto_pdf** | 746 | 3 | 0.50 | 435 | 3/3 |
 | **pareto_ppf** | 749 | 3 | 0.50 | 126 | 3/3 |
 | **pareto_sf** | 746 | 3 | 0.50 | 0.50 | 3/3 |
+| **poisson_cdf** | 1370 | 6 | 1.02 | 1.7e+10 | 6/6 |
+| **poisson_isf** | 870 | 4 | 0 | wrong | 4/4 |
+| **poisson_logcdf** | 1620 | 7 | 1.64 | wrong | 7/7 |
+| **poisson_logpmf** | 1370 | 6 | 0.50 | 1.4e+15 | 6/6 |
+| **poisson_logsf** | 1620 | 7 | 1.51 | wrong | 7/7 |
+| **poisson_pmf** | 1120 | 5 | 0.50 | 7.9e+16 | 5/5 |
+| **poisson_ppf** | 869 | 4 | 0 | wrong | 4/4 |
+| **poisson_sf** | 1370 | 6 | 1.00 | 7.3e+15 | 6/6 |
+| **randint_cdf** | 600 | 2 | 0.50 | 0.50 | 2/2 |
+| **randint_isf** | 900 | 3 | 0 | 1.7e+10 | 3/3 |
+| **randint_logcdf** | 600 | 2 | 0.50 | 4.7e+14 | 2/2 |
+| **randint_logpmf** | 600 | 2 | 0.50 | 0.67 | 2/2 |
+| **randint_logsf** | 600 | 2 | 0.50 | 4.0e+14 | 2/2 |
+| **randint_pmf** | 600 | 2 | 0.50 | 0.50 | 2/2 |
+| **randint_ppf** | 900 | 3 | 0 | 4.00 | 3/3 |
+| **randint_sf** | 600 | 2 | 0.50 | 7.8e+14 | 2/2 |
 | **rayleigh_cdf** | 1000 | 4 | 0.50 | 1.98 | 4/4 |
 | **rayleigh_isf** | 739 | 3 | 0.50 | 0.75 | 3/3 |
 | **rayleigh_logcdf** | 1000 | 4 | 0.70 | wrong | 4/4 |
@@ -198,11 +254,43 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | **weibull_min_pdf** | 750 | 3 | 0.50 | 483 | 3/3 |
 | **weibull_min_ppf** | 746 | 3 | 1.10 | 127 | 3/3 |
 | **weibull_min_sf** | 750 | 3 | 0.50 | 291 | 3/3 |
+| **zipf_cdf** | 750 | 3 | 0.50 | 6.74 | 3/3 |
+| **zipf_isf** | 664 | 3 | 0 | 6.3e+14 | 3/3 |
+| **zipf_logcdf** | 712 | 3 | 0.55 | 4.7e+80 | 3/3 |
+| **zipf_logpmf** | 750 | 3 | 0.50 | wrong | 3/3 |
+| **zipf_logsf** | 717 | 3 | 0.51 | wrong | 3/3 |
+| **zipf_pmf** | 750 | 3 | 0.50 | 5.25 | 3/3 |
+| **zipf_ppf** | 664 | 3 | 0 | 2.3e+15 | 3/3 |
+| **zipf_sf** | 721 | 3 | 0.50 | 6.1e+82 | 3/3 |
 
 ## Every region
 
 | function | region | points | ours max | ours p99.9 | SciPy max | SciPy p99.9 |
 |---|---|--:|--:|--:|--:|--:|
+| bernoulli_cdf | tiny | 250 | **0.48** | 0.48 | 0.48 | 0.48 |
+| bernoulli_cdf | core | 250 | **0.50** | 0.50 | 0.50 | 0.50 |
+| bernoulli_cdf | near1 | 240 | **0** | 0 | 0 | 0 |
+| bernoulli_isf | core | 249 | **0** | 0 | 0 | 0 |
+| bernoulli_isf | lower | 249 | **0** | 0 | wrong | wrong |
+| bernoulli_isf | upper | 249 | **0** | 0 | 0 | 0 |
+| bernoulli_logcdf | tiny | 250 | **0.36** | 0.36 | 9.0e+15 | 9.0e+15 |
+| bernoulli_logcdf | core | 250 | **0.50** | 0.50 | 30 | 30 |
+| bernoulli_logcdf | near1 | 228 | **0.50** | 0.50 | 0.50 | 0.50 |
+| bernoulli_logpmf | tiny | 250 | **0.46** | 0.46 | 0.46 | 0.46 |
+| bernoulli_logpmf | core | 250 | **0.50** | 0.50 | 1.85 | 1.85 |
+| bernoulli_logpmf | near1 | 240 | **0.50** | 0.50 | 0.50 | 0.50 |
+| bernoulli_logsf | tiny | 250 | **0.04** | 0.04 | 0.04 | 0.04 |
+| bernoulli_logsf | core | 250 | **0.50** | 0.50 | 0.50 | 0.50 |
+| bernoulli_logsf | near1 | 231 | **0.50** | 0.50 | 0.50 | 0.50 |
+| bernoulli_pmf | tiny | 250 | **0.48** | 0.48 | 27 | 27 |
+| bernoulli_pmf | core | 250 | **0.50** | 0.50 | 5.00 | 5.00 |
+| bernoulli_pmf | near1 | 241 | **0.00** | 0.00 | 6.00 | 6.00 |
+| bernoulli_ppf | core | 249 | **0** | 0 | 0 | 0 |
+| bernoulli_ppf | lower | 249 | **0** | 0 | 0 | 0 |
+| bernoulli_ppf | upper | 249 | **0** | 0 | 0 | 0 |
+| bernoulli_sf | tiny | 250 | **0** | 0 | 0 | 0 |
+| bernoulli_sf | core | 250 | **0** | 0 | 0 | 0 |
+| bernoulli_sf | near1 | 240 | **0** | 0 | 0 | 0 |
 | beta_cdf | small_lo | 60 | **0.50** | 0.50 | 4.17 | 4.17 |
 | beta_cdf | small_mid | 52 | **0.74** | 0.74 | 4.21 | 4.21 |
 | beta_cdf | mid_lo | 57 | **0.49** | 0.49 | 22 | 22 |
@@ -295,6 +383,59 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | beta_sf | mixed_lo | 30 | **0.33** | 0.33 | 0.33 | 0.33 |
 | beta_sf | mixed_mid | 30 | **2.33** | 2.33 | 2.92 | 2.92 |
 | beta_sf | mixed_hi | 30 | **0.76** | 0.76 | 2.66 | 2.66 |
+| binom_cdf | small | 250 | **5.59** | 5.59 | 44 | 44 |
+| binom_cdf | bulk | 250 | **8.64** | 8.64 | 1873 | 1873 |
+| binom_cdf | large_n | 120 | **4.87** | 4.87 | 7.0e+07 | 7.0e+07 |
+| binom_cdf | small_p | 250 | **0.47** | 0.47 | 0.47 | 0.47 |
+| binom_cdf | p_near_1 | 250 | **5.08** | 5.08 | 102 | 102 |
+| binom_cdf | lower | 250 | **9.47** | 9.47 | 19900 | 19900 |
+| binom_cdf | upper | 250 | **0.50** | 0.50 | 0.50 | 0.50 |
+| binom_isf | core | 250 | **0** | 0 | 0 | 0 |
+| binom_isf | lower | 250 | **0** | 0 | 3.4e+17 | 3.4e+17 |
+| binom_isf | upper | 250 | **0** | 0 | 2.5e+12 | 2.5e+12 |
+| binom_isf | large_n | 120 | **0** | 0 | 0 | 0 |
+| binom_isf | small_p | 250 | **0** | 0 | 0 | 0 |
+| binom_logcdf | small | 250 | **5.53** | 5.53 | 97850 | 97850 |
+| binom_logcdf | bulk | 250 | **9.83** | 9.83 | 3.1e+06 | 3.1e+06 |
+| binom_logcdf | large_n | 120 | **4.85** | 4.85 | 2.7e+08 | 2.7e+08 |
+| binom_logcdf | small_p | 250 | **1.46** | 1.46 | 9.0e+15 | 9.0e+15 |
+| binom_logcdf | p_near_1 | 250 | **2.79** | 2.79 | 5.1e+15 | 5.1e+15 |
+| binom_logcdf | lower | 250 | **0.71** | 0.71 | wrong | wrong |
+| binom_logcdf | upper | 250 | **6.41** | 6.41 | 9.0e+15 | 9.0e+15 |
+| binom_logcdf | deep | 250 | **5.55** | 5.55 | wrong | wrong |
+| binom_logpmf | small | 250 | **0.50** | 0.50 | 210 | 210 |
+| binom_logpmf | bulk | 250 | **0.50** | 0.50 | 2.3e+06 | 2.3e+06 |
+| binom_logpmf | large_n | 120 | **0.49** | 0.49 | 1.8e+15 | 1.8e+15 |
+| binom_logpmf | small_p | 250 | **0.50** | 0.50 | 1.8e+14 | 1.8e+14 |
+| binom_logpmf | p_near_1 | 250 | **0.50** | 0.50 | 2.8e+06 | 2.8e+06 |
+| binom_logpmf | tail | 250 | **0.50** | 0.50 | 147515 | 147515 |
+| binom_logpmf | deep | 250 | **0.50** | 0.50 | 2.9e+06 | 2.9e+06 |
+| binom_logsf | small | 250 | **4.44** | 4.44 | 8723 | 8723 |
+| binom_logsf | bulk | 250 | **8.81** | 8.81 | 1.6e+06 | 1.6e+06 |
+| binom_logsf | large_n | 120 | **6.65** | 6.65 | 1.4e+08 | 1.4e+08 |
+| binom_logsf | small_p | 250 | **0.58** | 0.58 | wrong | wrong |
+| binom_logsf | p_near_1 | 250 | **4.17** | 4.17 | 9.0e+15 | 9.0e+15 |
+| binom_logsf | lower | 250 | **7.72** | 7.72 | 9.0e+15 | 9.0e+15 |
+| binom_logsf | upper | 250 | **0.56** | 0.56 | 186 | 186 |
+| binom_logsf | deep | 250 | **6.71** | 6.71 | wrong | wrong |
+| binom_pmf | small | 250 | **0.50** | 0.50 | 133 | 133 |
+| binom_pmf | bulk | 250 | **0.50** | 0.50 | 1833 | 1833 |
+| binom_pmf | large_n | 120 | **0.49** | 0.49 | 3.4e+07 | 3.4e+07 |
+| binom_pmf | small_p | 250 | **0.50** | 0.50 | 1575 | 1575 |
+| binom_pmf | p_near_1 | 250 | **0.50** | 0.50 | 98 | 98 |
+| binom_pmf | tail | 250 | **0.50** | 0.50 | 18497 | 18497 |
+| binom_ppf | core | 250 | **0** | 0 | 0 | 0 |
+| binom_ppf | lower | 250 | **0** | 0 | 0 | 0 |
+| binom_ppf | upper | 250 | **0** | 0 | 1.8e+13 | 1.8e+13 |
+| binom_ppf | large_n | 119 | **0** | 0 | 0 | 0 |
+| binom_ppf | small_p | 250 | **0** | 0 | 0 | 0 |
+| binom_sf | small | 250 | **3.62** | 3.62 | 30 | 30 |
+| binom_sf | bulk | 250 | **6.30** | 6.30 | 2113 | 2113 |
+| binom_sf | large_n | 120 | **5.29** | 5.29 | 1.7e+07 | 1.7e+07 |
+| binom_sf | small_p | 250 | **1.88** | 1.88 | 737 | 737 |
+| binom_sf | p_near_1 | 250 | **1.74** | 1.74 | 73 | 73 |
+| binom_sf | lower | 250 | **0.47** | 0.47 | 1.45 | 1.45 |
+| binom_sf | upper | 250 | **6.14** | 6.14 | 20311 | 20311 |
 | cauchy_cdf | core | 250 | **0.50** | 0.50 | 1.32 | 1.32 |
 | cauchy_cdf | left | 250 | **0.50** | 0.50 | 1.40 | 1.40 |
 | cauchy_cdf | right | 250 | **0.50** | 0.50 | 1.38 | 1.38 |
@@ -727,6 +868,36 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | gamma_sf | huge_lo | 12 | **0.00** | 0.00 | 0.00 | 0.00 |
 | gamma_sf | huge_mid | 12 | **0.53** | 0.53 | 1.26 | 1.26 |
 | gamma_sf | huge_hi | 12 | **0.50** | 0.50 | 2184 | 2184 |
+| geom_cdf | small_p | 300 | **0.54** | 0.54 | 1.17 | 1.17 |
+| geom_cdf | core | 300 | **0.50** | 0.50 | 1.00 | 1.00 |
+| geom_cdf | near1 | 282 | **0.48** | 0.48 | 0.48 | 0.48 |
+| geom_cdf | small_k | 300 | **0.60** | 0.60 | 1.05 | 1.05 |
+| geom_isf | core | 300 | **2.00** | 2.00 | 4.00 | 4.00 |
+| geom_isf | lower | 300 | **1.22** | 1.22 | wrong | wrong |
+| geom_isf | upper | 300 | **0** | 0 | 5.6e+14 | 5.6e+14 |
+| geom_logcdf | small_p | 300 | **0.57** | 0.57 | 8.7e+15 | 8.7e+15 |
+| geom_logcdf | core | 300 | **0.50** | 0.50 | 8.9e+15 | 8.9e+15 |
+| geom_logcdf | near1 | 283 | **0.50** | 0.50 | 8.6e+15 | 8.6e+15 |
+| geom_logcdf | small_k | 300 | **0.58** | 0.58 | 9.0e+15 | 9.0e+15 |
+| geom_logpmf | small_p | 300 | **0.50** | 0.50 | 1.16 | 1.16 |
+| geom_logpmf | core | 300 | **0.50** | 0.50 | 1.46 | 1.46 |
+| geom_logpmf | near1 | 280 | **0.50** | 0.50 | 1.21 | 1.21 |
+| geom_logpmf | small_k | 300 | **0.50** | 0.50 | 1.81 | 1.81 |
+| geom_logsf | small_p | 300 | **0.54** | 0.54 | 0.92 | 0.92 |
+| geom_logsf | core | 300 | **0.50** | 0.50 | 1.13 | 1.13 |
+| geom_logsf | near1 | 292 | **0.49** | 0.49 | 0.98 | 0.98 |
+| geom_logsf | small_k | 300 | **0.51** | 0.51 | 1.17 | 1.17 |
+| geom_pmf | small_p | 300 | **0.57** | 0.57 | 3.2e+15 | 3.2e+15 |
+| geom_pmf | core | 300 | **0.50** | 0.50 | 1273 | 1273 |
+| geom_pmf | near1 | 282 | **0.50** | 0.50 | 0.77 | 0.77 |
+| geom_pmf | small_k | 300 | **0.50** | 0.50 | 17 | 17 |
+| geom_ppf | core | 300 | **1.00** | 1.00 | 4.50 | 4.50 |
+| geom_ppf | lower | 300 | **0** | 0 | 0 | 0 |
+| geom_ppf | upper | 300 | **1.00** | 1.00 | 3.8e+13 | 3.8e+13 |
+| geom_sf | small_p | 300 | **0.52** | 0.52 | 289 | 289 |
+| geom_sf | core | 300 | **0.50** | 0.50 | 292 | 292 |
+| geom_sf | near1 | 285 | **0.49** | 0.49 | 469 | 469 |
+| geom_sf | small_k | 300 | **0.50** | 0.50 | 639 | 639 |
 | gumbel_r_cdf | core | 250 | **0.49** | 0.49 | 3.64 | 3.64 |
 | gumbel_r_cdf | left | 250 | **0.49** | 0.49 | 379 | 379 |
 | gumbel_r_cdf | right | 250 | **0.50** | 0.50 | 0.50 | 0.50 |
@@ -796,6 +967,51 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | halfnorm_sf | core | 250 | **0.59** | 0.59 | 13 | 13 |
 | halfnorm_sf | right | 250 | **0.54** | 0.54 | 85 | 85 |
 | halfnorm_sf | tail | 250 | **1.00** | 1.00 | 2.0e+13 | 2.0e+13 |
+| hypergeom_cdf | small | 247 | **0.50** | 0.50 | 2.94 | 2.94 |
+| hypergeom_cdf | bulk | 250 | **0.50** | 0.50 | 638630 | 638630 |
+| hypergeom_cdf | skewed | 250 | **0.50** | 0.50 | 850569 | 850569 |
+| hypergeom_cdf | large | 100 | **0.51** | 0.51 | 5.0e+07 | 5.0e+07 |
+| hypergeom_cdf | lower | 250 | **0.50** | 0.50 | 987258 | 987258 |
+| hypergeom_cdf | upper | 250 | **0.49** | 0.49 | 44 | 44 |
+| hypergeom_isf | core | 250 | **0** | 0 | 0 | 0 |
+| hypergeom_isf | lower | 250 | **0** | 0 | 4.3e+16 | 4.3e+16 |
+| hypergeom_isf | upper | 250 | **0** | 0 | 8.8e+12 | 8.8e+12 |
+| hypergeom_isf | large | 100 | **0** | 0 | 0 | 0 |
+| hypergeom_logcdf | small | 250 | **0.50** | 0.50 | 115 | 115 |
+| hypergeom_logcdf | bulk | 250 | **0.50** | 0.50 | 1.6e+07 | 1.6e+07 |
+| hypergeom_logcdf | skewed | 250 | **0.50** | 0.50 | 2.7e+07 | 2.7e+07 |
+| hypergeom_logcdf | large | 100 | **0.50** | 0.50 | 1.7e+09 | 1.7e+09 |
+| hypergeom_logcdf | lower | 250 | **0.50** | 0.50 | 750506 | 750506 |
+| hypergeom_logcdf | upper | 250 | **0.50** | 0.50 | 1.8e+07 | 1.8e+07 |
+| hypergeom_logcdf | deep | 250 | **0.50** | 0.50 | 7.5e+06 | 7.5e+06 |
+| hypergeom_logpmf | small | 250 | **0.50** | 0.50 | 135 | 135 |
+| hypergeom_logpmf | bulk | 250 | **0.50** | 0.50 | 3.0e+06 | 3.0e+06 |
+| hypergeom_logpmf | skewed | 250 | **0.50** | 0.50 | 5.3e+06 | 5.3e+06 |
+| hypergeom_logpmf | large | 100 | **0.49** | 0.49 | 2.0e+08 | 2.0e+08 |
+| hypergeom_logpmf | tail | 250 | **0.50** | 0.50 | 672353 | 672353 |
+| hypergeom_logpmf | deep | 250 | **0.50** | 0.50 | 150121 | 150121 |
+| hypergeom_logsf | small | 245 | **0.50** | 0.50 | 84 | 84 |
+| hypergeom_logsf | bulk | 250 | **0.50** | 0.50 | 1.2e+07 | 1.2e+07 |
+| hypergeom_logsf | skewed | 250 | **0.50** | 0.50 | 2.6e+07 | 2.6e+07 |
+| hypergeom_logsf | large | 100 | **0.53** | 0.53 | 1.1e+09 | 1.1e+09 |
+| hypergeom_logsf | lower | 250 | **0.50** | 0.50 | 2.5e+07 | 2.5e+07 |
+| hypergeom_logsf | upper | 250 | **0.50** | 0.50 | 1.4e+06 | 1.4e+06 |
+| hypergeom_logsf | deep | 250 | **0.50** | 0.50 | 2.3e+06 | 2.3e+06 |
+| hypergeom_pmf | small | 245 | **0.50** | 0.50 | 2.77 | 2.77 |
+| hypergeom_pmf | bulk | 250 | **0.50** | 0.50 | 989089 | 989089 |
+| hypergeom_pmf | skewed | 250 | **0.50** | 0.50 | 669243 | 669243 |
+| hypergeom_pmf | large | 100 | **0.48** | 0.48 | 8.6e+07 | 8.6e+07 |
+| hypergeom_pmf | tail | 250 | **0.50** | 0.50 | 538506 | 538506 |
+| hypergeom_ppf | core | 250 | **0** | 0 | 0 | 0 |
+| hypergeom_ppf | lower | 250 | **0** | 0 | 0 | 0 |
+| hypergeom_ppf | upper | 250 | **0** | 0 | 1.8e+13 | 1.8e+13 |
+| hypergeom_ppf | large | 100 | **0** | 0 | 0 | 0 |
+| hypergeom_sf | small | 246 | **0.50** | 0.50 | 3.08 | 3.08 |
+| hypergeom_sf | bulk | 250 | **0.50** | 0.50 | 495006 | 495006 |
+| hypergeom_sf | skewed | 250 | **0.50** | 0.50 | 718320 | 718320 |
+| hypergeom_sf | large | 100 | **0.49** | 0.49 | 1.4e+08 | 1.4e+08 |
+| hypergeom_sf | lower | 250 | **0.50** | 0.50 | 147 | 147 |
+| hypergeom_sf | upper | 250 | **0.50** | 0.50 | 1.2e+06 | 1.2e+06 |
 | invgamma_cdf | small_lo | 60 | **1.49** | 1.49 | 914 | 914 |
 | invgamma_cdf | small_mid | 57 | **1.17** | 1.17 | 14 | 14 |
 | invgamma_cdf | small_hi | 6 | **0.08** | 0.08 | 0.08 | 0.08 |
@@ -1009,6 +1225,57 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | lomax_sf | tiny | 250 | **0.46** | 0.46 | 0.46 | 0.46 |
 | lomax_sf | core | 250 | **0.50** | 0.50 | 2.92 | 2.92 |
 | lomax_sf | tail | 250 | **0.50** | 0.50 | 410 | 410 |
+| nbinom_cdf | small_n | 250 | **0.71** | 0.71 | 7.88 | 7.88 |
+| nbinom_cdf | bulk | 250 | **8.71** | 8.71 | 357 | 357 |
+| nbinom_cdf | large_n | 120 | **4.12** | 4.12 | 1.7e+06 | 1.7e+06 |
+| nbinom_cdf | small_p | 250 | **5.82** | 5.82 | 61 | 61 |
+| nbinom_cdf | p_near_1 | 250 | **0.50** | 0.50 | 0.50 | 0.50 |
+| nbinom_cdf | lower | 250 | **8.21** | 8.21 | 146063 | 146063 |
+| nbinom_cdf | upper | 250 | **0.50** | 0.50 | 2.16 | 2.16 |
+| nbinom_isf | core | 249 | **0** | 0 | 0 | 0 |
+| nbinom_isf | lower | 250 | **0** | 0 | 1.0e+12 | 1.0e+12 |
+| nbinom_isf | upper | 250 | **0** | 0 | 1.1e+14 | 1.1e+14 |
+| nbinom_isf | large_n | 120 | **0** | 0 | 0 | 0 |
+| nbinom_logcdf | small_n | 250 | **2.39** | 2.39 | 14 | 14 |
+| nbinom_logcdf | bulk | 250 | **7.02** | 7.02 | 953 | 953 |
+| nbinom_logcdf | large_n | 120 | **2.23** | 2.23 | 8.2e+06 | 8.2e+06 |
+| nbinom_logcdf | small_p | 250 | **6.19** | 6.19 | 1.2e+12 | 1.2e+12 |
+| nbinom_logcdf | p_near_1 | 250 | **4.81** | 4.81 | 14 | 14 |
+| nbinom_logcdf | lower | 250 | **0.75** | 0.75 | wrong | wrong |
+| nbinom_logcdf | upper | 250 | **10** | 10 | 455673 | 455673 |
+| nbinom_logcdf | deep | 250 | **3.25** | 3.25 | wrong | wrong |
+| nbinom_logpmf | small_n | 250 | **0.50** | 0.50 | 19 | 19 |
+| nbinom_logpmf | bulk | 250 | **0.50** | 0.50 | 121201 | 121201 |
+| nbinom_logpmf | large_n | 120 | **0.50** | 0.50 | 1.3e+12 | 1.3e+12 |
+| nbinom_logpmf | small_p | 250 | **0.50** | 0.50 | 1.4e+13 | 1.4e+13 |
+| nbinom_logpmf | p_near_1 | 250 | **0.50** | 0.50 | 12260 | 12260 |
+| nbinom_logpmf | tail | 250 | **0.50** | 0.50 | 4.7e+07 | 4.7e+07 |
+| nbinom_logpmf | deep | 250 | **0.50** | 0.50 | 5.6e+07 | 5.6e+07 |
+| nbinom_logsf | small_n | 250 | **0.84** | 0.84 | 4.10 | 4.10 |
+| nbinom_logsf | bulk | 250 | **5.57** | 5.57 | 9.9e+11 | 9.9e+11 |
+| nbinom_logsf | large_n | 120 | **2.35** | 2.35 | 2.1e+06 | 2.1e+06 |
+| nbinom_logsf | small_p | 250 | **6.60** | 6.60 | 8.6e+15 | 8.6e+15 |
+| nbinom_logsf | p_near_1 | 250 | **0.96** | 0.96 | 2.17 | 2.17 |
+| nbinom_logsf | lower | 250 | **6.67** | 6.67 | 9.0e+15 | 9.0e+15 |
+| nbinom_logsf | upper | 250 | **0.52** | 0.52 | 5882 | 5882 |
+| nbinom_logsf | deep | 250 | **1.70** | 1.70 | wrong | wrong |
+| nbinom_pmf | small_n | 250 | **0.50** | 0.50 | 8.99 | 8.99 |
+| nbinom_pmf | bulk | 250 | **0.50** | 0.50 | 376 | 376 |
+| nbinom_pmf | large_n | 120 | **0.50** | 0.50 | 2.0e+06 | 2.0e+06 |
+| nbinom_pmf | small_p | 250 | **0.50** | 0.50 | 106 | 106 |
+| nbinom_pmf | p_near_1 | 250 | **0.50** | 0.50 | 40 | 40 |
+| nbinom_pmf | tail | 250 | **0.50** | 0.50 | 277951 | 277951 |
+| nbinom_ppf | core | 250 | **0** | 0 | 0 | 0 |
+| nbinom_ppf | lower | 250 | **0** | 0 | 0 | 0 |
+| nbinom_ppf | upper | 250 | **0** | 0 | 2.8e+14 | 2.8e+14 |
+| nbinom_ppf | large_n | 120 | **0** | 0 | 524288 | 524288 |
+| nbinom_sf | small_n | 250 | **3.95** | 3.95 | 11 | 11 |
+| nbinom_sf | bulk | 250 | **11** | 11 | 513 | 513 |
+| nbinom_sf | large_n | 120 | **2.25** | 2.25 | 2.7e+06 | 2.7e+06 |
+| nbinom_sf | small_p | 250 | **4.42** | 4.42 | 73 | 73 |
+| nbinom_sf | p_near_1 | 250 | **1.32** | 1.32 | 6.68 | 6.68 |
+| nbinom_sf | lower | 250 | **0.50** | 0.50 | 13 | 13 |
+| nbinom_sf | upper | 250 | **6.04** | 6.04 | 250155 | 250155 |
 | ncx2_cdf | small_lo | 29 | **1.37** | 1.37 | 2.9e+13 | 2.9e+13 |
 | ncx2_cdf | small_mid | 30 | **3.05** | 3.05 | 4.53 | 4.53 |
 | ncx2_cdf | small_hi | 30 | **0.00** | 0.00 | 0.00 | 0.00 |
@@ -1132,6 +1399,69 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | pareto_sf | near_one | 246 | **0.49** | 0.49 | 0.49 | 0.49 |
 | pareto_sf | core | 250 | **0.50** | 0.50 | 0.50 | 0.50 |
 | pareto_sf | tail | 250 | **0.50** | 0.50 | 0.50 | 0.50 |
+| poisson_cdf | small_mu | 250 | **0.81** | 0.81 | 1.95 | 1.95 |
+| poisson_cdf | bulk | 250 | **0.76** | 0.76 | 150493 | 150493 |
+| poisson_cdf | large_mu | 120 | **0.70** | 0.70 | 1.7e+10 | 1.7e+10 |
+| poisson_cdf | tiny_mu | 250 | **0.46** | 0.46 | 0.46 | 0.46 |
+| poisson_cdf | lower | 250 | **1.02** | 1.02 | 38723 | 38723 |
+| poisson_cdf | upper | 250 | **0.47** | 0.47 | 1.1e+09 | 1.1e+09 |
+| poisson_isf | core | 250 | **0** | 0 | 0 | 0 |
+| poisson_isf | lower | 250 | **0** | 0 | wrong | wrong |
+| poisson_isf | upper | 250 | **0** | 0 | 1.1e+12 | 1.1e+12 |
+| poisson_isf | large_mu | 120 | **0** | 0 | wrong | wrong |
+| poisson_logcdf | small_mu | 250 | **1.00** | 1.00 | 5.1e+12 | 5.1e+12 |
+| poisson_logcdf | bulk | 250 | **1.08** | 1.08 | 2.5e+07 | 2.5e+07 |
+| poisson_logcdf | large_mu | 120 | **1.19** | 1.19 | 8.0e+15 | 8.0e+15 |
+| poisson_logcdf | tiny_mu | 250 | **0.50** | 0.50 | 8.9e+15 | 8.9e+15 |
+| poisson_logcdf | lower | 250 | **0.89** | 0.89 | wrong | wrong |
+| poisson_logcdf | upper | 250 | **0.90** | 0.90 | 9.0e+15 | 9.0e+15 |
+| poisson_logcdf | deep | 250 | **1.64** | 1.64 | wrong | wrong |
+| poisson_logpmf | small_mu | 250 | **0.50** | 0.50 | 6.09 | 6.09 |
+| poisson_logpmf | bulk | 250 | **0.50** | 0.50 | 1.1e+06 | 1.1e+06 |
+| poisson_logpmf | large_mu | 120 | **0.50** | 0.50 | 1.4e+15 | 1.4e+15 |
+| poisson_logpmf | tiny_mu | 250 | **0.50** | 0.50 | 0.51 | 0.51 |
+| poisson_logpmf | tail | 250 | **0.50** | 0.50 | 1.8e+08 | 1.8e+08 |
+| poisson_logpmf | deep | 250 | **0.50** | 0.50 | 568 | 568 |
+| poisson_logsf | small_mu | 250 | **1.51** | 1.51 | 9.29 | 9.29 |
+| poisson_logsf | bulk | 250 | **1.23** | 1.23 | 9.3e+06 | 9.3e+06 |
+| poisson_logsf | large_mu | 120 | **0.91** | 0.91 | 4.4e+15 | 4.4e+15 |
+| poisson_logsf | tiny_mu | 250 | **0.50** | 0.50 | wrong | wrong |
+| poisson_logsf | lower | 250 | **0.99** | 0.99 | 8.9e+15 | 8.9e+15 |
+| poisson_logsf | upper | 250 | **0.50** | 0.50 | 2.2e+14 | 2.2e+14 |
+| poisson_logsf | deep | 250 | **1.50** | 1.50 | wrong | wrong |
+| poisson_pmf | small_mu | 250 | **0.50** | 0.50 | 43 | 43 |
+| poisson_pmf | bulk | 250 | **0.50** | 0.50 | 1.1e+07 | 1.1e+07 |
+| poisson_pmf | large_mu | 120 | **0.49** | 0.49 | 7.9e+16 | 7.9e+16 |
+| poisson_pmf | tiny_mu | 250 | **0.49** | 0.49 | 492 | 492 |
+| poisson_pmf | tail | 250 | **0.49** | 0.49 | 3.2e+10 | 3.2e+10 |
+| poisson_ppf | core | 250 | **0** | 0 | 0 | 0 |
+| poisson_ppf | lower | 250 | **0** | 0 | 0 | 0 |
+| poisson_ppf | upper | 250 | **0** | 0 | 8.2e+11 | 8.2e+11 |
+| poisson_ppf | large_mu | 119 | **0** | 0 | wrong | wrong |
+| poisson_sf | small_mu | 250 | **0.60** | 0.60 | 43 | 43 |
+| poisson_sf | bulk | 250 | **0.76** | 0.76 | 3.3e+10 | 3.3e+10 |
+| poisson_sf | large_mu | 120 | **0.69** | 0.69 | 7.3e+15 | 7.3e+15 |
+| poisson_sf | tiny_mu | 250 | **1.00** | 1.00 | 3.8e+13 | 3.8e+13 |
+| poisson_sf | lower | 250 | **0.47** | 0.47 | 0.47 | 0.47 |
+| poisson_sf | upper | 250 | **0.69** | 0.69 | 3.9e+15 | 3.9e+15 |
+| randint_cdf | small | 300 | **0.49** | 0.49 | 0.49 | 0.49 |
+| randint_cdf | large | 300 | **0.50** | 0.50 | 0.50 | 0.50 |
+| randint_isf | core | 300 | **0** | 0 | 16 | 16 |
+| randint_isf | lower | 300 | **0** | 0 | 0 | 0 |
+| randint_isf | upper | 300 | **0** | 0 | 1.7e+10 | 1.7e+10 |
+| randint_logcdf | small | 300 | **0.50** | 0.50 | 30 | 30 |
+| randint_logcdf | large | 300 | **0.50** | 0.50 | 4.7e+14 | 4.7e+14 |
+| randint_logpmf | small | 300 | **0.50** | 0.50 | 0.67 | 0.67 |
+| randint_logpmf | large | 300 | **0.50** | 0.50 | 0.52 | 0.52 |
+| randint_logsf | small | 300 | **0.50** | 0.50 | 32 | 32 |
+| randint_logsf | large | 300 | **0.50** | 0.50 | 4.0e+14 | 4.0e+14 |
+| randint_pmf | small | 300 | **0.49** | 0.49 | 0.49 | 0.49 |
+| randint_pmf | large | 300 | **0.50** | 0.50 | 0.50 | 0.50 |
+| randint_ppf | core | 300 | **0** | 0 | 0 | 0 |
+| randint_ppf | lower | 300 | **0** | 0 | 0 | 0 |
+| randint_ppf | upper | 300 | **0** | 0 | 4.00 | 4.00 |
+| randint_sf | small | 300 | **0.49** | 0.49 | 32 | 32 |
+| randint_sf | large | 300 | **0.50** | 0.50 | 7.8e+14 | 7.8e+14 |
 | rayleigh_cdf | tiny | 250 | **0.50** | 0.50 | 1.39 | 1.39 |
 | rayleigh_cdf | core | 250 | **0.50** | 0.50 | 1.98 | 1.98 |
 | rayleigh_cdf | right | 250 | **0.50** | 0.50 | 0.51 | 0.51 |
@@ -1392,3 +1722,27 @@ Errors in ULPs against mpmath; **bold**: at least as accurate as SciPy in every 
 | weibull_min_sf | tiny | 250 | **0.48** | 0.48 | 0.48 | 0.48 |
 | weibull_min_sf | core | 250 | **0.50** | 0.50 | 1.92 | 1.92 |
 | weibull_min_sf | tail | 250 | **0.50** | 0.50 | 291 | 291 |
+| zipf_cdf | near1 | 250 | **0.50** | 0.50 | 3.14 | 3.14 |
+| zipf_cdf | core | 250 | **0.50** | 0.50 | 6.74 | 6.74 |
+| zipf_cdf | large_a | 250 | **0.44** | 0.44 | 2.96 | 2.96 |
+| zipf_isf | core | 249 | **0** | 0 | 0 | 0 |
+| zipf_isf | lower | 166 | **0** | 0 | 6.3e+14 | 6.3e+14 |
+| zipf_isf | upper | 249 | **0** | 0 | 0 | 0 |
+| zipf_logcdf | near1 | 250 | **0.50** | 0.50 | 1.75 | 1.75 |
+| zipf_logcdf | core | 249 | **0.55** | 0.55 | 4.6e+26 | 4.6e+26 |
+| zipf_logcdf | large_a | 213 | **0.50** | 0.50 | 4.7e+80 | 4.7e+80 |
+| zipf_logpmf | near1 | 250 | **0.50** | 0.50 | 0.64 | 0.64 |
+| zipf_logpmf | core | 250 | **0.50** | 0.50 | 180 | 180 |
+| zipf_logpmf | large_a | 250 | **0.50** | 0.50 | wrong | wrong |
+| zipf_logsf | near1 | 250 | **0.51** | 0.51 | 64714 | 64714 |
+| zipf_logsf | core | 250 | **0.50** | 0.50 | wrong | wrong |
+| zipf_logsf | large_a | 217 | **0.50** | 0.50 | wrong | wrong |
+| zipf_pmf | near1 | 250 | **0.50** | 0.50 | 3.30 | 3.30 |
+| zipf_pmf | core | 250 | **0.50** | 0.50 | 5.25 | 5.25 |
+| zipf_pmf | large_a | 250 | **0.50** | 0.50 | 2.68 | 2.68 |
+| zipf_ppf | core | 249 | **0** | 0 | 0 | 0 |
+| zipf_ppf | lower | 249 | **0** | 0 | 0 | 0 |
+| zipf_ppf | upper | 166 | **0** | 0 | 2.3e+15 | 2.3e+15 |
+| zipf_sf | near1 | 250 | **0.50** | 0.50 | 0.63 | 0.63 |
+| zipf_sf | core | 250 | **0.50** | 0.50 | 9.7e+24 | 9.7e+24 |
+| zipf_sf | large_a | 221 | **0.50** | 0.50 | 6.1e+82 | 6.1e+82 |

@@ -57,7 +57,13 @@ go test -run TestAccuracyTable -accuracy.table=docs/accuracy-table.md
 
 ## Headline (distributions)
 
-HEADLINE_PLACEHOLDER
+Over 256 fixtures (33 distributions × 8 functions, 1479 regions, about
+212 000 points), the maximum error of this package is at or below SciPy's
+in **1473 of 1479 regions**. The six exceptions are all in the beta
+distribution and all below 4.5 ulp (next section). In hundreds of regions
+SciPy's error is in the thousands to 10^16 ulp, or its result is "wrong"
+(NaN, 0 or ±Inf where the true value is finite): deep tails, large shapes,
+log forms beyond underflow.
 
 The per-function summary and every region are in
 [accuracy-table.md](accuracy-table.md) (generated; measured on arm64, the
@@ -83,7 +89,35 @@ Typical worst cases per family, ours against SciPy's:
 
 ## Where this package is not at least as accurate as SciPy
 
-EXCEPTIONS_PLACEHOLDER
+| fixture | region | ours max | SciPy max |
+|---|---|--:|--:|
+| beta_sf | small_mid | 1.93 | 0.50 |
+| beta_sf | mid_mid | 0.81 | 0.49 |
+| beta_sf | mid_hi | 0.70 | 0.50 |
+| beta_sf | large_mid | 2.11 | 2.11 (equal to 3 digits) |
+| beta_sf | large_hi | 4.42 | 2.45 |
+| beta_ppf | large_core | 1.03 | 0.79 |
+
+The beta survival function and quantile are go-numerics/special's
+`BetaIncC` and `BetaIncInv` called directly; Boost's (SciPy's) are a little
+more accurate on these points. Reformulating (`I_{1-x}(b, a)` for x ≥ 1/2,
+where 1-x is exact) gave the same errors, so the fix belongs in the
+incomplete beta function itself. The same function is why the binomial and
+negative binomial cdf/sf reach 6–11 ulp (SciPy: 10^6–10^7 ulp there).
+
+Other limits stated plainly:
+
+- The ULP fixtures sample standard forms; with loc and scale, (x-loc)/scale
+  is rounded exactly as SciPy rounds it, and the result inherits that.
+- The noncentral chi-squared sf in the far upper tail is a sum of many
+  incomplete gamma terms: up to 151 ulp (SciPy up to 8.5e15).
+- On s390x and ppc64le, where Go's log1p/exp differ in the last bits, the
+  log forms of the gamma/beta families reach about 2 ulp more than on
+  arm64/amd64 (budgets raised from measurements under qemu,
+  `testdata/raise_budgets.py`); the comparison table is arm64's.
+- Zipf's SciPy column is partial: SciPy's zipf cdf and quantile sum every
+  mass up to k, so points with k beyond 1e4 are not compared with SciPy
+  (they are with mpmath).
 
 ## Techniques
 
@@ -144,5 +178,8 @@ A deliberately broken formula must fail the suite:
   describe failures (71 messages).
 - Tests: Shapiro's 0.221157 → 0.221158 (68 failures); Kendall's variance
   2n+5 → 2n+6 (162 failures).
+- Discrete: Loader's Stirling coefficient 1/1260 → 1/1261: TestAccuracy
+  fails in 21 fixtures (binomial, Poisson, negative binomial,
+  hypergeometric masses and tails, Zipf quantiles) and TestParity in four.
 - Multivariate: four perturbations (MVN log-density factor, KDE neff, a
   Gauss-Legendre weight, the BCa cube) each fail their parity tests.

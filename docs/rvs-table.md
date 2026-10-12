@@ -2,28 +2,36 @@
 
 | distribution | draws compared | differing | max difference (ulp, or integer units) | bit-identical |
 |---|--:|--:|--:|:-:|
+| bernoulli (Bernoulli) | 15195 | 0 | 0 | yes |
 | beta (Beta) | 15195 | 1 | 1.00 | no |
+| binom (Binomial) | 21273 | 0 | 0 | yes |
 | cauchy (Cauchy) | 9117 | 1478 | 256 | no |
 | chi (Chi) | 9117 | 1 | 1.00 | no |
 | chi2 (ChiSquared) | 12156 | 5 | 1.00 | no |
 | expon (Exponential) | 9117 | 0 | 0 | yes |
 | f (F) | 15195 | 8 | 2.00 | no |
 | gamma (Gamma) | 12156 | 5 | 1.00 | no |
+| geom (Geometric) | 12156 | 0 | 0 | yes |
 | gumbel_r (Gumbel) | 9117 | 2 | 1.00 | no |
 | halfnorm (HalfNormal) | 9117 | 0 | 0 | yes |
+| hypergeom (Hypergeometric) | 27351 | 0 | 0 | yes |
 | invgamma (InverseGamma) | 9117 | 3489 | 83 | no |
 | laplace (Laplace) | 9117 | 1 | 1.00 | no |
 | logistic (Logistic) | 9117 | 0 | 0 | yes |
 | lognorm (LogNormal) | 12156 | 25 | 2.00 | no |
 | loguniform (Reciprocal) | 12156 | 24 | 1.00 | no |
 | lomax (Lomax) | 18234 | 22 | 4.00 | no |
+| nbinom (NegativeBinomial) | 15195 | 0 | 0 | yes |
 | ncx2 (NoncentralChiSquared) | 12156 | 0 | 0 | yes |
 | norm (Normal) | 9117 | 0 | 0 | yes |
 | pareto (Pareto) | 18234 | 20 | 1.00 | no |
+| poisson (Poisson) | 15195 | 0 | 0 | yes |
+| randint (DiscreteUniform) | 12156 | 0 | 0 | yes |
 | rayleigh (Rayleigh) | 9117 | 0 | 0 | yes |
 | reciprocal (Reciprocal) | 12156 | 24 | 1.00 | no |
-| t (StudentT) | 18234 | 3039 | NaN | no |
+| t (StudentT) | 18234 | 0 | 0 | yes |
 | triang (Triangular) | 15195 | 0 | 0 | yes |
 | uniform (Uniform) | 9117 | 0 | 0 | yes |
 | vonmises (VonMises) | 18234 | 2612 | 940032 | no |
 | weibull_min (Weibull) | 15195 | 16 | 2.00 | no |
+| zipf (Zipf) | 12156 | 0 | 0 | yes |
