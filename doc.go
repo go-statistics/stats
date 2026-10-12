@@ -1,6 +1,8 @@
 // Package stats is probability distributions, descriptive statistics and
 // statistical tests in pure Go (no cgo), with the results of scipy.stats
-// and NumPy's statistics, measured to be at least as accurate.
+// and NumPy's statistics, measured against mpmath to be at least as accurate
+// as SciPy in 1473 of 1479 regions (the exceptions, all beta sf and ppf
+// within 4.5 ulp, are listed in docs/accuracy.md).
 //
 // # Distributions
 //
