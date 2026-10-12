@@ -218,8 +218,8 @@ func TestRadixSortIdentity(t *testing.T) {
 	r := rand.New(rand.NewPCG(9, 10))
 	gen := []func() float64{
 		func() float64 { return r.NormFloat64() },
-		func() float64 { return math.Round(r.NormFloat64() * 3) }, // ties, zeros of one sign
-		func() float64 { return -math.Round(r.Float64() * 3) },    // -0 only
+		func() float64 { return math.Round(r.NormFloat64() * 3) },  // ties, zeros of one sign
+		func() float64 { return -math.Round(r.Float64() * 3) },     // -0 only
 		func() float64 { return math.Float64frombits(r.Uint64()) }, // every pattern, NaNs included
 		func() float64 {
 			return []float64{math.Inf(1), math.Inf(-1), math.MaxFloat64, -math.SmallestNonzeroFloat64, 1}[r.IntN(5)]
