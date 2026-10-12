@@ -151,7 +151,7 @@ func FitHalfNormal[D Data](x D, o *FitOptions) (HalfNormal, error) {
 	}
 	scale, ok := fx["Scale"]
 	if !ok {
-		scale = math.Sqrt(mean(sqDev(v, loc)))
+		scale = math.Sqrt(sumSqDev(v, loc)/float64(len(v)))
 	}
 	d := HalfNormal{Loc: loc, Scale: scale}
 	return d, d.Validate()

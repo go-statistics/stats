@@ -76,11 +76,7 @@ func average(x, w []float64, n int, name string) (avg, scl float64, err error) {
 	if scl == 0 {
 		return math.NaN(), 0, fmt.Errorf("%w: %s: weights sum to zero", ErrData, name)
 	}
-	p := make([]float64, len(x))
-	for i := range x {
-		p[i] = float64(x[i] * w[i])
-	}
-	return sum(p) / scl, scl, nil
+	return sumProd(x, w) / scl, scl, nil
 }
 
 // Mean returns the arithmetic mean of the data: numpy.mean(x) (or
@@ -116,17 +112,26 @@ func Var[D Data](x D, o *MeanOptions) (float64, error) {
 		return math.NaN(), err
 	}
 	omitted := n < len(v)
-	d := make([]float64, len(v))
-	for i, t := range v {
-		e := t - m
-		switch {
-		case w != nil:
-			d[i] = float64(w[i] * float64(e*e))
-		case omitted && raw[i] != raw[i]:
-			// numpy.nanvar leaves the NaN positions at zero
-		default:
-			d[i] = float64(e * e)
-		}
+	var ss float64
+	switch {
+	case w == nil && !omitted:
+		ss = sumSqDev(v, m)
+	default:
+		ss = sumTerms(len(v), func(d []float64, lo int) {
+			for i := range d {
+				j := lo + i
+				e := v[j] - m
+				switch {
+				case w != nil:
+					d[i] = float64(w[j] * float64(e*e))
+				case omitted && raw[j] != raw[j]:
+					// numpy.nanvar leaves the NaN positions at zero
+					d[i] = 0
+				default:
+					d[i] = float64(e * e)
+				}
+			}
+		})
 	}
 	dof := scl - o.Ddof
 	switch {
@@ -135,7 +140,7 @@ func Var[D Data](x D, o *MeanOptions) (float64, error) {
 	case w == nil:
 		dof = max(dof, 0)
 	}
-	return sum(d) / dof, nil
+	return ss / dof, nil
 }
 
 // Std returns the standard deviation: numpy.std(x, ddof=Ddof), to the bit.
@@ -147,17 +152,14 @@ func Std[D Data](x D, o *MeanOptions) (float64, error) {
 // moment is scipy.stats._moment: mean((x - c)**order) with the power of
 // order 2 a product (NumPy's fast path) and the others correctly rounded.
 func moment(v []float64, order int, c float64) float64 {
-	d := make([]float64, len(v))
-	for i, t := range v {
-		e := t - c
-		switch order {
-		case 2:
-			d[i] = float64(e * e)
-		default:
-			d[i] = crPow(e, float64(order))
-		}
+	if order == 2 {
+		return sumSqDev(v, c) / float64(len(v))
 	}
-	return mean(d)
+	return sumTerms(len(v), func(d []float64, lo int) {
+		for i, t := range v[lo : lo+len(d)] {
+			d[i] = crPow(t-c, float64(order))
+		}
+	}) / float64(len(v))
 }
 
 // MomentOptions are the options of Moment.
@@ -245,18 +247,14 @@ func skewness(v []float64, unbiased bool) float64 {
 // k), one buffer reused: the pairwise sums of _moment, to the bit.
 func centralMoments(v []float64, m float64, upto int) [5]float64 {
 	var r [5]float64
-	d := make([]float64, len(v))
-	for k := 2; k <= upto; k++ {
-		for i, t := range v {
-			e := t - m
-			switch k {
-			case 2:
-				d[i] = float64(e * e)
-			default:
-				d[i] = powIntSigned(e, k)
+	fn := float64(len(v))
+	r[2] = sumSqDev(v, m) / fn
+	for k := 3; k <= upto; k++ {
+		r[k] = sumTerms(len(v), func(d []float64, lo int) {
+			for i, t := range v[lo : lo+len(d)] {
+				d[i] = powIntSigned(t-m, k)
 			}
-		}
-		r[k] = mean(d)
+		}) / fn
 	}
 	return r
 }
@@ -413,7 +411,7 @@ func SEM[D Data](x D, o *DdofOptions) (float64, error) {
 // npVar is numpy.var(v, ddof=ddof): the divisor max(n - ddof, 0).
 func npVar(v []float64, ddof float64) float64 {
 	m := mean(v)
-	return sum(sqDev(v, m)) / max(float64(len(v))-ddof, 0)
+	return sumSqDev(v, m) / max(float64(len(v))-ddof, 0)
 }
 
 // Variation returns the coefficient of variation std(x, ddof)/mean(x):
@@ -480,7 +478,7 @@ func zmap(scores, compare []float64, o *DdofOptions, self bool) ([]float64, erro
 	} else {
 		fn := float64(len(compare))
 		mn = mean(compare)
-		vr = mean(sqDev(compare, mn)) * scipyFactor(fn, ddof)
+		vr = (sumSqDev(compare, mn) / float64(len(compare))) * scipyFactor(fn, ddof)
 	}
 	sd := math.Sqrt(vr)
 	z := make([]float64, len(scores))
@@ -519,11 +517,7 @@ func xpMean(x, w []float64) float64 {
 	if w == nil {
 		return mean(x)
 	}
-	p := make([]float64, len(x))
-	for i := range x {
-		p[i] = float64(x[i] * w[i])
-	}
-	return sum(p) / sum(w)
+	return sumProd(x, w) / sum(w)
 }
 
 func powerMeanData(x []float64, o *PowerMeanOptions, name string) (v, w []float64, err error) {
