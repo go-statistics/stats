@@ -14,7 +14,7 @@ var _ Discrete = Binomial{}
 
 // NewBinomial returns Binomial{N: n, P: p, Loc: loc}, with an error wrapping ErrParam when a
 // parameter is out of the domain: scipy.stats.binom(n, p, loc).
-func NewBinomial(n int, p float64, loc float64) (Binomial, error) {
+func NewBinomial(n int64, p float64, loc float64) (Binomial, error) {
 	d := Binomial{N: n, P: p, Loc: loc}
 	return d, d.Validate()
 }

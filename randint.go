@@ -8,7 +8,7 @@ import (
 	"github.com/go-statistics/stats/internal/dd"
 )
 
-//stats:discrete DiscreteUniform randint low=Low:int high=High:int
+//stats:discrete DiscreteUniform randint low=Low:int64 high=High:int64
 
 // DiscreteUniform is the uniform distribution on the integers Low, Low+1,
 // ..., High-1 (High excluded, High > Low): scipy.stats.randint(low, high,
@@ -17,7 +17,7 @@ import (
 // CDF and SF are the exact counts over High-Low, rounded once; their
 // logarithms are differences of double-double logarithms of the counts.
 type DiscreteUniform struct {
-	Low, High int
+	Low, High int64
 	Loc       float64
 }
 

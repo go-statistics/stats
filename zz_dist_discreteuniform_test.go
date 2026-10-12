@@ -9,7 +9,7 @@ func init() {
 		typ:  reflect.TypeOf(DiscreteUniform{}),
 		kind: "discrete",
 		construct: func(p map[string]float64) (any, error) {
-			return NewDiscreteUniform(int(p["Low"]), int(p["High"]), p["Loc"])
+			return NewDiscreteUniform(int64(p["Low"]), int64(p["High"]), p["Loc"])
 		},
 	}
 }

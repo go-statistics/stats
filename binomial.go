@@ -9,7 +9,7 @@ import (
 	"github.com/go-statistics/stats/internal/dd"
 )
 
-//stats:discrete Binomial binom n=N:int p=P
+//stats:discrete Binomial binom n=N:int64 p=P
 
 // Binomial is the number of successes in N independent trials of
 // probability P: mass C(N,k) P^k (1-P)^(N-k) on k = 0..N:
@@ -24,7 +24,7 @@ import (
 // smallest k with CDF(k) >= p, resp. SF(k) <= q) from a Cornish-Fisher
 // starting point.
 type Binomial struct {
-	N      int
+	N      int64
 	P, Loc float64
 }
 

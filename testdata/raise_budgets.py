@@ -19,8 +19,13 @@ def budget_of(m):
     return math.ceil(b / e) * e
 
 
+LANE = "another architecture"
+args = sys.argv[1:]
+if args and args[0].startswith("--lane="):
+    LANE = args[0][len("--lane="):]
+    args = args[1:]
 new = {}
-for log in sys.argv[1:]:
+for log in args:
     for line in open(log):
         m = pat.search(line)
         if m:
@@ -35,5 +40,8 @@ for (fx, region), b in sorted(new.items()):
         if len(f) == 2 and f[0] == region and float(f[1]) < b:
             l = "%s %g" % (region, b)
             print(fx, l)
+            out.append(l)
+            out.append("# %s raised to 1.5x the error measured on %s (per-architecture math and fused multiply-adds move the last bits)" % (region, LANE))
+            continue
         out.append(l)
     open(path, "w").write("\n".join(out) + "\n")

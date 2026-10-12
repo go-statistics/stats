@@ -14,7 +14,7 @@ var _ Discrete = DiscreteUniform{}
 
 // NewDiscreteUniform returns DiscreteUniform{Low: low, High: high, Loc: loc}, with an error wrapping ErrParam when a
 // parameter is out of the domain: scipy.stats.randint(low, high, loc).
-func NewDiscreteUniform(low int, high int, loc float64) (DiscreteUniform, error) {
+func NewDiscreteUniform(low int64, high int64, loc float64) (DiscreteUniform, error) {
 	d := DiscreteUniform{Low: low, High: high, Loc: loc}
 	return d, d.Validate()
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/go-statistics/stats/internal/dd"
 )
 
-//stats:discrete Hypergeometric hypergeom M=Total:int n=Good:int N=Draws:int
+//stats:discrete Hypergeometric hypergeom M=Total:int64 n=Good:int64 N=Draws:int64
 
 // Hypergeometric is the number of good items among Draws drawn without
 // replacement from Total items of which Good are good: mass
@@ -26,7 +26,7 @@ import (
 // logarithms (log of the first mass plus log of the scaled sum) stay
 // accurate where the probabilities underflow.
 type Hypergeometric struct {
-	Total, Good, Draws int
+	Total, Good, Draws int64
 	Loc                float64
 }
 

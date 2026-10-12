@@ -9,7 +9,7 @@ func init() {
 		typ:  reflect.TypeOf(Hypergeometric{}),
 		kind: "discrete",
 		construct: func(p map[string]float64) (any, error) {
-			return NewHypergeometric(int(p["Total"]), int(p["Good"]), int(p["Draws"]), p["Loc"])
+			return NewHypergeometric(int64(p["Total"]), int64(p["Good"]), int64(p["Draws"]), p["Loc"])
 		},
 	}
 }

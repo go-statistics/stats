@@ -9,7 +9,7 @@ func init() {
 		typ:  reflect.TypeOf(Binomial{}),
 		kind: "discrete",
 		construct: func(p map[string]float64) (any, error) {
-			return NewBinomial(int(p["N"]), p["P"], p["Loc"])
+			return NewBinomial(int64(p["N"]), p["P"], p["Loc"])
 		},
 	}
 }

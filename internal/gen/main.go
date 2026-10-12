@@ -214,7 +214,7 @@ func init() {
 		fit: func(x []float64, o *FitOptions) (any, error) { return Fit{{.Name}}(x, o) },
 {{- end}}
 		construct: func(p map[string]float64) (any, error) {
-			return New{{.Name}}({{range .Params}}{{if eq .Type "int"}}int(p[{{printf "%q" .Field}}]){{else}}p[{{printf "%q" .Field}}]{{end}}, {{end}}p["Loc"]{{if eq .Kind "continuous"}}, p["Scale"]{{end}})
+			return New{{.Name}}({{range .Params}}{{if eq .Type "float64"}}p[{{printf "%q" .Field}}]{{else}}{{.Type}}(p[{{printf "%q" .Field}}]){{end}}, {{end}}p["Loc"]{{if eq .Kind "continuous"}}, p["Scale"]{{end}})
 		},
 	}
 }

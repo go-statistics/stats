@@ -1,7 +1,10 @@
 small_mu 2.3000000000000003
 bulk 1.9000000000000001
-large_mu 1.4000000000000001
+large_mu 2.6
+# large_mu raised to 1.5x the error measured on s390x, ppc64le and loong64 (CI, qemu) (per-architecture math and fused multiply-adds move the last bits)
 tiny_mu 1
-lower 1.5
+lower 2.8
+# lower raised to 1.5x the error measured on s390x, ppc64le and loong64 (CI, qemu) (per-architecture math and fused multiply-adds move the last bits)
 upper 1
-deep 2.3000000000000003
+deep 3.6
+# deep raised to 1.5x the error measured on s390x, ppc64le and loong64 (CI, qemu) (per-architecture math and fused multiply-adds move the last bits)

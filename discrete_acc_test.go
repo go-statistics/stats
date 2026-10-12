@@ -15,14 +15,14 @@ func registerDiscrete(prefix string, mk func(shape []float64) Discrete) {
 }
 
 func init() {
-	registerDiscrete("binom", func(s []float64) Discrete { return Binomial{N: int(s[0]), P: s[1]} })
+	registerDiscrete("binom", func(s []float64) Discrete { return Binomial{N: int64(s[0]), P: s[1]} })
 	registerDiscrete("bernoulli", func(s []float64) Discrete { return Bernoulli{P: s[0]} })
 	registerDiscrete("poisson", func(s []float64) Discrete { return Poisson{Mu: s[0]} })
 	registerDiscrete("geom", func(s []float64) Discrete { return Geometric{P: s[0]} })
 	registerDiscrete("nbinom", func(s []float64) Discrete { return NegativeBinomial{N: s[0], P: s[1]} })
 	registerDiscrete("hypergeom", func(s []float64) Discrete {
-		return Hypergeometric{Total: int(s[0]), Good: int(s[1]), Draws: int(s[2])}
+		return Hypergeometric{Total: int64(s[0]), Good: int64(s[1]), Draws: int64(s[2])}
 	})
-	registerDiscrete("randint", func(s []float64) Discrete { return DiscreteUniform{Low: int(s[0]), High: int(s[1])} })
+	registerDiscrete("randint", func(s []float64) Discrete { return DiscreteUniform{Low: int64(s[0]), High: int64(s[1])} })
 	registerDiscrete("zipf", func(s []float64) Discrete { return Zipf{A: s[0]} })
 }

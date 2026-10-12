@@ -14,7 +14,7 @@ var _ Discrete = Hypergeometric{}
 
 // NewHypergeometric returns Hypergeometric{Total: M, Good: n, Draws: N, Loc: loc}, with an error wrapping ErrParam when a
 // parameter is out of the domain: scipy.stats.hypergeom(M, n, N, loc).
-func NewHypergeometric(M int, n int, N int, loc float64) (Hypergeometric, error) {
+func NewHypergeometric(M int64, n int64, N int64, loc float64) (Hypergeometric, error) {
 	d := Hypergeometric{Total: M, Good: n, Draws: N, Loc: loc}
 	return d, d.Validate()
 }

@@ -211,11 +211,8 @@ func TestZipfMoments(t *testing.T) {
 
 // numpy refuses populations of 10^9 or more good or bad items.
 func TestHypergeometricDrawLimit(t *testing.T) {
-	if math.MaxInt < 3e9 {
-		t.Skip("int too small")
-	}
 	big := int64(2e9)
-	d := Hypergeometric{Total: int(big + 5), Good: int(big), Draws: 3}
+	d := Hypergeometric{Total: big + 5, Good: big, Draws: 3}
 	if _, err := d.Rvs(random.DefaultRNG(1), 2); !errors.Is(err, ErrParam) {
 		t.Errorf("Rvs with good = 2e9: %v", err)
 	}
