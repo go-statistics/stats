@@ -32,11 +32,8 @@ func gammaExponent(a float64, x dd.DD) (e, c dd.DD) {
 	if a < stirlingMin {
 		am1h, am1l := dd.TwoSum(a, -1)
 		e = dd.Sub(dd.Mul(dd.DD{Hi: am1h, Lo: am1l}, logDD(x)), x)
-		g := special.Gamma(a)
-		if math.IsInf(g, 1) { // a below 1/MaxFloat64: 1/Γ(a) = a/Γ(1+a) ≈ a
-			return e, dd.F(a)
-		}
-		return e, dd.Div(dd.F(1), dd.F(g))
+		r := shapeMemo(tagGammaInv, a, 0, gammaInv)
+		return e, dd.DD{Hi: r[0], Lo: r[1]}
 	}
 	u := dd.DivF(dd.AddF(x, -a), a)
 	g := gOf(u, func() dd.DD { return dd.Sub(logDD(x), dd.Log(a)) }) // log(1+u) = log(x/a)
@@ -57,12 +54,11 @@ func gammaLogDensity(a float64, x dd.DD) dd.DD {
 	if a < stirlingMin {
 		am1h, am1l := dd.TwoSum(a, -1)
 		e := dd.Sub(dd.Mul(dd.DD{Hi: am1h, Lo: am1l}, logDD(x)), x)
-		if g := special.Gamma(a); !math.IsInf(g, 1) {
-			// log of Γ(a) (within an ulp): an absolute error of 2^-53,
-			// where log Γ(a) rounded carries ulp(log Γ(a))
-			return dd.Sub(e, dd.Log(g))
+		if r := shapeMemo(tagGammaLog, a, 0, gammaLogConst); r[2] == 0 {
+			return dd.Sub(e, dd.DD{Hi: r[0], Lo: r[1]})
+		} else {
+			return dd.AddF(e, r[0])
 		}
-		return dd.AddF(e, -special.LogGamma(a))
 	}
 	e, c := gammaExponent(a, x)
 	return dd.Add(e, logDD(c))
@@ -100,10 +96,50 @@ func betaExponent(a, b float64, x, y dd.DD) (e, c dd.DD) {
 	am1h, am1l := dd.TwoSum(a, -1)
 	bm1h, bm1l := dd.TwoSum(b, -1)
 	e = dd.Add(dd.Mul(dd.DD{Hi: am1h, Lo: am1l}, lx), dd.Mul(dd.DD{Hi: bm1h, Lo: bm1l}, ly))
-	if bf := special.Beta(a, b); bf > 0x1p-1000 && !math.IsInf(bf, 1) {
-		return e, dd.Div(dd.F(1), dd.F(bf))
+	if r := shapeMemo(tagBetaInv, a, b, betaInv); r[2] == 0 {
+		return e, dd.DD{Hi: r[0], Lo: r[1]}
+	} else {
+		return dd.AddF(e, r[0]), dd.F(1)
 	}
-	return dd.AddF(e, -special.LogBeta(a, b)), dd.F(1)
+}
+
+// gammaInv is 1/Γ(a) as a double-double (a below 1/MaxFloat64, where Γ(a)
+// overflows: 1/Γ(a) = a/Γ(1+a) ≈ a), for shapeMemo.
+func gammaInv(a, _ float64) [4]float64 {
+	g := special.Gamma(a)
+	if math.IsInf(g, 1) {
+		return [4]float64{a, 0}
+	}
+	c := dd.Div(dd.F(1), dd.F(g))
+	return [4]float64{c.Hi, c.Lo}
+}
+
+// gammaLogConst is log Γ(a) as a double-double, the log of Γ(a) rounded
+// (within an ulp: an absolute error of 2^-53, where log Γ(a) rounded
+// carries ulp(log Γ(a))), or, where Γ(a) overflows, {-log Γ(a), 0, 1}.
+func gammaLogConst(a, _ float64) [4]float64 {
+	if g := special.Gamma(a); !math.IsInf(g, 1) {
+		l := dd.Log(g)
+		return [4]float64{l.Hi, l.Lo}
+	}
+	return [4]float64{-special.LogGamma(a), 0, 1}
+}
+
+// betaInv is 1/B(a, b) as a double-double while B(a, b) is a normal
+// float64, else {-log B(a, b), 0, 1}, for shapeMemo.
+func betaInv(a, b float64) [4]float64 {
+	if bf := special.Beta(a, b); bf > 0x1p-1000 && !math.IsInf(bf, 1) {
+		c := dd.Div(dd.F(1), dd.F(bf))
+		return [4]float64{c.Hi, c.Lo}
+	}
+	return [4]float64{-special.LogBeta(a, b), 0, 1}
+}
+
+// betaLogInv is logDD(1/B(a, b)) where betaInv gives 1/B(a, b).
+func betaLogInv(a, b float64) [4]float64 {
+	r := shapeMemo(tagBetaInv, a, b, betaInv)
+	l := logDD(dd.DD{Hi: r[0], Lo: r[1]})
+	return [4]float64{l.Hi, l.Lo}
 }
 
 // gOf returns g(u) = u - log(1+u) >= 0: the series near 0 (log1pmxNeg),
@@ -126,6 +162,13 @@ func betaDensity(a, b float64, x, y, s dd.DD) float64 {
 // betaLogDensity returns log(x^(a-1) y^(b-1) / B(a,b)) as a double-double.
 func betaLogDensity(a, b float64, x, y dd.DD) dd.DD {
 	e, c := betaExponent(a, b, x, y)
+	if c.Hi == 1 && c.Lo == 0 {
+		return dd.Add(e, logDD(c))
+	}
+	if !(a >= stirlingMin && b >= stirlingMin) { // c = 1/B(a, b)
+		r := shapeMemo(tagBetaLog, a, b, betaLogInv)
+		return dd.Add(e, dd.DD{Hi: r[0], Lo: r[1]})
+	}
 	return dd.Add(e, logDD(c))
 }
 

@@ -13,11 +13,38 @@ import (
 // ulp; ours are the correctly rounded ones), NaN handling and selection.
 
 // crLog returns log(x) correctly rounded (barring a near-tie).
+//
+// Ziv's strategy: dd.Log (relative error below 2^-72) decides the rounding
+// unless the value lies within 2^-66 relative of a midpoint between two
+// floats (about one argument in 2^13), and only then is dd.LogAccurate
+// (2^-104) evaluated. Where the fast path decides, the rounding of every
+// value within its error bound is the same, so the result is the one
+// LogAccurate gives: the function is unchanged, bit for bit.
 func crLog(x float64) float64 {
 	if !(x > 0) || math.IsInf(x, 1) {
 		return math.Log(x)
 	}
+	if y, ok := roundDecided(dd.Log(x), 0x1p-66); ok {
+		return y
+	}
 	return dd.LogAccurate(x).Float()
+}
+
+// roundDecided returns the float64 nearest r = r.Hi + r.Lo, and whether that
+// rounding holds for every value within rel·|r| of r: the remainder r - y
+// (exact) must stay that far from half an ulp of y. y must be a normal
+// float64 (or zero, where r is exact).
+func roundDecided(r dd.DD, rel float64) (float64, bool) {
+	y, rem := dd.FastTwoSum(r.Hi, r.Lo)
+	// 2^e <= |y| < 2^(e+1): half an ulp is 2^(e-53), or 2^(e-54) below
+	// |y| = 2^e; rel·|r| < rel·2^(e+1)
+	b := math.Float64bits(y)
+	p := math.Float64frombits(b & (0x7ff << 52))
+	half := p * 0x1p-53
+	if b&(1<<52-1) == 0 && (rem < 0) != (y < 0) {
+		half = p * 0x1p-54
+	}
+	return y, math.Abs(rem) < half-p*2*rel
 }
 
 // crLog2 returns log2(x) correctly rounded (barring a near-tie), for

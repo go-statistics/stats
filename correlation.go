@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
 )
 
 // CorrelationOptions are the options of Pearsonr, Spearmanr and
@@ -59,15 +58,6 @@ func pairs[D Data](x, y D, name string) ([]float64, []float64, error) {
 		return a, b, fmt.Errorf("%w: %s needs samples of equal length, got %d and %d", ErrData, name, len(a), len(b))
 	}
 	return a, b, nil
-}
-
-// dot is Σ a[i]·b[i] in double-double, rounded once.
-func dotDD(a, b []float64) float64 {
-	var s dd.DD
-	for i := range a {
-		s = dd.Add(s, dd.MulFF(a[i], b[i]))
-	}
-	return s.Float()
 }
 
 // constant reports whether every value equals the first.
@@ -129,19 +119,8 @@ func Pearsonr[D Data](x, y D, o *CorrelationOptions) (PearsonResult, error) {
 // the means scaled by their norms before the inner product, as SciPy's
 // pearsonr forms it (with a double-double inner product).
 func correlate(a, b []float64) float64 {
-	xm := deviations(a)
-	ym := deviations(b)
-	return dotDD(xm, ym) / math.Sqrt(dotDD(xm, xm)) / math.Sqrt(dotDD(ym, ym))
-}
-
-// deviations returns a - mean(a).
-func deviations(a []float64) []float64 {
-	m := mean(a)
-	d := make([]float64, len(a))
-	for i, v := range a {
-		d[i] = v - m
-	}
-	return d
+	ma, mb := mean(a), mean(b)
+	return devDot(a, b, ma, mb) / math.Sqrt(devDot(a, a, ma, ma)) / math.Sqrt(devDot(b, b, mb, mb))
 }
 
 // Spearmanr is Spearman's rank correlation coefficient of two samples
@@ -175,10 +154,10 @@ func Spearmanr[D Data](x, y D, o *CorrelationOptions) (TestResult, error) {
 	<-done
 	// np.corrcoef: the covariance matrix scaled by the standard deviations.
 	n := float64(len(a))
-	xm, ym := deviations(ra), deviations(rb)
-	cxy := dotDD(xm, ym) / (n - 1)
-	sx := math.Sqrt(dotDD(xm, xm) / (n - 1))
-	sy := math.Sqrt(dotDD(ym, ym) / (n - 1))
+	ma, mb := mean(ra), mean(rb)
+	cxy := devDot(ra, rb, ma, mb) / (n - 1)
+	sx := math.Sqrt(devDot(ra, ra, ma, ma) / (n - 1))
+	sy := math.Sqrt(devDot(rb, rb, mb, mb) / (n - 1))
 	rs := clipTo(cxy/sx/sy, -1, 1)
 	dof := n - 2
 	t := rs * math.Sqrt(dof/((rs+1)*(1-rs)))
@@ -489,10 +468,9 @@ func Linregress[D Data](x, y D, o *CorrelationOptions) (LinregressResult, error)
 	const tiny = 1.0e-20
 	n := float64(len(a))
 	xmean, ymean := mean(a), mean(b)
-	xm, ym := deviations(a), deviations(b)
-	ssxm := dotDD(xm, xm) / n
-	ssym := dotDD(ym, ym) / n
-	ssxym := dotDD(xm, ym) / n
+	ssxm := devDot(a, a, xmean, xmean) / n
+	ssym := devDot(b, b, ymean, ymean) / n
+	ssxym := devDot(a, b, xmean, ymean) / n
 	var r float64
 	switch {
 	case ssxm == 0 || ssym == 0:

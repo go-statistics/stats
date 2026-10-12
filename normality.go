@@ -79,8 +79,8 @@ func ShapiroWilk[D Data](x D) (TestResult, error) {
 // swilkW is the Shapiro-Wilk statistic (a·y)² / Σ(y - ȳ)² for sorted y.
 func swilkW(y, a []float64) float64 {
 	num := dotDD(a, y)
-	d := deviations(y)
-	return num * num / dotDD(d, d)
+	m := mean(y)
+	return num * num / devDot(y, y, m, m)
 }
 
 // ADDist is the distribution family of AndersonDarling (SciPy's dist=).
