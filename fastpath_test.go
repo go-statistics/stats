@@ -272,3 +272,41 @@ func TestRadixSortIdentity(t *testing.T) {
 		}
 	}
 }
+
+func TestDirichletLogPDFFast(t *testing.T) {
+	r := rand.New(rand.NewPCG(11, 12))
+	undecided, total := 0, 0
+	for s := range *fastpathN / 20 {
+		k := 2 + s%6
+		alpha := make([]float64, k)
+		for i := range alpha {
+			alpha[i] = []float64{0.3, 1, 1.5, 7.25, 1e3, 1 + 1e-12}[r.IntN(6)]
+		}
+		d, err := NewDirichlet(alpha)
+		if err != nil {
+			t.Fatal(err)
+		}
+		x := make([]float64, k)
+		tot := 0.0
+		for i := range x {
+			x[i] = math.Ldexp(r.Float64()+0.01, -r.IntN(40))
+			tot += x[i]
+		}
+		for i := range x {
+			x[i] /= tot
+		}
+		want := d.logPDF(x)
+		got, ok := d.logPDFFast(x)
+		total++
+		if !ok {
+			undecided++
+			continue
+		}
+		if w := want.Hi + want.Lo; math.Float64bits(got) != math.Float64bits(w) {
+			t.Errorf("alpha %v x %v: fast %v, accurate %v", alpha, x, got, w)
+		}
+	}
+	if undecided > total/100 {
+		t.Errorf("undecided %d of %d", undecided, total)
+	}
+}

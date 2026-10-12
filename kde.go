@@ -470,6 +470,7 @@ func (k *GaussianKDE) sum1D(t float64) (a0, s float64) {
 func (k *GaussianKDE) sumND(t, buf []float64) (a0, s float64) {
 	d := k.d
 	mx := math.Inf(-1)
+	nan := false
 	for i := range k.ew {
 		a := 0.0
 		p := k.white[i*d : (i+1)*d]
@@ -477,8 +478,20 @@ func (k *GaussianKDE) sumND(t, buf []float64) (a0, s float64) {
 			u := p[c] - t[c]
 			a += float64(u * u)
 		}
-		buf[i] = k.elw[i] - a/2
-		mx = math.Max(mx, buf[i])
+		b := k.elw[i] - a/2
+		buf[i] = b
+		// mx = math.Max(mx, b), without its call: NaN sticks, +0 beats -0
+		switch {
+		case b > mx:
+			mx = b
+		case b != b:
+			nan = true
+		case b == 0 && mx == 0 && !math.Signbit(b):
+			mx = b
+		}
+	}
+	if nan {
+		mx = math.NaN()
 	}
 	if math.IsInf(mx, 0) || math.IsNaN(mx) {
 		return -mx, 1

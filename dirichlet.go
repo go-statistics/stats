@@ -101,8 +101,41 @@ func (d *Dirichlet) LogPDF(x []float64) (float64, error) {
 	if err != nil {
 		return math.NaN(), err
 	}
+	if y, ok := d.logPDFFast(x); ok {
+		return y, nil
+	}
 	h := d.logPDF(x)
 	return h.Hi + h.Lo, nil
+}
+
+// logPDFFast is logPDF(x) rounded, by Ziv's strategy: with dd.Log (2^-72)
+// in place of dd.LogAccurate, the rounding is decided unless the sum lies
+// within both paths' error bounds of a midpoint (ok false: the caller then
+// takes the accurate path, whose result this is wherever it decides).
+func (d *Dirichlet) logPDFFast(x []float64) (float64, bool) {
+	s := dd.Neg(d.lnB)
+	mag := math.Abs(d.lnB.Hi)
+	for i, v := range x {
+		a := d.alpha[i]
+		if a == 1 {
+			continue
+		}
+		if v == 0 {
+			return math.Inf(-1), true
+		}
+		hi, lo := dd.TwoSum(a, -1)
+		t := dd.Mul(dd.DD{Hi: hi, Lo: lo}, dd.Log(v))
+		s = dd.Add(s, t)
+		mag += math.Abs(t.Hi)
+	}
+	// each term within 2^-71 of its size (the logarithm) on this path and
+	// 2^-103 on the accurate one, the double-double sums within 2^-100 of
+	// the sizes summed
+	if !(mag < 0x1p1000) {
+		return 0, false
+	}
+	y, rem := dd.FastTwoSum(s.Hi, s.Lo)
+	return y, decidedAbs(y, rem, 0x1p-70*mag)
 }
 
 // PDF returns the density at x (see LogPDF): scipy.stats.dirichlet.pdf.
