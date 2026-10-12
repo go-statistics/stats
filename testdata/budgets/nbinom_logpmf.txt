@@ -1,0 +1,7 @@
+small_n 1
+bulk 1
+large_n 1
+small_p 1
+p_near_1 1
+tail 1
+deep 1

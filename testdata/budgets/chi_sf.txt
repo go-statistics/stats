@@ -1,0 +1,12 @@
+small_lo 1
+small_mid 1.5
+small_hi 1.8
+mid_lo 1
+mid_mid 2.1
+mid_hi 2.1
+large_lo 1
+large_mid 1.6
+large_hi 2.1
+huge_lo 1
+huge_mid 1.3
+huge_hi 1.3

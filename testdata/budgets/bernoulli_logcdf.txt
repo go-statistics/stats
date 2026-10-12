@@ -1,0 +1,3 @@
+tiny 1
+core 1
+near1 1

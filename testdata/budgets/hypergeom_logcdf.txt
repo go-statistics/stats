@@ -1,0 +1,7 @@
+small 1
+bulk 1
+skewed 1
+large 1
+lower 1
+upper 1
+deep 1

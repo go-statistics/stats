@@ -1,0 +1,8 @@
+small_n 6
+bulk 17
+large_n 3.7
+small_p 7.4
+p_near_1 3.1
+# p_near_1 raised to 1.5x the error measured on s390x, ppc64le and loong64 (CI, qemu) (per-architecture math and fused multiply-adds move the last bits)
+lower 1
+upper 9.1

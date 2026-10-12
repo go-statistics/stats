@@ -1,0 +1,199 @@
+package stats
+
+import (
+	"fmt"
+	"math"
+
+	"github.com/go-numerics/special"
+)
+
+// This file holds the helpers shared by the hypothesis tests.
+//
+// Conventions of the tests (ttest.go, chisquare.go, correlation.go, ks.go,
+// ranktests.go, normality.go, anova.go):
+//
+//   - The options argument may be nil; the zero value of every options
+//     struct selects SciPy's defaults.
+//   - Where SciPy raises ValueError (mismatched lengths, an invalid option,
+//     a negative count), the function returns an error wrapping ErrData or
+//     ErrParam.
+//   - Where SciPy returns NaN, with or without a warning (a NaN in the
+//     input under SciPy's default nan_policy="propagate", a sample too
+//     small for the test, constant data), the function returns a result
+//     whose fields are NaN and a nil error, as SciPy does.
+
+// TestResult is the outcome of a test that has a statistic and a p-value
+// only (SciPy's two-field result tuples and SignificanceResult).
+type TestResult struct {
+	Statistic, PValue float64
+}
+
+// Method selects how a test computes its p-value: SciPy's method= argument
+// of the rank, correlation and Kolmogorov-Smirnov tests. The zero value is
+// MethodAuto, SciPy's default.
+type Method int
+
+const (
+	// MethodAuto is method="auto": the exact distribution when it is cheap
+	// and valid, the asymptotic one otherwise (each test documents its
+	// rule).
+	MethodAuto Method = iota
+	// MethodExact is method="exact": the exact null distribution.
+	MethodExact
+	// MethodAsymptotic is method="asymptotic" (method="asymp" for the
+	// Kolmogorov-Smirnov tests): the large-sample approximation.
+	MethodAsymptotic
+	// MethodApprox is the Kolmogorov-Smirnov one-sample test's
+	// method="approx": twice the one-sided exact p-value.
+	MethodApprox
+)
+
+// String returns SciPy's name for the method.
+func (m Method) String() string {
+	switch m {
+	case MethodAuto:
+		return "auto"
+	case MethodExact:
+		return "exact"
+	case MethodAsymptotic:
+		return "asymptotic"
+	case MethodApprox:
+		return "approx"
+	}
+	return "invalid"
+}
+
+var qnan = math.NaN()
+
+// checkAlternative returns an error wrapping ErrParam for an Alternative
+// outside {TwoSided, Less, Greater}.
+func checkAlternative(a Alternative) error {
+	if a < TwoSided || a > Greater {
+		return fmt.Errorf("%w: alternative %d is not TwoSided, Less or Greater", ErrParam, int(a))
+	}
+	return nil
+}
+
+// hasNaN reports whether any value is NaN.
+func anyNaN(v ...[]float64) bool {
+	for _, s := range v {
+		for _, x := range s {
+			if x != x {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// pvalueSym is SciPy's _get_pvalue for a distribution symmetric about 0
+// given by its survival function: less → sf(-t), greater → sf(t),
+// two-sided → 2·sf(|t|).
+func pvalueSym(t float64, sf func(float64) float64, alt Alternative) float64 {
+	switch alt {
+	case Less:
+		return sf(-t)
+	case Greater:
+		return sf(t)
+	}
+	return 2 * sf(math.Abs(t))
+}
+
+// normSF is special.ndtr(-z), SciPy's _SimpleNormal().sf.
+func normSF(z float64) float64 { return special.Ndtr(-z) }
+
+// studentSF is the survival function of Student's t with df degrees of
+// freedom (SciPy's _SimpleStudentT(df).sf = stdtr(df, -t)).
+func studentSF(df float64) func(float64) float64 {
+	d := StudentT{Df: df, Scale: 1}
+	return d.SF
+}
+
+// chi2SF is the chi-squared survival function (SciPy's chdtrc(df, x)).
+func chi2SF(df, x float64) float64 {
+	return ChiSquared{Df: df, Scale: 1}.SF(x)
+}
+
+// clip01 clips a probability to [0, 1], propagating NaN as np.clip does.
+func clip01(p float64) float64 {
+	switch {
+	case p < 0:
+		return 0
+	case p > 1:
+		return 1
+	}
+	return p
+}
+
+// clip clips x to [lo, hi], propagating NaN.
+func clipTo(x, lo, hi float64) float64 {
+	switch {
+	case x < lo:
+		return lo
+	case x > hi:
+		return hi
+	}
+	return x
+}
+
+// sumMapped is sum(f(a)) without forming f(a): NumPy's pairwise
+// summation (the recursion and the 8-way unrolled leaves of data.go's
+// sum), with f applied to each element as the leaves read it, so that the
+// result is the bit-identical np.sum of the mapped array.
+func sumMapped(a []float64, f func(float64) float64) float64 {
+	n := len(a)
+	switch {
+	case n < 8:
+		r := 0.0
+		for _, v := range a {
+			r += f(v)
+		}
+		return r
+	case n <= 128:
+		var r [8]float64
+		for k := 0; k < 8; k++ {
+			r[k] = f(a[k])
+		}
+		i := 8
+		for ; i < n-n%8; i += 8 {
+			r[0] += f(a[i])
+			r[1] += f(a[i+1])
+			r[2] += f(a[i+2])
+			r[3] += f(a[i+3])
+			r[4] += f(a[i+4])
+			r[5] += f(a[i+5])
+			r[6] += f(a[i+6])
+			r[7] += f(a[i+7])
+		}
+		res := ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]))
+		for ; i < n; i++ {
+			res += f(a[i])
+		}
+		return res
+	default:
+		n2 := n / 2
+		n2 -= n2 % 8
+		return sumMapped(a[:n2], f) + sumMapped(a[n2:], f)
+	}
+}
+
+// centralMoment is SciPy's _moment(a, order) about the given center:
+// mean((a - center)**order), the powers formed by repeated products.
+func centralMoment(a []float64, center float64, order int) float64 {
+	return sumMapped(a, func(v float64) float64 {
+		e := v - center
+		p := e
+		for k := 1; k < order; k++ {
+			p = float64(p * e)
+		}
+		return p
+	}) / float64(len(a))
+}
+
+// varDdof is SciPy's _var(a, ddof): mean of the squared deviations, then
+// scaled by n/(n-ddof).
+func varDdof(a []float64, ddof float64) float64 {
+	n := float64(len(a))
+	v := centralMoment(a, mean(a), 2)
+	return v * (n / (n - ddof))
+}

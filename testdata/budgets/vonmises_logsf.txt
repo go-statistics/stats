@@ -1,0 +1,4 @@
+edge 1
+left 1.5
+core 5.3
+right 3.6

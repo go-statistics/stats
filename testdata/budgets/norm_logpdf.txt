@@ -1,0 +1,6 @@
+core 1
+mid 1
+tail 1
+underflow 1
+zero_crossing 1
+huge 1
