@@ -142,14 +142,16 @@ func TestPerfReport(t *testing.T) {
 	for _, name := range names {
 		c := perfCases[name]
 		serial, par := c.setup(c.n)
-		if serial == nil {
-			// Not elementwise: the single-core time is the same call with
-			// GOMAXPROCS=1 (the functions that split work over goroutines
-			// then stay on one).
-			serial = func() {
-				defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(1))
-				par()
+		// Not elementwise: the single-core time is the same call with
+		// GOMAXPROCS=1 (the functions that split work over goroutines then
+		// stay on one), set outside the timed interval (changing it stops
+		// the world, tens of microseconds).
+		timeSerial := func() float64 {
+			if serial != nil {
+				return timeIt(serial)
 			}
+			defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(1))
+			return timeIt(par)
 		}
 		py := c.py
 		if py == (pyCase{}) {
@@ -170,7 +172,7 @@ func TestPerfReport(t *testing.T) {
 		var ts, tg, tp []float64
 		for r := 0; r < rounds; r++ {
 			ts = append(ts, sp.time(t, py, c.n))
-			tg = append(tg, timeIt(serial))
+			tg = append(tg, timeSerial())
 			tp = append(tp, timeIt(par))
 		}
 		ms, mg, mp := medianOf(ts)*1e3, medianOf(tg)*1e3, medianOf(tp)*1e3

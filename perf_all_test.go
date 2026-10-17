@@ -50,7 +50,15 @@ func perfCause(name string) string {
 	case fam == "mvn" && m == "cdf":
 		return "own: randomised lattice rule in double-double"
 	case m == "fit":
-		return causeFit
+		switch fam {
+		case "beta", "cauchy", "chi", "chi2", "f", "gamma", "invgamma", "lognorm", "lomax", "reciprocal", "t", "triang", "weibull_min":
+			return causeFit
+		case "logistic":
+			return "own+special: nested root finding to full precision, special.Expit per point"
+		case "pareto", "gumbel_r":
+			return "own: likelihood equations solved to full precision by bracketing"
+		}
+		return "own: closed form; the data checks and sums"
 	case m == "cdf" || m == "sf" || m == "ppf" || m == "isf" || m == "logcdf" || m == "logsf":
 		if special[fam] {
 			return causeSpecial
