@@ -2,9 +2,11 @@ package stats
 
 import (
 	"flag"
+	"fmt"
 	"math"
 	"os"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"testing"
@@ -553,6 +555,76 @@ func TestPerfAnnotate(t *testing.T) {
 		lines[i] = strings.Join(c, "|")
 	}
 	if err := os.WriteFile(*perfAnnotate, []byte(strings.Join(lines, "\n")), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+var perfCompare = flag.String("perf.compare", "", "BEFORE,AFTER,OUT: write the one-core speed-ups of two generated tables side by side")
+
+func readPerfTable(t *testing.T, path string) map[string][]string {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows := map[string][]string{}
+	for _, l := range strings.Split(string(b), "\n") {
+		c := strings.Split(l, "|")
+		if len(c) != 10 {
+			continue
+		}
+		for i := range c {
+			c[i] = strings.TrimSpace(c[i])
+		}
+		if c[1] == "case" || strings.HasPrefix(c[1], "-") {
+			continue
+		}
+		rows[c[1]] = c[1:9]
+	}
+	return rows
+}
+
+// TestPerfCompare puts the one-core speed-ups of two runs of TestPerfReport
+// side by side, slowest (after) first.
+func TestPerfCompare(t *testing.T) {
+	f := strings.Split(*perfCompare, ",")
+	if len(f) != 3 {
+		t.Skip("set -perf.compare=BEFORE,AFTER,OUT")
+	}
+	before, after := readPerfTable(t, f[0]), readPerfTable(t, f[1])
+	// SciPy's time over one core's, from the times (more digits than the
+	// printed speed-up)
+	speedup := func(r []string) float64 {
+		s, err1 := strconv.ParseFloat(r[2], 64)
+		g, err2 := strconv.ParseFloat(r[3], 64)
+		if err1 != nil || err2 != nil {
+			return math.NaN()
+		}
+		return s / g
+	}
+	var names []string
+	for k := range after {
+		if _, ok := before[k]; ok {
+			names = append(names, k)
+		}
+	}
+	sort.Slice(names, func(i, j int) bool {
+		a, b := speedup(after[names[i]]), speedup(after[names[j]])
+		if a != b && a == a && b == b {
+			return a < b
+		}
+		return names[i] < names[j]
+	})
+	var b strings.Builder
+	b.WriteString("| case | n | before: speed-up, one core | after: speed-up, one core | gain | slower because |\n|---|--:|--:|--:|--:|---|\n")
+	for _, k := range names {
+		x, y := speedup(before[k]), speedup(after[k])
+		if x != x || y != y { // SciPy raised
+			fmt.Fprintf(&b, "| %s | %s | — | — | — | SciPy raises |\n", k, after[k][1])
+			continue
+		}
+		fmt.Fprintf(&b, "| %s | %s | %.3gx | %.3gx | %.3gx | %s |\n", k, after[k][1], x, y, y/x, after[k][7])
+	}
+	if err := os.WriteFile(f[2], []byte(b.String()), 0o644); err != nil {
 		t.Fatal(err)
 	}
 }

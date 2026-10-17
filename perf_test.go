@@ -177,7 +177,7 @@ func TestPerfReport(t *testing.T) {
 		if ms != ms { // SciPy raised (zipf.ppf: "updating stopped, endless loop")
 			fmt.Fprintf(&b, "| %s | %d | raises | %.4g | %.4g | — | — | |\n", name, c.n, mg, mp)
 		} else {
-			fmt.Fprintf(&b, "| %s | %d | %.4g | %.4g | %.4g | %.2fx | %.2fx |%s\n", name, c.n, ms, mg, mp, ms/mg, ms/mp, perfNote(name, ms/mg))
+			fmt.Fprintf(&b, "| %s | %d | %.4g | %.4g | %.4g | %.3gx | %.3gx |%s\n", name, c.n, ms, mg, mp, ms/mg, ms/mp, perfNote(name, ms/mg))
 		}
 		t.Logf("%s: scipy %.4g ms, go one core %.4g ms, go %.4g ms", name, ms, mg, mp)
 		// the table so far, so that an interrupted run keeps its rows
