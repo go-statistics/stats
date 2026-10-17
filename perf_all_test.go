@@ -4,7 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"math"
+	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -19,23 +21,72 @@ import (
 // descriptive statistic, test, fit and multivariate operation (named cases,
 // mirrored in the server's CASES).
 
-// perfCause says, for a row still slower than SciPy on one core, where the
-// time goes (filled from profiles; see docs/perf.md).
-var perfCause = map[string]string{}
-
+// perfNote says, for a row still slower than SciPy on one core, where the
+// time goes (from profiles; see docs/perf.md): "special" when it is in
+// go-numerics/special, "ndarray" in go-ndarray's generator, "own" when it
+// is this package's (with why).
 func perfNote(name string, ratio float64) string {
 	if ratio >= 1 {
 		return " |"
 	}
-	if c, ok := perfCause[name]; ok {
-		return " " + c + " |"
-	}
-	if i := strings.IndexByte(name, '.'); i > 0 {
-		if c, ok := perfCause[name[i:]]; ok {
-			return " " + c + " |"
+	return " " + perfCause(name) + " |"
+}
+
+const (
+	causeSpecial = "special: incomplete gamma/beta, their inverses, Ndtr/Ndtri"
+	causeNdarray = "ndarray: the generator's draws"
+	causeDD      = "own: double-double evaluation (≤ 0.5–2 ulp results)"
+	causeCR      = "own: correctly rounded log/pow per element"
+	causeFit     = "own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point"
+	causeMV      = "own: double-double solve per point"
+)
+
+func perfCause(name string) string {
+	fam, m, _ := strings.Cut(name, ".")
+	special := map[string]bool{"beta": true, "t": true, "f": true, "gamma": true, "chi2": true, "chi": true,
+		"invgamma": true, "ncx2": true, "binom": true, "nbinom": true, "poisson": true, "norm": true, "lognorm": true}
+	switch {
+	case m == "fit":
+		return causeFit
+	case m == "cdf" || m == "sf" || m == "ppf" || m == "isf" || m == "logcdf" || m == "logsf":
+		if special[fam] {
+			return causeSpecial
 		}
+		return causeDD
+	case m == "rvs":
+		switch fam {
+		case "invgamma":
+			return "special: inverse incomplete gamma per draw (SciPy's generic ppf sampling)"
+		case "cauchy", "gumbel_r", "weibull_min", "pareto", "lomax", "reciprocal", "lognorm":
+			return "own: SciPy's transform with correctly rounded elementary functions"
+		case "mvn":
+			return "own: NumPy's SVD factor, then ndarray's normals"
+		}
+		return causeNdarray
+	case m == "pdf" || m == "logpdf" || m == "pmf" || m == "logpmf":
+		if fam == "mvn" {
+			return causeMV
+		}
+		if fam == "dirichlet" {
+			return "own: double-double sum of logs (Ziv fast path)"
+		}
+		return causeDD
+	case fam == "mvn" && m == "cdf":
+		return "own: randomised lattice rule in double-double"
+	case fam == "kde":
+		return "own: compensated sums of exponentials per point"
 	}
-	return " |"
+	switch name {
+	case "entropy", "pmean", "gmean", "power_divergence", "hmean":
+		return causeCR
+	case "pearsonr", "linregress", "chisquare", "f_oneway":
+		return "own: exact (double-double-equivalent) sums, compensated on two lanes; NumPy uses SIMD/BLAS"
+	case "mode":
+		return "own: comparison sort (data holding both -0 and +0 cannot take the radix path bit-identically)"
+	case "anderson", "average", "mean", "tmean", "tmin", "tmax", "moment", "bootstrap", "mvn.fit":
+		return "own: scalar loops where NumPy has SIMD kernels"
+	}
+	return "own"
 }
 
 // perfDist is one distribution of the generic cases: the Go value, SciPy's
@@ -493,4 +544,34 @@ func TestPerfProfile(t *testing.T) {
 		par()
 	}
 	t.Logf("%s: %d calls, %.4g ms each", *perfProfile, k, time.Since(t0).Seconds()*1e3/float64(k))
+}
+
+var perfAnnotate = flag.String("perf.annotate", "", "rewrite the \"slower because\" column of this generated table")
+
+// TestPerfAnnotate refreshes the causes of a table written by TestPerfReport
+// (after perfCause changes) without measuring again.
+func TestPerfAnnotate(t *testing.T) {
+	if *perfAnnotate == "" {
+		t.Skip("set -perf.annotate=PATH")
+	}
+	b, err := os.ReadFile(*perfAnnotate)
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(string(b), "\n")
+	for i, l := range lines {
+		c := strings.Split(l, "|")
+		if len(c) != 10 || strings.TrimSpace(c[1]) == "case" || strings.HasPrefix(strings.TrimSpace(c[1]), "--") {
+			continue
+		}
+		r, err := strconv.ParseFloat(strings.TrimSuffix(strings.TrimSpace(c[6]), "x"), 64)
+		if err != nil { // SciPy raised
+			continue
+		}
+		c[8] = strings.TrimSuffix(perfNote(strings.TrimSpace(c[1]), r), "|")
+		lines[i] = strings.Join(c, "|")
+	}
+	if err := os.WriteFile(*perfAnnotate, []byte(strings.Join(lines, "\n")), 0o644); err != nil {
+		t.Fatal(err)
+	}
 }
