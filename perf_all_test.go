@@ -2,7 +2,6 @@ package stats
 
 import (
 	"flag"
-	"fmt"
 	"math"
 	"os"
 	"runtime"
@@ -16,10 +15,10 @@ import (
 )
 
 // The rest of the public surface in the SciPy speed comparison: every
-// distribution's elementwise functions and draws (generic cases, driven by
-// "@dist" / "@rvs" / "@entropy" commands to bench/scipy_server.py), and every
-// descriptive statistic, test, fit and multivariate operation (named cases,
-// mirrored in the server's CASES).
+// distribution's elementwise functions, draws, entropies and fits (generic
+// cases, their SciPy side built by pyDist, pyRvs, pyEntropy and pyFit), and
+// every descriptive statistic, test and multivariate operation (named
+// cases, their SciPy side in pyCases).
 
 // perfNote says, for a row still slower than SciPy on one core, where the
 // time goes (from profiles; see docs/perf.md): "special" when it is in
@@ -46,6 +45,8 @@ func perfCause(name string) string {
 	special := map[string]bool{"beta": true, "t": true, "f": true, "gamma": true, "chi2": true, "chi": true,
 		"invgamma": true, "ncx2": true, "binom": true, "nbinom": true, "poisson": true, "norm": true, "lognorm": true}
 	switch {
+	case fam == "mvn" && m == "cdf":
+		return "own: randomised lattice rule in double-double"
 	case m == "fit":
 		return causeFit
 	case m == "cdf" || m == "sf" || m == "ppf" || m == "isf" || m == "logcdf" || m == "logsf":
@@ -71,8 +72,6 @@ func perfCause(name string) string {
 			return "own: double-double sum of logs (Ziv fast path)"
 		}
 		return causeDD
-	case fam == "mvn" && m == "cdf":
-		return "own: randomised lattice rule in double-double"
 	case fam == "kde":
 		return "own: compensated sums of exponentials per point"
 	}
@@ -135,17 +134,6 @@ var perfDists = []perfDist{
 	{Zipf{A: 2.5}, "zipf", []float64{2.5}, 1, 200, true},
 }
 
-func pyArgs(a []float64) string {
-	if len(a) == 0 {
-		return "-"
-	}
-	s := make([]string, len(a))
-	for i, v := range a {
-		s[i] = fmt.Sprint(v)
-	}
-	return strings.Join(s, ",")
-}
-
 type rvser interface {
 	Rvs(g *random.Generator, size ...int) (*ndarray.Array, error)
 }
@@ -179,19 +167,19 @@ func init() {
 			if disc {
 				c = elementwiseFloor(n, lo, hi, f)
 			}
-			c.py = fmt.Sprintf("@dist %s %s %v %v %d %s", pd.name, m, lo, hi, b2i(disc), pyArgs(pd.args))
+			c.py = pyDist(pd.name, m, lo, hi, disc, pd.args)
 			perfCases[name] = c
 		}
 		name := pd.name + ".rvs"
 		if _, ok := perfCases[name]; !ok {
 			r := pd.d.(rvser)
-			perfCases[name] = perfCase{n: 1_000_000, py: fmt.Sprintf("@rvs %s %s", pd.name, pyArgs(pd.args)),
+			perfCases[name] = perfCase{n: 1_000_000, py: pyRvs(pd.name, pd.args),
 				setup: func(n int) (func(), func()) {
 					return nil, func() { r.Rvs(random.DefaultRNG(1), n) }
 				}}
 		}
 		ent := pd.d.(interface{ Entropy() float64 })
-		perfCases[pd.name+".entropy"] = perfCase{n: 1, py: fmt.Sprintf("@entropy %s %s", pd.name, pyArgs(pd.args)),
+		perfCases[pd.name+".entropy"] = perfCase{n: 1, py: pyEntropy(pd.name, pd.args),
 			setup: func(int) (func(), func()) {
 				return nil, func() {
 					for range 100 {
@@ -200,13 +188,6 @@ func init() {
 				}
 			}}
 	}
-}
-
-func b2i(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
 }
 
 func elementwiseFloor(n int, lo, hi float64, f func(float64) float64) perfCase {
@@ -501,7 +482,7 @@ func init() {
 			continue
 		}
 		r := pd.d.(rvser)
-		perfCases[pd.name+".fit"] = perfCase{n: 10_000, py: fmt.Sprintf("@fit %s %s", pd.name, pyArgs(pd.args)),
+		perfCases[pd.name+".fit"] = perfCase{n: 10_000, py: pyFit(pd.name, pd.args),
 			setup: func(n int) (func(), func()) {
 				a, _ := r.Rvs(random.DefaultRNG(7), n)
 				x, _ := ndarray.Data[float64](a)

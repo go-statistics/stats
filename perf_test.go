@@ -1,7 +1,6 @@
 package stats
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"math"
@@ -9,7 +8,6 @@ import (
 	"os/exec"
 	"runtime"
 	"sort"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -22,8 +20,9 @@ import (
 //
 //	go test -run TestPerfReport -perf.report=docs/perf-table.md -timeout 60m
 //
-// starts bench/scipy_server.py through uv (the native interpreter: the
-// comparison is with what a user of this machine runs) and, case by case and
+// starts SciPy through uv (one python -c process, perf_scipy_test.go; the
+// native interpreter: the comparison is with what a user of this machine
+// runs) and, case by case and
 // round by round, times the SciPy call and the Go call on the same data back
 // to back, so that the load of the shared host hits both alike. The table
 // reports medians.
@@ -37,7 +36,7 @@ var (
 const gold = 0.6180339887498949
 
 // points is lo + (hi-lo)·frac(i·gold), the same IEEE operations as
-// bench/scipy_server.py.
+// the Python side (pyPoints).
 func points(n int, lo, hi float64) []float64 {
 	v := make([]float64, n)
 	for i := range v {
@@ -59,9 +58,9 @@ func normalDraws(n int, seed uint64) []float64 {
 type perfCase struct {
 	n     int
 	setup func(n int) (serial, par func())
-	// py, when set, is the command sent to bench/scipy_server.py instead of
-	// the case name (generic distribution cases: "@dist norm pdf ...").
-	py string
+	// py is the SciPy side (perf_scipy_test.go); the zero value means
+	// pyCases[name].
+	py pyCase
 }
 
 var perfCases = map[string]perfCase{}
@@ -119,28 +118,7 @@ func TestPerfReport(t *testing.T) {
 	if *perfReport == "" {
 		t.Skip("set -perf.report=PATH to run the SciPy speed comparison")
 	}
-	uv := os.ExpandEnv("$HOME/.local/bin/uv")
-	cmd := exec.Command(uv, "run", "--with", "scipy==1.18.1", "--with", "numpy==2.5.4", "python", "bench/scipy_server.py")
-	// One thread on the SciPy side too: the comparison is core for core.
-	cmd.Env = append(os.Environ(), "OMP_NUM_THREADS=1", "OPENBLAS_NUM_THREADS=1", "MKL_NUM_THREADS=1", "VECLIB_MAXIMUM_THREADS=1")
-	stdin, _ := cmd.StdinPipe()
-	stdout, _ := cmd.StdoutPipe()
-	cmd.Stderr = os.Stderr
-	if err := cmd.Start(); err != nil {
-		t.Fatal(err)
-	}
-	rd := bufio.NewScanner(stdout)
-	scipy := func(name string, n int) float64 {
-		fmt.Fprintf(stdin, "%s %d\n", name, n)
-		if !rd.Scan() {
-			t.Fatalf("scipy server: %v", rd.Err())
-		}
-		v, err := strconv.ParseFloat(strings.TrimSpace(rd.Text()), 64)
-		if err != nil {
-			t.Fatal(err)
-		}
-		return v
-	}
+	sp := startSciPy(t)
 	up, _ := exec.Command("uptime").Output()
 	var names []string
 	for k := range perfCases {
@@ -173,11 +151,14 @@ func TestPerfReport(t *testing.T) {
 				par()
 			}
 		}
-		py := name
-		if c.py != "" {
-			py = c.py
+		py := c.py
+		if py == (pyCase{}) {
+			var ok bool
+			if py, ok = pyCases[name]; !ok {
+				t.Fatalf("%s: no SciPy side", name)
+			}
 		}
-		scipy(py, c.n) // warm-up both sides
+		sp.time(t, py, c.n) // warm-up both sides
 		warm := timeIt(par)
 		rounds := *perfRounds
 		switch {
@@ -188,7 +169,7 @@ func TestPerfReport(t *testing.T) {
 		}
 		var ts, tg, tp []float64
 		for r := 0; r < rounds; r++ {
-			ts = append(ts, scipy(py, c.n))
+			ts = append(ts, sp.time(t, py, c.n))
 			tg = append(tg, timeIt(serial))
 			tp = append(tp, timeIt(par))
 		}
@@ -204,8 +185,6 @@ func TestPerfReport(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	fmt.Fprintln(stdin, "quit")
-	cmd.Wait()
 	if err := os.WriteFile(*perfReport, []byte(b.String()), 0o644); err != nil {
 		t.Fatal(err)
 	}
