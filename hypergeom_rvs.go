@@ -101,7 +101,7 @@ func hypergeometricHRUA(bg random.BitGenerator, good, bad, sample int64) int64 {
 	h := float64(hruaD1*c) + hruaD2
 	m := int64(math.Floor(float64(float64(computed+1)*float64(minGB+1)) / float64(popsize+2)))
 	gm := logFactorial(m) + logFactorial(minGB-m) + logFactorial(computed-m) + logFactorial(maxGB-computed+m)
-	b := math.Min(float64(min(computed, minGB)+1), math.Floor(a+float64(16*c)))
+	b := min(float64(min(computed, minGB)+1), math.Floor(a+float64(16*c)))
 	var k int64
 	for {
 		u := bg.Float64()

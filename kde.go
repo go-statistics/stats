@@ -248,7 +248,7 @@ func (k *GaussianKDE) prepare() {
 		copy(k.white[j*d:(j+1)*d], z[o*d:(o+1)*d])
 		k.ew[j] = w[o]
 		k.elw[j] = math.Log(w[o])
-		k.wmax = math.Max(k.wmax, w[o])
+		k.wmax = max(k.wmax, w[o])
 	}
 }
 
@@ -480,7 +480,7 @@ func (k *GaussianKDE) sumND(t, buf []float64) (a0, s float64) {
 		}
 		b := k.elw[i] - a/2
 		buf[i] = b
-		// mx = math.Max(mx, b), without its call: NaN sticks, +0 beats -0
+		// mx = max(mx, b), without its call: NaN sticks, +0 beats -0
 		switch {
 		case b > mx || (b == 0 && mx == 0 && !math.Signbit(b)):
 			mx = b

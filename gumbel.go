@@ -166,7 +166,7 @@ func FitGumbel[D Data](x D, o *FitOptions) (Gumbel, error) {
 			mx := math.Inf(-1)
 			for i, y := range v {
 				t[i] = -y / scale
-				mx = math.Max(mx, t[i])
+				mx = max(mx, t[i])
 			}
 			for i, y := range v {
 				w[i] = math.Exp(t[i] - mx)
@@ -193,7 +193,7 @@ func FitGumbel[D Data](x D, o *FitOptions) (Gumbel, error) {
 func logSumExp(a []float64) float64 {
 	mx := math.Inf(-1)
 	for _, x := range a {
-		mx = math.Max(mx, x)
+		mx = max(mx, x)
 	}
 	s := make([]float64, len(a))
 	for i, x := range a {

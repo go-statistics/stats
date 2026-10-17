@@ -115,8 +115,8 @@ type hypergeom struct {
 	total, marked, nDraw float64
 }
 
-func (h hypergeom) lo() float64 { return math.Max(0, h.nDraw-(h.total-h.marked)) }
-func (h hypergeom) hi() float64 { return math.Min(h.marked, h.nDraw) }
+func (h hypergeom) lo() float64 { return max(0, h.nDraw-(h.total-h.marked)) }
+func (h hypergeom) hi() float64 { return min(h.marked, h.nDraw) }
 
 // pmfDD is P(X = k), k an integer (0 < nDraw < total: Fisher's test
 // returns before any empty margin reaches here).

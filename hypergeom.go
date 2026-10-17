@@ -49,7 +49,7 @@ func (s hypergeomStd) valid() bool {
 }
 
 func (s hypergeomStd) support() (lo, hi float64) {
-	return math.Max(0, s.nd-s.bad), math.Min(s.n, s.nd)
+	return max(0, s.nd-s.bad), min(s.n, s.nd)
 }
 
 // term returns the mass at k (in the support) as c·exp(e).
@@ -211,7 +211,7 @@ func (s hypergeomStd) entropy() float64 {
 		return entropyLargeVar(v, s.skew(), s.kurtosis())
 	}
 	mode := math.Floor((s.n + 1) * (s.nd + 1) / (s.m + 2))
-	return entropySum(math.Max(lo, math.Min(mode, hi)), lo, hi, s.term)
+	return entropySum(max(lo, min(mode, hi)), lo, hi, s.term)
 }
 
 // munp is E[X^n] from the factorial moments n_(j) N_(j) / M_(j) (falling

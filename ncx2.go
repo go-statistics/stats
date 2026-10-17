@@ -50,7 +50,7 @@ func (s ncx2Std) mixture(start float64, logTerm func(j float64) dd.DD, ratio fun
 	// terms); start from the caller's estimate and step to it
 	// start is the root of ratio(j) = 1, so ratio(j-1) > 1 at its floor
 	// (up to rounding, which only costs a step of the walk below)
-	j := math.Max(0, math.Floor(start))
+	j := max(0, math.Floor(start))
 	if !(j < 1<<40) {
 		// the largest term is beyond any index that matters: the density
 		// is far below the smallest subnormal there
@@ -171,7 +171,7 @@ func (s ncx2Std) cdf(x float64) float64 {
 		// the upper tail is the small one: 1 - sf rounds once
 		return 1 - s.sf(x)
 	}
-	return math.Min(1, s.tailSum(x/2, false))
+	return min(1, s.tailSum(x/2, false))
 }
 
 // ncx2Tiny is where x/2 nears the bottom of the normal range; below, the
@@ -218,7 +218,7 @@ func (s ncx2Std) logSFDeep(y float64) dd.DD {
 	for j := 0.0; ; j++ {
 		l := dd.Add(s.poissonLog(j), logUpperGamma(s.k+j, y))
 		terms = append(terms, l)
-		best = math.Max(best, l.Hi)
+		best = max(best, l.Hi)
 		if (l.Hi < best-40 && j > s.mu) || l.Hi != l.Hi || j > s.mu+60*math.Sqrt(s.mu+1)+500 {
 			break
 		}
@@ -238,7 +238,7 @@ func (s ncx2Std) guess(p, q float64) float64 {
 	if q < p {
 		z = -special.Ndtri(q)
 	}
-	return math.Max(m+math.Sqrt(v)*z, m*1e-3)
+	return max(m+math.Sqrt(v)*z, m*1e-3)
 }
 
 func (s ncx2Std) ppf(p float64) float64 {

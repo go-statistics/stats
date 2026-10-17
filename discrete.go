@@ -89,7 +89,7 @@ func shiftDraws(a *ndarray.Array, loc float64) *ndarray.Array {
 // nowhere below b. It is how SciPy's rv_discrete ppf and isf are defined:
 // ppf(p) = smallestK(cdf(k) >= p), isf(q) = smallestK(sf(k) <= q).
 func smallestK(k0, a, b float64, ok func(float64) bool) float64 {
-	k := math.Max(a, math.Min(b, math.Floor(k0)))
+	k := max(a, min(b, math.Floor(k0)))
 	if k != k {
 		k = a
 	}
@@ -97,7 +97,7 @@ func smallestK(k0, a, b float64, ok func(float64) bool) float64 {
 		hi := k // ok(hi)
 		step := 1.0
 		for hi > a {
-			lo := math.Max(a, hi-step)
+			lo := max(a, hi-step)
 			if !ok(lo) {
 				return bisectK(lo, hi, ok)
 			}
@@ -109,7 +109,7 @@ func smallestK(k0, a, b float64, ok func(float64) bool) float64 {
 	lo := k // !ok(lo)
 	step := 1.0
 	for {
-		hi := math.Min(b, lo+step)
+		hi := min(b, lo+step)
 		if hi == b || ok(hi) {
 			return bisectK(lo, hi, ok)
 		}

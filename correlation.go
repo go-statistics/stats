@@ -255,7 +255,7 @@ func kendall(a, b []float64, o *KendallOptions) (TestResult, error) {
 		minclasses := min(nx, ny)
 		tau = 2 * float64(cmd) / (float64(int64(size)*int64(size)*int64(minclasses-1)) / float64(minclasses))
 	}
-	tau = math.Min(1, math.Max(-1, tau))
+	tau = min(1, max(-1, tau))
 	method := o.Method
 	if method == MethodExact && (xtie != 0 || ytie != 0) {
 		return TestResult{qnan, qnan}, fmt.Errorf("%w: ties found, the exact method cannot be used", ErrData)

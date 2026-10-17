@@ -111,7 +111,7 @@ func eighLower(m []float64, d int) (w, v []float64) {
 func eigCutoff(w []float64) float64 {
 	m := 0.0
 	for _, x := range w {
-		m = math.Max(m, math.Abs(x))
+		m = max(m, math.Abs(x))
 	}
 	return 1e6 * 0x1p-52 * m
 }

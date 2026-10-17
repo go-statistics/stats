@@ -32,7 +32,7 @@ func invertCDF(target float64, upper bool, f, pdf func(float64) float64, x0, lo,
 		b = x
 	}
 	// grow towards the root from x until it is bracketed by finite values
-	step := math.Max(math.Abs(x)*0.5, 1)
+	step := max(math.Abs(x)*0.5, 1)
 	for i := 0; i < 2100 && (math.IsInf(a, 0) || math.IsInf(b, 0)); i++ {
 		if math.IsInf(b, 1) {
 			y := a + step
@@ -89,10 +89,10 @@ func invertCDF(target float64, upper bool, f, pdf func(float64) float64, x0, lo,
 // exponents when the bracket spans many binades of positive numbers.
 func midpoint(a, b float64) float64 {
 	if math.IsInf(b, 1) {
-		return math.Max(2*a, 1)
+		return max(2*a, 1)
 	}
 	if math.IsInf(a, -1) {
-		return math.Min(2*b, -1)
+		return min(2*b, -1)
 	}
 	if a == 0 && b > 0 {
 		return b * 0x1p-32 // a root near 0 may be 1e-300: shrink geometrically

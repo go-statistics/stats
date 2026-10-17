@@ -171,7 +171,7 @@ func solveLogMinusDigamma(s float64) float64 {
 	for i, done := 0, false; i < 100 && !done; i++ {
 		f := logMinusDigamma(a) - s
 		fp := 1/a - special.Polygamma(1, a)
-		na := math.Max(a-f/fp, a/8)
+		na := max(a-f/fp, a/8)
 		done = math.Abs(na-a) <= 4e-16*a
 		a = na
 	}
@@ -186,7 +186,7 @@ func digammaInv(y float64) float64 {
 		a = -1 / (y - special.Digamma(1))
 	}
 	for i, done := 0, false; i < 100 && !done; i++ {
-		na := math.Max(a-(special.Digamma(a)-y)/special.Polygamma(1, a), a/8)
+		na := max(a-(special.Digamma(a)-y)/special.Polygamma(1, a), a/8)
 		done = math.Abs(na-a) <= 4e-16*a
 		a = na
 	}

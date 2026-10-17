@@ -137,7 +137,7 @@ func Bartlett[D Data](samples ...D) (TestResult, error) {
 	denom := 1 + 1/(3*(k-1))*(sum(inv)-1/(ntot-k))
 	t := numer / denom
 	p := chi2SF(k-1, t)
-	return TestResult{math.Max(t, 0), p}, nil
+	return TestResult{max(t, 0), p}, nil
 }
 
 // LeveneCenter is the center of Levene's test (SciPy's center=). The

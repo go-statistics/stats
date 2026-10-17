@@ -193,7 +193,11 @@ func TestPerfReport(t *testing.T) {
 			tp = append(tp, timeIt(par))
 		}
 		ms, mg, mp := medianOf(ts)*1e3, medianOf(tg)*1e3, medianOf(tp)*1e3
-		fmt.Fprintf(&b, "| %s | %d | %.4g | %.4g | %.4g | %.2fx | %.2fx |%s\n", name, c.n, ms, mg, mp, ms/mg, ms/mp, perfNote(name, ms/mg))
+		if ms != ms { // SciPy raised (zipf.ppf: "updating stopped, endless loop")
+			fmt.Fprintf(&b, "| %s | %d | raises | %.4g | %.4g | — | — | |\n", name, c.n, mg, mp)
+		} else {
+			fmt.Fprintf(&b, "| %s | %d | %.4g | %.4g | %.4g | %.2fx | %.2fx |%s\n", name, c.n, ms, mg, mp, ms/mg, ms/mp, perfNote(name, ms/mg))
+		}
 		t.Logf("%s: scipy %.4g ms, go one core %.4g ms, go %.4g ms", name, ms, mg, mp)
 		// the table so far, so that an interrupted run keeps its rows
 		if err := os.WriteFile(*perfReport, []byte(b.String()), 0o644); err != nil {

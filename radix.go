@@ -44,11 +44,28 @@ const (
 	radixSize   = 1 << radixBits
 )
 
-// radixHist reports whether a holds no NaN and not both signed zeros, and
-// fills the per-digit histograms of the keys of a.
+// radixHist reports whether a holds no NaN and not both signed zeros
+// (checked first, so that the data the comparison sort must handle cost one
+// cheap pass), and fills the per-digit histograms of the keys of a.
 func radixHist(a []float64, h *[radixPasses][radixSize]int) bool {
-	negZero, posZero := false, false
+	if !radixable(len(a), func(i int) float64 { return a[i] }) {
+		return false
+	}
 	for _, x := range a {
+		k := floatKey(x)
+		for p := range radixPasses {
+			h[p][(k>>(p*radixBits))&(radixSize-1)]++
+		}
+	}
+	return true
+}
+
+// radixable reports whether the n values hold no NaN and not both -0 and
+// +0.
+func radixable(n int, at func(i int) float64) bool {
+	negZero, posZero := false, false
+	for i := range n {
+		x := at(i)
 		if x != x {
 			return false
 		}
@@ -58,10 +75,6 @@ func radixHist(a []float64, h *[radixPasses][radixSize]int) bool {
 			} else {
 				posZero = true
 			}
-		}
-		k := floatKey(x)
-		for p := range radixPasses {
-			h[p][(k>>(p*radixBits))&(radixSize-1)]++
 		}
 	}
 	return !(negZero && posZero)
@@ -132,27 +145,15 @@ func radixSortPairs[T any](p []T, val func(T) float64) bool {
 	if n < radixMin {
 		return false
 	}
+	if !radixable(n, func(i int) float64 { return val(p[i]) }) {
+		return false
+	}
 	var h [radixPasses][radixSize]int
-	negZero, posZero := false, false
 	for _, e := range p {
-		x := val(e)
-		if x != x {
-			return false
-		}
-		if x == 0 {
-			if math.Signbit(x) {
-				negZero = true
-			} else {
-				posZero = true
-			}
-		}
-		k := floatKey(x)
+		k := floatKey(val(e))
 		for q := range radixPasses {
 			h[q][(k>>(q*radixBits))&(radixSize-1)]++
 		}
-	}
-	if negZero && posZero {
-		return false
 	}
 	tmp := make([]T, n)
 	src, dst := p, tmp
