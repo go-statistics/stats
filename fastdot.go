@@ -65,19 +65,16 @@ func dotDev(a, b []float64, ma, mb float64) (float64, bool) {
 	// Σ|p| beyond 2^1000 may have overflowed somewhere; below 2^-900 the
 	// products may have lost bits to underflow; NaN: let the exact path
 	// say what it says.
-	if !(pa < 0x1p1000 && pa > 0x1p-900) {
+	// The exact sum is h + l + Σ(q+f). The float64 sums c0, c1 err by at
+	// most γ_2n·Σ(|q|+|f|) together; ea, pa (float64 sums of nonnegative
+	// terms) are below their exact values by at most a factor 1-γ_n, which
+	// the constants absorb (n·u < 2^-20 is required).
+	fn := float64(n)
+	if !(pa < 0x1p1000 && pa > 0x1p-900) || fn*u53 > 0x1p-20 {
 		return 0, false
 	}
 	h, l := dd.TwoSum(s0, s1)
 	l2 := l + c0 + c1
-	fn := float64(n)
-	// The exact sum is h + l + Σ(q+f). The float64 sums c0, c1 err by at
-	// most γ_2n·Σ(|q|+|f|) together; ea, pa (float64 sums of nonnegative
-	// terms) are below their exact values by at most a factor 1-γ_n, which
-	// the constants absorb (n·u < 2^-20 is required below).
-	if fn*u53 > 0x1p-20 {
-		return 0, false
-	}
 	errFast := 4.4*fn*u53*ea + 2.2*u53*(math.Abs(l)+math.Abs(c0)+math.Abs(c1))
 	errDD := 3.3 * fn * u53 * u53 * pa
 	y, rem := dd.TwoSum(h, l2)
@@ -89,8 +86,8 @@ func dotDev(a, b []float64, ma, mb float64) (float64, bool) {
 // side of rem.
 func decidedAbs(y, rem, err float64) bool {
 	b := math.Float64bits(y)
-	if b&(0x7ff<<52) == 0 {
-		return false // zero or subnormal: no claim
+	if e := b & (0x7ff << 52); e == 0 || e == 0x7ff<<52 {
+		return false // zero, subnormal, infinite or NaN: no claim
 	}
 	p := math.Float64frombits(b & (0x7ff << 52))
 	half := p * 0x1p-53

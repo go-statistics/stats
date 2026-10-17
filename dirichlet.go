@@ -130,10 +130,7 @@ func (d *Dirichlet) logPDFFast(x []float64) (float64, bool) {
 	}
 	// each term within 2^-71 of its size (the logarithm) on this path and
 	// 2^-103 on the accurate one, the double-double sums within 2^-100 of
-	// the sizes summed
-	if !(mag < 0x1p1000) {
-		return 0, false
-	}
+	// the sizes summed (an infinite size decides nothing)
 	y, rem := dd.FastTwoSum(s.Hi, s.Lo)
 	return y, decidedAbs(y, rem, 0x1p-70*mag)
 }

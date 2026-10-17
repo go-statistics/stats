@@ -18,7 +18,8 @@ import (
 // on other data the comparison sort is used. The same holds for the stable
 // sorts of (value, payload) pairs: an LSD radix sort is stable.
 
-const radixMin = 1024
+// radixMin is a variable so that the tests can force either path.
+var radixMin = 1024
 
 // floatKey maps x to an unsigned integer whose order is that of the
 // float64 values (-0 just before +0, NaNs beyond the infinities).
@@ -168,8 +169,6 @@ func radixSortPairs[T any](p []T, val func(T) float64) bool {
 		}
 		src, dst = dst, src
 	}
-	if &src[0] != &p[0] {
-		copy(p, src)
-	}
+	copy(p, src) // (onto itself after an even number of passes)
 	return true
 }

@@ -310,3 +310,53 @@ func TestDirichletLogPDFFast(t *testing.T) {
 		t.Errorf("undecided %d of %d", undecided, total)
 	}
 }
+
+// TestRadixPathsIdentity runs the statistics that sort with the radix
+// sort and with the comparison sort (radixMin raised) and compares bits.
+func TestRadixPathsIdentity(t *testing.T) {
+	r := rand.New(rand.NewPCG(13, 14))
+	n := 3000
+	a, b, w := make([]float64, n), make([]float64, n), make([]float64, n)
+	for i := range a {
+		a[i] = math.Round(r.NormFloat64()*20) / 4
+		b[i] = r.NormFloat64()
+		w[i] = r.Float64()
+	}
+	run := func() []float64 {
+		var out []float64
+		add := func(v ...float64) { out = append(out, v...) }
+		for _, m := range []RankMethod{RankAverage, RankMin, RankMax, RankDense, RankOrdinal} {
+			rk, _ := RankData(a, m)
+			add(rk...)
+		}
+		md, _ := Mode(a, nil)
+		add(md.Mode, float64(md.Count))
+		ks, _ := KSTest2Samp(a, b, nil)
+		add(ks.Statistic, ks.PValue)
+		cf, _ := CumFreq(a, &FreqOptions{NumBins: 17, Weights: w})
+		add(cf.Freq...)
+		cf, _ = CumFreq(b, &FreqOptions{NumBins: 17})
+		add(cf.Freq...)
+		kt, _ := Kendalltau(a, b, nil)
+		add(kt.Statistic, kt.PValue)
+		mw, _ := MannWhitneyU(a, b, nil)
+		add(mw.Statistic, mw.PValue)
+		return out
+	}
+	fast := run()
+	defer func(m int) { radixMin = m }(radixMin)
+	radixMin = 1 << 62
+	slow := run()
+	for i := range fast {
+		if math.Float64bits(fast[i]) != math.Float64bits(slow[i]) {
+			t.Fatalf("value %d: radix %v, comparison sort %v", i, fast[i], slow[i])
+		}
+	}
+}
+
+func TestDirichletLogPDFFastZero(t *testing.T) {
+	d, _ := NewDirichlet([]float64{2, 1.5, 3})
+	if y, ok := d.logPDFFast([]float64{0, 0.5, 0.5}); !ok || !math.IsInf(y, -1) {
+		t.Errorf("logPDFFast at x_0 = 0 with a_0 > 1: %v %v", y, ok)
+	}
+}

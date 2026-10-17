@@ -482,12 +482,10 @@ func (k *GaussianKDE) sumND(t, buf []float64) (a0, s float64) {
 		buf[i] = b
 		// mx = math.Max(mx, b), without its call: NaN sticks, +0 beats -0
 		switch {
-		case b > mx:
+		case b > mx || (b == 0 && mx == 0 && !math.Signbit(b)):
 			mx = b
 		case b != b:
 			nan = true
-		case b == 0 && mx == 0 && !math.Signbit(b):
-			mx = b
 		}
 	}
 	if nan {
