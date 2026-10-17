@@ -17,8 +17,13 @@ meaning, and `Loc` and `Scale` (continuous) or `Loc` (discrete):
 stats.Beta{A: 2, B: 5, Loc: 0, Scale: 1}.PPF(0.975) // scipy.stats.beta.ppf(0.975, 2, 5)
 ```
 
-Its methods are pure functions of the value: safe for concurrent use,
-nothing cached, nothing allocated on the scalar paths. The zero value has
+Its methods are pure functions of the value: safe for concurrent use and
+nothing allocated on the scalar paths. The constants that depend on the
+shapes only (1/Γ(a), 1/B(a, b), the t density's constant, ζ(a) for Zipf)
+are kept in a small lock-free memo (`shapecache.go`, a seqlock of atomics)
+so that 10^6 evaluations of one distribution, or the likelihood of a fit,
+compute them once; the memo holds the values the functions compute, so a
+result never depends on it. The zero value has
 `Scale` 0 and is invalid: the methods then return NaN, as SciPy does for
 out-of-domain parameters, and `Validate` (or the `NewXxx` constructor)
 says why with an error wrapping `ErrParam`.

@@ -137,6 +137,16 @@ Other limits stated plainly:
   analytically (SciPy's formulas lose up to 3e-9 relative, and
   scipy.stats.beta(3, 2e7).entropy() returns 0.0 where the value is -14.96).
 
+- Fast paths never change a result. Where a correctly rounded or
+  double-double value is rounded once at the end (crLog, crPow, the inner
+  products and chi-squared sums, the Dirichlet log-density), a cheaper
+  evaluation with a rigorous running error bound decides the rounding, and
+  the accurate evaluation runs only when the bound cannot (Ziv's strategy;
+  see [perf.md](perf.md)). The radix sort is used only where the sorted
+  sequence is unique as bit patterns. A golden comparison of 2.4 million
+  values (every distribution function, draw and fit, every statistic and
+  test) against the code before these paths is bit-identical.
+
 ## Tests, descriptive statistics, multivariate
 
 Compared with SciPy 1.18.1 / NumPy 2.5.4 (x86-64) on generated datasets,
