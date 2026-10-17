@@ -345,7 +345,7 @@ func TestRadixPathsIdentity(t *testing.T) {
 	}
 	fast := run()
 	defer func(m int) { radixMin = m }(radixMin)
-	radixMin = 1 << 62
+	radixMin = math.MaxInt
 	slow := run()
 	for i := range fast {
 		if math.Float64bits(fast[i]) != math.Float64bits(slow[i]) {
