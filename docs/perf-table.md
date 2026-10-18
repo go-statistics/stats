@@ -71,7 +71,7 @@ Median of 7 interleaved rounds (3 for calls over 2 s, 1 over 20 s); darwin/arm64
 | entropy | 1000000 | 3.079 | 14.82 | 14.38 | 0.208x | 0.214x | own: correctly rounded log/pow per element |
 | expon.cdf | 100000 | 1.08 | 1.292 | 0.2903 | 0.836x | 3.72x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | expon.entropy | 1 | 16.61 | 0.05088 | 0.000625 | 327x | 2.66e+04x | |
-| expon.fit | 10000 | 0.007125 | 0.03975 | 0.008875 | 0.179x | 0.803x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| expon.fit | 10000 | 0.007125 | 0.03975 | 0.008875 | 0.179x | 0.803x | own: closed form; the data checks and sums |
 | expon.isf | 20000 | 0.1813 | 0.1897 | 0.06579 | 0.956x | 2.76x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | expon.logpdf | 100000 | 0.5833 | 0.5918 | 0.1875 | 0.986x | 3.11x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | expon.pdf | 100000 | 0.6048 | 1.001 | 0.2147 | 0.604x | 2.82x | own: double-double evaluation (≤ 0.5–2 ulp results) |
@@ -160,7 +160,7 @@ Median of 7 interleaved rounds (3 for calls over 2 s, 1 over 20 s); darwin/arm64
 | kurtosistest | 1000000 | 10.68 | 8.354 | 8.28 | 1.28x | 1.29x | |
 | laplace.cdf | 100000 | 1.068 | 1.535 | 0.368 | 0.695x | 2.9x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | laplace.entropy | 1 | 16.59 | 0.04879 | 0.000667 | 340x | 2.49e+04x | |
-| laplace.fit | 10000 | 0.1335 | 0.1599 | 0.1362 | 0.835x | 0.98x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| laplace.fit | 10000 | 0.1335 | 0.1599 | 0.1362 | 0.835x | 0.98x | own: closed form; the data checks and sums |
 | laplace.isf | 20000 | 0.272 | 0.2187 | 0.07308 | 1.24x | 3.72x | |
 | laplace.logpdf | 100000 | 1.055 | 0.711 | 0.2154 | 1.48x | 4.9x | |
 | laplace.pdf | 100000 | 0.6752 | 1.275 | 0.3195 | 0.53x | 2.11x | own: double-double evaluation (≤ 0.5–2 ulp results) |
@@ -171,7 +171,7 @@ Median of 7 interleaved rounds (3 for calls over 2 s, 1 over 20 s); darwin/arm64
 | linregress | 1000000 | 1.668 | 4.755 | 4.679 | 0.351x | 0.357x | own: exact (double-double-equivalent) sums, compensated on two lanes; NumPy uses SIMD/BLAS |
 | logistic.cdf | 100000 | 0.7758 | 3.242 | 0.7273 | 0.239x | 1.07x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | logistic.entropy | 1 | 22.33 | 0.06 | 0.00075 | 372x | 2.98e+04x | |
-| logistic.fit | 10000 | 1.117 | 23.37 | 22.58 | 0.0478x | 0.0495x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| logistic.fit | 10000 | 1.117 | 23.37 | 22.58 | 0.0478x | 0.0495x | own+special: nested root finding to full precision, special.Expit per point |
 | logistic.isf | 20000 | 0.2297 | 0.5368 | 0.2265 | 0.428x | 1.01x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | logistic.logpdf | 100000 | 1.27 | 3.238 | 1.047 | 0.392x | 1.21x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | logistic.pdf | 100000 | 1.284 | 3.835 | 0.9405 | 0.335x | 1.37x | own: double-double evaluation (≤ 0.5–2 ulp results) |
@@ -205,7 +205,7 @@ Median of 7 interleaved rounds (3 for calls over 2 s, 1 over 20 s); darwin/arm64
 | multinomial.logpmf | 100000 | 10.78 | 9.203 | 9.259 | 1.17x | 1.16x | |
 | multinomial.rvs | 100000 | 20.26 | 70.23 | 75.96 | 0.288x | 0.267x | ndarray: the generator's draws |
 | mvn.cdf | 1 | 3.394 | 10.95 | 9.941 | 0.31x | 0.341x | own: randomised lattice rule in double-double |
-| mvn.fit | 100000 | 3.79 | 4.527 | 7.769 | 0.837x | 0.488x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| mvn.fit | 100000 | 3.79 | 4.527 | 7.769 | 0.837x | 0.488x | own: closed form; the data checks and sums |
 | mvn.logpdf | 100000 | 1.609 | 21.48 | 20.34 | 0.0749x | 0.0791x | own: double-double solve per point |
 | mvn.rvs | 100000 | 2.813 | 3.922 | 3.875 | 0.717x | 0.726x | own: NumPy's SVD factor, then ndarray's normals |
 | nbinom.cdf | 100000 | 15.18 | 436.8 | 52.39 | 0.0347x | 0.29x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
@@ -226,7 +226,7 @@ Median of 7 interleaved rounds (3 for calls over 2 s, 1 over 20 s); darwin/arm64
 | ncx2.sf | 100000 | 11.38 | 788.5 | 99.94 | 0.0144x | 0.114x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
 | norm.cdf | 1000000 | 10.64 | 24.66 | 4.307 | 0.432x | 2.47x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
 | norm.entropy | 1 | 15.72 | 0.04842 | 0.000541 | 325x | 2.91e+04x | |
-| norm.fit | 10000 | 0.01825 | 0.04717 | 0.007333 | 0.387x | 2.49x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| norm.fit | 10000 | 0.01825 | 0.04717 | 0.007333 | 0.387x | 2.49x | own: closed form; the data checks and sums |
 | norm.isf | 20000 | 0.2771 | 1.145 | 0.2473 | 0.242x | 1.12x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
 | norm.logpdf | 100000 | 0.6449 | 0.72 | 0.1817 | 0.896x | 3.55x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | norm.pdf | 1000000 | 6.273 | 10.22 | 1.759 | 0.614x | 3.57x | own: double-double evaluation (≤ 0.5–2 ulp results) |
@@ -236,7 +236,7 @@ Median of 7 interleaved rounds (3 for calls over 2 s, 1 over 20 s); darwin/arm64
 | normaltest | 1000000 | 19.97 | 15.74 | 15.54 | 1.27x | 1.29x | |
 | pareto.cdf | 100000 | 1.129 | 3.044 | 0.4821 | 0.371x | 2.34x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | pareto.entropy | 1 | 15.04 | 0.06479 | 0.002375 | 232x | 6.33e+03x | |
-| pareto.fit | 10000 | 0.7946 | 2.012 | 1.97 | 0.395x | 0.403x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| pareto.fit | 10000 | 0.7946 | 2.012 | 1.97 | 0.395x | 0.403x | own: likelihood equations solved to full precision by bracketing |
 | pareto.isf | 20000 | 0.2365 | 0.7972 | 0.2116 | 0.297x | 1.12x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | pareto.logpdf | 100000 | 1.335 | 2.64 | 0.4605 | 0.506x | 2.9x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | pareto.pdf | 100000 | 0.9429 | 2.826 | 0.405 | 0.334x | 2.33x | own: double-double evaluation (≤ 0.5–2 ulp results) |
@@ -322,7 +322,7 @@ Median of 7 interleaved rounds (3 for calls over 2 s, 1 over 20 s); darwin/arm64
 | tvar | 1000000 | 4.983 | 3.659 | 3.606 | 1.36x | 1.38x | |
 | uniform.cdf | 100000 | 0.742 | 0.2873 | 0.1286 | 2.58x | 5.77x | |
 | uniform.entropy | 1 | 16.35 | 0.04492 | 0.000625 | 364x | 2.62e+04x | |
-| uniform.fit | 10000 | 0.01096 | 0.05625 | 0.007916 | 0.195x | 1.38x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| uniform.fit | 10000 | 0.01096 | 0.05625 | 0.007916 | 0.195x | 1.38x | own: closed form; the data checks and sums |
 | uniform.isf | 20000 | 0.1455 | 0.05546 | 0.03671 | 2.62x | 3.96x | |
 | uniform.logpdf | 100000 | 0.8441 | 0.5262 | 0.1756 | 1.6x | 4.81x | |
 | uniform.pdf | 100000 | 0.48 | 0.2954 | 0.1143 | 1.62x | 4.2x | |

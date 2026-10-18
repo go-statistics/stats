@@ -23,7 +23,7 @@
 | beta.fit | 10000 | 0.00829x | 0.0403x | 4.86x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
 | hypergeom.sf | 100000 | 0.0451x | 0.0451x | 0.999x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | hypergeom.cdf | 100000 | 0.0384x | 0.0455x | 1.19x | own: double-double evaluation (≤ 0.5–2 ulp results) |
-| logistic.fit | 10000 | 0.0441x | 0.0478x | 1.08x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| logistic.fit | 10000 | 0.0441x | 0.0478x | 1.08x | own+special: nested root finding to full precision, special.Expit per point |
 | gamma.fit | 10000 | 0.0237x | 0.0486x | 2.05x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
 | t.cdf | 1000000 | 0.041x | 0.0539x | 1.32x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
 | t.sf | 100000 | 0.0531x | 0.0564x | 1.06x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
@@ -66,14 +66,14 @@
 | binom.logpmf | 100000 | 0.168x | 0.168x | 1x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | lognorm.sf | 100000 | 0.196x | 0.168x | 0.861x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
 | nbinom.pmf | 100000 | 0.18x | 0.177x | 0.984x | own: double-double evaluation (≤ 0.5–2 ulp results) |
-| expon.fit | 10000 | 0.0865x | 0.179x | 2.07x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| expon.fit | 10000 | 0.0865x | 0.179x | 2.07x | own: closed form; the data checks and sums |
 | gamma.cdf | 1000000 | 0.145x | 0.18x | 1.24x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
 | gamma.sf | 100000 | 0.202x | 0.182x | 0.901x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
 | lognorm.isf | 20000 | 0.19x | 0.184x | 0.973x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
 | lognorm.ppf | 20000 | 0.232x | 0.187x | 0.803x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
 | cauchy.sf | 100000 | 0.192x | 0.192x | 1x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | norm.ppf | 1000000 | 0.198x | 0.192x | 0.97x | special: incomplete gamma/beta, their inverses, Ndtr/Ndtri |
-| uniform.fit | 10000 | 0.121x | 0.195x | 1.61x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| uniform.fit | 10000 | 0.121x | 0.195x | 1.61x | own: closed form; the data checks and sums |
 | t.fit | 10000 | 0.0198x | 0.197x | 9.95x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
 | cauchy.cdf | 100000 | 0.189x | 0.206x | 1.09x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | invgamma.pdf | 100000 | 0.16x | 0.207x | 1.29x | own: double-double evaluation (≤ 0.5–2 ulp results) |
@@ -136,10 +136,10 @@
 | pareto.cdf | 100000 | 0.473x | 0.371x | 0.784x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | cauchy.isf | 20000 | 0.388x | 0.379x | 0.977x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | cauchy.ppf | 20000 | 0.35x | 0.38x | 1.08x | own: double-double evaluation (≤ 0.5–2 ulp results) |
-| norm.fit | 10000 | 0.234x | 0.387x | 1.65x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| norm.fit | 10000 | 0.234x | 0.387x | 1.65x | own: closed form; the data checks and sums |
 | logistic.logpdf | 100000 | 0.372x | 0.392x | 1.05x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | gmean | 1000000 | 0.0606x | 0.395x | 6.51x | own: correctly rounded log/pow per element |
-| pareto.fit | 10000 | 0.0682x | 0.395x | 5.79x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| pareto.fit | 10000 | 0.0682x | 0.395x | 5.79x | own: likelihood equations solved to full precision by bracketing |
 | kde.evaluate2d | 10000 | 0.239x | 0.396x | 1.66x | own: compensated sums of exponentials per point |
 | halfnorm.ppf | 20000 | 0.34x | 0.401x | 1.18x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | gumbel_r.cdf | 100000 | 0.408x | 0.404x | 0.989x | own: double-double evaluation (≤ 0.5–2 ulp results) |
@@ -206,11 +206,11 @@
 | moment | 1000000 | 0.803x | 0.818x | 1.02x | own: scalar loops where NumPy has SIMD kernels |
 | beta.rvs | 1000000 | 0.842x | 0.826x | 0.981x | ndarray: the generator's draws |
 | t.rvs | 1000000 | 0.817x | 0.832x | 1.02x | ndarray: the generator's draws |
-| laplace.fit | 10000 | 0.234x | 0.835x | 3.57x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| laplace.fit | 10000 | 0.234x | 0.835x | 3.57x | own: closed form; the data checks and sums |
 | expon.cdf | 100000 | 0.791x | 0.836x | 1.06x | own: double-double evaluation (≤ 0.5–2 ulp results) |
 | chi.rvs | 1000000 | 0.803x | 0.836x | 1.04x | ndarray: the generator's draws |
 | ncx2.rvs | 1000000 | 0.819x | 0.836x | 1.02x | ndarray: the generator's draws |
-| mvn.fit | 100000 | 0.689x | 0.837x | 1.22x | own: Nelder-Mead polished to ~1e-10 (SciPy's fmin: 4 digits), DD log-density per point |
+| mvn.fit | 100000 | 0.689x | 0.837x | 1.22x | own: closed form; the data checks and sums |
 | chi2.rvs | 1000000 | 0.819x | 0.839x | 1.02x | ndarray: the generator's draws |
 | triang.rvs | 1000000 | 0.824x | 0.844x | 1.03x | ndarray: the generator's draws |
 | expon.rvs | 1000000 | 0.824x | 0.845x | 1.03x | ndarray: the generator's draws |
