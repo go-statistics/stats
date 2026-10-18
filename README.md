@@ -116,6 +116,20 @@ inverses: t, beta and F quantiles at 0.005–0.04x), and in the numerical fits,
 polished to about 1e-10 where SciPy stops at four digits. `Map` spreads the
 elementwise functions over every core.
 
+## Robustness
+
+No argument a caller can pass crashes or stalls a distribution method:
+every PDF/PMF, CDF, SF, their logarithms, PPF, ISF, the moments, Median,
+Entropy and Interval of every distribution are swept over huge, tiny,
+subnormal, signed-zero, NaN and infinite arguments at every fixture
+instance (`TestExtremeInputsNoPanic`, in CI), with each parameter set to
+extremes as well (`go test -run TestExtremeParamsNoPanic
+-extreme.params`), and fuzzed (`FuzzDistributionMethods`). The cases the
+sweeps found are pinned in `TestHangRegressions`. The one known slow call
+is NoncentralChiSquared's quantile in the far tail at very large Nc
+(ISF(1e-308) at Nc = 1e8 takes minutes); beyond Nc = 2·10^10 its
+distribution functions return NaN.
+
 ## Design
 
 [docs/design.md](docs/design.md).

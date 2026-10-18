@@ -65,8 +65,14 @@ func (s vonmisesStd) i0e() float64 {
 func (s vonmisesStd) valid() bool             { return s.k >= 0 && !math.IsInf(s.k, 1) }
 func (s vonmisesStd) support() (a, b float64) { return math.Inf(-1), math.Inf(1) }
 
-// vmReduce returns r = z - 2πn in [-π, π] as a double-double, and n.
+// vmReduce returns r = z - 2πn in [-π, π] as a double-double, and n:
+// with 2π in double-double below 2^20, to 1280 bits above
+// (reduceTwoPiHuge), where the double-double product 2πn no longer
+// carries enough bits for the remainder.
 func vmReduce(z float64) (dd.DD, float64) {
+	if reduceTwoPiHugeOK(z) {
+		return reduceTwoPiHuge(z)
+	}
 	n := math.RoundToEven(z / twoPiDD.Hi)
 	r := dd.Sub(dd.F(z), dd.MulF(twoPiDD, n))
 	switch {
