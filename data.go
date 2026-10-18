@@ -56,22 +56,21 @@ func sum(a []float64) float64 {
 		}
 		return r
 	case n <= 128:
-		var r [8]float64
-		copy(r[:], a[:8])
-		i := 8
-		for ; i < n-n%8; i += 8 {
-			r[0] += a[i]
-			r[1] += a[i+1]
-			r[2] += a[i+2]
-			r[3] += a[i+3]
-			r[4] += a[i+4]
-			r[5] += a[i+5]
-			r[6] += a[i+6]
-			r[7] += a[i+7]
+		r0, r1, r2, r3, r4, r5, r6, r7 := a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]
+		m := n - n%8
+		for b := a[8:m]; len(b) >= 8; b = b[8:] {
+			r0 += b[0]
+			r1 += b[1]
+			r2 += b[2]
+			r3 += b[3]
+			r4 += b[4]
+			r5 += b[5]
+			r6 += b[6]
+			r7 += b[7]
 		}
-		res := ((r[0] + r[1]) + (r[2] + r[3])) + ((r[4] + r[5]) + (r[6] + r[7]))
-		for ; i < n; i++ {
-			res += a[i]
+		res := ((r0 + r1) + (r2 + r3)) + ((r4 + r5) + (r6 + r7))
+		for _, v := range a[m:] {
+			res += v
 		}
 		return res
 	default:
@@ -84,19 +83,91 @@ func sum(a []float64) float64 {
 // mean is np.mean: the pairwise sum divided by the count.
 func mean(a []float64) float64 { return sum(a) / float64(len(a)) }
 
-// sqDev returns the squared deviations (x - m)², each product rounded
-// separately (no fused multiply-add), as NumPy forms them before summing.
-func sqDev(a []float64, m float64) []float64 {
-	d := make([]float64, len(a))
-	for i, v := range a {
-		t := v - m
-		d[i] = float64(t * t)
+// sumSqDev is sum of the squared deviations (x - m)², each product rounded
+// separately (no fused multiply-add), as NumPy forms them before summing:
+// the same pairwise summation as sum, without the array of terms.
+func sumSqDev(a []float64, m float64) float64 {
+	n := len(a)
+	switch {
+	case n < 8:
+		r := 0.0
+		for _, v := range a {
+			t := v - m
+			r += float64(t * t)
+		}
+		return r
+	case n <= 128:
+		sq := func(v float64) float64 { t := v - m; return float64(t * t) }
+		r0, r1, r2, r3 := sq(a[0]), sq(a[1]), sq(a[2]), sq(a[3])
+		r4, r5, r6, r7 := sq(a[4]), sq(a[5]), sq(a[6]), sq(a[7])
+		k := n - n%8
+		for b := a[8:k]; len(b) >= 8; b = b[8:] {
+			r0 += sq(b[0])
+			r1 += sq(b[1])
+			r2 += sq(b[2])
+			r3 += sq(b[3])
+			r4 += sq(b[4])
+			r5 += sq(b[5])
+			r6 += sq(b[6])
+			r7 += sq(b[7])
+		}
+		res := ((r0 + r1) + (r2 + r3)) + ((r4 + r5) + (r6 + r7))
+		for _, v := range a[k:] {
+			res += sq(v)
+		}
+		return res
+	default:
+		n2 := n / 2
+		n2 -= n2 % 8
+		return sumSqDev(a[:n2], m) + sumSqDev(a[n2:], m)
 	}
-	return d
+}
+
+// sumTerms is sum of the n terms fill writes, without an array of them:
+// the pairwise recursion of sum splits [0, n) exactly as it splits an array
+// of length n, and each leaf (at most 128 terms) is filled into one reused
+// buffer by fill(dst, lo), which sets dst[i] to term lo+i. The result is
+// sum's, bit for bit.
+func sumTerms(n int, fill func(dst []float64, lo int)) float64 {
+	buf := make([]float64, min(n, 128))
+	return sumTermsAt(0, n, buf, fill)
+}
+
+func sumTermsAt(lo, n int, buf []float64, fill func(dst []float64, lo int)) float64 {
+	if n <= 128 {
+		b := buf[:n]
+		fill(b, lo)
+		return sum(b)
+	}
+	n2 := n / 2
+	n2 -= n2 % 8
+	return sumTermsAt(lo, n2, buf, fill) + sumTermsAt(lo+n2, n-n2, buf, fill)
 }
 
 // variance is np.var(a, ddof=ddof) to the bit.
 func variance(a []float64, ddof float64) float64 {
 	m := mean(a)
-	return sum(sqDev(a, m)) / (float64(len(a)) - ddof)
+	return sumSqDev(a, m) / (float64(len(a)) - ddof)
+}
+
+// sumProd is sum of the products x[i]·w[i], each rounded (no fused
+// multiply-add), without the array of them.
+func sumProd(x, w []float64) float64 {
+	w = w[:len(x)]
+	return sumTerms(len(x), func(d []float64, lo int) {
+		xs, ws := x[lo:lo+len(d)], w[lo:lo+len(d)]
+		for i := range d {
+			d[i] = float64(xs[i] * ws[i])
+		}
+	})
+}
+
+// sumSub is sum of the differences a[i] - m (each rounded), without the
+// array of them.
+func sumSub(a []float64, m float64) float64 {
+	return sumTerms(len(a), func(d []float64, lo int) {
+		for i, v := range a[lo : lo+len(d)] {
+			d[i] = v - m
+		}
+	})
 }

@@ -22,7 +22,7 @@ func ShapiroWilk[D Data](x D) (TestResult, error) {
 		return TestResult{qnan, qnan}, nil
 	}
 	y := slices.Clone(v)
-	slices.Sort(y)
+	sortFloats(y)
 	c := v[n/2] // SciPy subtracts x[n//2] of the unsorted data (gh-15777)
 	for i := range y {
 		y[i] -= c
@@ -79,8 +79,8 @@ func ShapiroWilk[D Data](x D) (TestResult, error) {
 // swilkW is the Shapiro-Wilk statistic (a·y)² / Σ(y - ȳ)² for sorted y.
 func swilkW(y, a []float64) float64 {
 	num := dotDD(a, y)
-	d := deviations(y)
-	return num * num / dotDD(d, d)
+	m := mean(y)
+	return num * num / devDot(y, y, m, m)
 }
 
 // ADDist is the distribution family of AndersonDarling (SciPy's dist=).
@@ -132,7 +132,7 @@ func AndersonDarling[D Data](x D, dist ADDist) (AndersonResult, error) {
 		return bad, fmt.Errorf("%w: anderson needs at least one observation", ErrData)
 	}
 	y := slices.Clone(v)
-	slices.Sort(y)
+	sortFloats(y)
 	n := float64(len(y))
 	xbar := mean(v)
 	w := make([]float64, len(y))

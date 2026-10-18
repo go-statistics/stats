@@ -145,7 +145,7 @@ func DifferentialEntropy[D Data](x D, o *DiffEntropyOptions) (float64, error) {
 		return math.NaN(), nil
 	}
 	s := slices.Clone(v)
-	slices.Sort(s)
+	sortFloats(s)
 	method := o.Method
 	if method == DiffEntropyAuto {
 		switch {

@@ -130,7 +130,7 @@ func (s binomStd) entropy() float64 {
 		return 0
 	}
 	mode := math.Floor((s.n + 1) * s.p)
-	return entropySum(math.Min(mode, s.n), 0, s.n, s.term)
+	return entropySum(min(mode, s.n), 0, s.n, s.term)
 }
 
 // munp is E[X^n] from the factorial moments n(n-1)...(n-j+1) p^j.

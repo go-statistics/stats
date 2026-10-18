@@ -294,7 +294,7 @@ func (s vonmisesStd) solveCentral(q float64) float64 {
 	if q == 0 {
 		return 0
 	}
-	y := math.Min(q*2*math.Pi*s.i0e(), math.Pi/2) // f(0) = 1/(2π I0e(k))
+	y := min(q*2*math.Pi*s.i0e(), math.Pi/2) // f(0) = 1/(2π I0e(k))
 	return newtonLog(s.centralLog, s.logpdf, math.Log(q), 0, math.Pi, y)
 }
 

@@ -3,7 +3,6 @@ package stats
 import (
 	"fmt"
 	"math"
-	"sort"
 	"strings"
 
 	"github.com/go-numerics/optimize"
@@ -119,12 +118,12 @@ func fitMLE(p mleProblem, fixed map[string]float64) ([]float64, error) {
 	}
 	for restart := 0; restart < 6; restart++ {
 		r, _ := optimize.Minimize(optimize.Problem{Func: obj}, u, optimize.NelderMead, &optimize.Options{
-			Xatol: 1e-12, Fatol: 1e-13 * math.Max(1, math.Abs(best)), MaxIter: 1000 * len(u), MaxFev: 2000 * len(u), Adaptive: len(u) > 2,
+			Xatol: 1e-12, Fatol: 1e-13 * max(1, math.Abs(best)), MaxIter: 1000 * len(u), MaxFev: 2000 * len(u), Adaptive: len(u) > 2,
 		})
 		// Nelder-Mead never returns a point worse than its start
 		improved := best - r.Fun
 		u, best = r.X, r.Fun
-		if improved <= 1e-14*math.Max(1, math.Abs(best)) {
+		if improved <= 1e-14*max(1, math.Abs(best)) {
 			break
 		}
 	}
@@ -168,8 +167,8 @@ func fitLocScaleSupport(v []float64, s contStd) (loc, scale float64) {
 func minMax(v []float64) (lo, hi float64) {
 	lo, hi = v[0], v[0]
 	for _, x := range v[1:] {
-		lo = math.Min(lo, x)
-		hi = math.Max(hi, x)
+		lo = min(lo, x)
+		hi = max(hi, x)
 	}
 	return lo, hi
 }
@@ -230,6 +229,6 @@ func fitContinuous(v []float64, fixed map[string]float64, names []string, positi
 // sortedCopy returns a sorted copy of v.
 func sortedCopy(v []float64) []float64 {
 	s := append([]float64(nil), v...)
-	sort.Float64s(s)
+	sortFloats(s)
 	return s
 }

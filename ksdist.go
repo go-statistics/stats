@@ -240,7 +240,7 @@ func kolmogDurbin(n int, d float64) float64 {
 		fac /= float64(j)
 		v[j-1] *= fac
 	}
-	tt := math.Pow(math.Max(2*h-1, 0), float64(m)) - 2*math.Pow(h, float64(m))
+	tt := math.Pow(max(2*h-1, 0), float64(m)) - 2*math.Pow(h, float64(m))
 	v[m-1] = (1 + tt) * fac
 	for i := 1; i < m; i++ {
 		for r := i - 1; r < m; r++ {
@@ -392,7 +392,7 @@ func kolmogPomeranz(n int, x float64) dd.DD {
 					s = dd.Add(s, dd.Mul(a[r], pwrs[c-r]))
 				}
 				V1[q] = s
-				vmax = math.Max(vmax, s.Hi)
+				vmax = max(vmax, s.Hi)
 			}
 			if 0 < vmax && vmax < ks2m128 {
 				for q := range V1 {

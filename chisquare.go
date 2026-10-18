@@ -58,7 +58,7 @@ func PowerDivergence[D Data](observed D, lambda float64, o *ChiSquareOptions) (T
 			return TestResult{qnan, qnan}, nil
 		}
 		so, se := sum(obs), sum(exp)
-		if rel := math.Abs(so-se) / math.Min(so, se); rel > 1.4901161193847656e-08 {
+		if rel := math.Abs(so-se) / min(so, se); rel > 1.4901161193847656e-08 {
 			return TestResult{qnan, qnan}, fmt.Errorf("%w: the observed frequencies sum to %v and the expected ones to %v (relative difference %v > sqrt(eps))", ErrData, so, se, rel)
 		}
 	} else if anyNaN(obs) {
@@ -103,6 +103,15 @@ func powerDivergence(obs, exp []float64, ddof, lambda float64) TestResult {
 // p-value of a large statistic is sensitive to its last bits (the
 // relative error of the chi-squared tail grows like x/2 times that of x).
 func sumDD(a []float64) float64 {
+	if y, ok := sumFast(a); ok {
+		return y
+	}
+	return sumDDExact(a)
+}
+
+// sumDDExact is sumDD's double-double sum (Σ through sum where a holds an
+// infinity or a NaN).
+func sumDDExact(a []float64) float64 {
 	var s dd.DD
 	for _, v := range a {
 		if math.IsInf(v, 0) || v != v {
@@ -172,7 +181,7 @@ func Chi2Contingency(observed *ndarray.Array, o *Chi2ContingencyOptions) (Chi2Co
 	if dof == 1 && !o.NoCorrection {
 		for i := range obs {
 			diff := exp[i] - obs[i]
-			mag := math.Min(0.5, math.Abs(diff))
+			mag := min(0.5, math.Abs(diff))
 			switch {
 			case diff > 0:
 				obs[i] += mag
@@ -367,7 +376,7 @@ func FisherExact(table [2][2]int64, o *FisherExactOptions) (TestResult, error) {
 	default:
 		p = fisherTwoSided(h, x, n)
 	}
-	return TestResult{odds, math.Min(p, 1)}, nil
+	return TestResult{odds, min(p, 1)}, nil
 }
 
 // fisherTwoSided is the two-sided p-value of fisher_exact: the tail of
@@ -379,7 +388,7 @@ func fisherTwoSided(h hypergeom, x, n float64) float64 {
 	pmode := h.pmf(mode)
 	const eps = 1e-14
 	gamma := 1 + eps
-	if math.Abs(pexact-pmode)/math.Max(pexact, pmode) <= eps {
+	if math.Abs(pexact-pmode)/max(pexact, pmode) <= eps {
 		return 1
 	}
 	if x < mode {

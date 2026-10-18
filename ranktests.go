@@ -60,7 +60,7 @@ func MannWhitneyU[D Data](x, y D, o *MannWhitneyUOptions) (RankTestResult, error
 	r1 := sum(ranks[:len(a)])
 	u1 := r1 - n1*(n1+1)/2
 	u2 := n1*n2 - u1
-	u, f := math.Max(u1, u2), 2.0
+	u, f := max(u1, u2), 2.0
 	switch o.Alternative {
 	case Greater:
 		u, f = u1, 1
@@ -336,12 +336,12 @@ func wilcoxon(d []float64, o *WilcoxonOptions) RankTestResult {
 		case Greater:
 			p = wilcoxonSF(dist, hi, mean)
 		default:
-			p = clip01(2 * math.Min(wilcoxonSF(dist, hi, mean), wilcoxonCDF(dist, lo, mean)))
+			p = clip01(2 * min(wilcoxonSF(dist, hi, mean), wilcoxonCDF(dist, lo, mean)))
 		}
 	}
 	stat := rPlus
 	if o.Alternative == TwoSided {
-		stat = math.Min(rPlus, rMinus)
+		stat = min(rPlus, rMinus)
 	}
 	zs := qnan
 	if o.Method == MethodAsymptotic {
@@ -431,7 +431,7 @@ func wilcoxonPermutation(d, r []float64, zsplit, observed float64, alt Alternati
 	case Greater:
 		return clip01(pg)
 	}
-	return clip01(math.Min(pl, pg) * 2)
+	return clip01(min(pl, pg) * 2)
 }
 
 // KruskalWallis is the Kruskal-Wallis H test of the null hypothesis that

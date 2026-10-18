@@ -37,8 +37,15 @@ func (d Zipf) std() zipfStd {
 	if !(d.A > 1) || math.IsInf(d.A, 1) {
 		return zipfStd{a: d.A}
 	}
-	eta := zetaTail(d.A, 2)
+	r := shapeMemo(tagZipfEta, d.A, 0, zipfEta)
+	eta := dd.DD{Hi: r[0], Lo: r[1]}
 	return zipfStd{a: d.A, z: dd.AddF(eta, 1), eta: eta}
+}
+
+// zipfEta is η(a) = ζ(a, 2), for shapeMemo.
+func zipfEta(a, _ float64) [4]float64 {
+	e := zetaTail(a, 2)
+	return [4]float64{e.Hi, e.Lo}
 }
 
 // zipfStd holds a, ζ(a) and η(a) = ζ(a) - 1 = ζ(a, 2) (the latter accurate
@@ -116,7 +123,7 @@ func (s zipfStd) logsf(k float64) float64 {
 // guess inverts SF(k) ≈ k^(1-a) / ((a-1) ζ(a)) at q, within [1, 2^62].
 func (s zipfStd) guess(q float64) float64 {
 	g := math.Pow((s.a-1)*s.z.Hi*q, -1/(s.a-1))
-	return math.Min(g, 0x1p62)
+	return min(g, 0x1p62)
 }
 
 func (s zipfStd) ppf(p float64) float64 {
@@ -220,7 +227,7 @@ var bernoulliEM = [...]float64{
 // stays accurate as a approaches 1.
 func zetaPartial(a, k float64) dd.DD {
 	s := dd.F(0)
-	for j := 1.0; j <= math.Min(k, emStart-1); j++ {
+	for j := 1.0; j <= min(k, emStart-1); j++ {
 		s = dd.Add(s, expDD2(dd.MulF(dd.Log(j), -a)))
 	}
 	if k < emStart {
@@ -265,7 +272,7 @@ func zetaTail(a, q float64) dd.DD {
 // max(20, 4(a+11)), then Euler-Maclaurin from there, where the first
 // omitted correction (B_12 f^(11)) is below 2^-55 of the tail.
 func zetaTailScaled(a, q float64) dd.DD {
-	jm := math.Max(emStart, 4*(a+11))
+	jm := max(emStart, 4*(a+11))
 	lq := dd.Log(q)
 	s := dd.F(0)
 	j := q

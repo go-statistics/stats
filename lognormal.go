@@ -248,7 +248,7 @@ func FitLogNormal[D Data](x D, o *FitOptions) (LogNormal, error) {
 			dr = dl(rb)
 			delta *= 2
 		}
-		lb := math.Min(math.Nextafter(rb, math.Inf(-1)), rb-1)
+		lb := min(math.Nextafter(rb, math.Inf(-1)), rb-1)
 		dlb := dl(lb)
 		delta = 2 * (rb - lb)
 		for finite(lb) && finite(dlb) && math.Signbit(dlb) == math.Signbit(dr) {

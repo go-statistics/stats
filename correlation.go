@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
 )
 
 // CorrelationOptions are the options of Pearsonr, Spearmanr and
@@ -61,15 +60,6 @@ func pairs[D Data](x, y D, name string) ([]float64, []float64, error) {
 	return a, b, nil
 }
 
-// dot is Σ a[i]·b[i] in double-double, rounded once.
-func dotDD(a, b []float64) float64 {
-	var s dd.DD
-	for i := range a {
-		s = dd.Add(s, dd.MulFF(a[i], b[i]))
-	}
-	return s.Float()
-}
-
 // constant reports whether every value equals the first.
 func isConstant(a []float64) bool {
 	for _, v := range a {
@@ -103,11 +93,14 @@ func Pearsonr[D Data](x, y D, o *CorrelationOptions) (PearsonResult, error) {
 	}
 	n := float64(len(a))
 	res := PearsonResult{n: n, alt: o.Alternative}
-	if anyNaN(a, b) || isConstant(a) || isConstant(b) {
+	// a NaN makes the pairwise mean NaN, so only a NaN mean needs the scan
+	// (a NaN mean without one comes from +Inf and -Inf)
+	ma, mb := mean(a), mean(b)
+	if (ma != ma && anyNaN(a)) || (mb != mb && anyNaN(b)) || isConstant(a) || isConstant(b) {
 		res.Statistic, res.PValue = qnan, qnan
 		return res, nil
 	}
-	r := clipTo(correlate(a, b), -1, 1)
+	r := clipTo(correlateMeans(a, b, ma, mb), -1, 1)
 	if len(a) == 2 {
 		res.Statistic, res.PValue = math.RoundToEven(r), 1
 		return res, nil
@@ -125,23 +118,12 @@ func Pearsonr[D Data](x, y D, o *CorrelationOptions) (PearsonResult, error) {
 	return res, nil
 }
 
-// correlate is the sample correlation of a and b, the deviations from
-// the means scaled by their norms before the inner product, as SciPy's
-// pearsonr forms it (with a double-double inner product).
-func correlate(a, b []float64) float64 {
-	xm := deviations(a)
-	ym := deviations(b)
-	return dotDD(xm, ym) / math.Sqrt(dotDD(xm, xm)) / math.Sqrt(dotDD(ym, ym))
-}
-
-// deviations returns a - mean(a).
-func deviations(a []float64) []float64 {
-	m := mean(a)
-	d := make([]float64, len(a))
-	for i, v := range a {
-		d[i] = v - m
-	}
-	return d
+// correlateMeans is the sample correlation of a and b (means ma and mb),
+// the deviations from the means scaled by their norms before the inner
+// product, as SciPy's pearsonr forms it (with a double-double inner
+// product).
+func correlateMeans(a, b []float64, ma, mb float64) float64 {
+	return devDot(a, b, ma, mb) / math.Sqrt(devDot(a, a, ma, ma)) / math.Sqrt(devDot(b, b, mb, mb))
 }
 
 // Spearmanr is Spearman's rank correlation coefficient of two samples
@@ -175,10 +157,10 @@ func Spearmanr[D Data](x, y D, o *CorrelationOptions) (TestResult, error) {
 	<-done
 	// np.corrcoef: the covariance matrix scaled by the standard deviations.
 	n := float64(len(a))
-	xm, ym := deviations(ra), deviations(rb)
-	cxy := dotDD(xm, ym) / (n - 1)
-	sx := math.Sqrt(dotDD(xm, xm) / (n - 1))
-	sy := math.Sqrt(dotDD(ym, ym) / (n - 1))
+	ma, mb := mean(ra), mean(rb)
+	cxy := devDot(ra, rb, ma, mb) / (n - 1)
+	sx := math.Sqrt(devDot(ra, ra, ma, ma) / (n - 1))
+	sy := math.Sqrt(devDot(rb, rb, mb, mb) / (n - 1))
 	rs := clipTo(cxy/sx/sy, -1, 1)
 	dof := n - 2
 	t := rs * math.Sqrt(dof/((rs+1)*(1-rs)))
@@ -276,7 +258,7 @@ func kendall(a, b []float64, o *KendallOptions) (TestResult, error) {
 		minclasses := min(nx, ny)
 		tau = 2 * float64(cmd) / (float64(int64(size)*int64(size)*int64(minclasses-1)) / float64(minclasses))
 	}
-	tau = math.Min(1, math.Max(-1, tau))
+	tau = min(1, max(-1, tau))
 	method := o.Method
 	if method == MethodExact && (xtie != 0 || ytie != 0) {
 		return TestResult{qnan, qnan}, fmt.Errorf("%w: ties found, the exact method cannot be used", ErrData)
@@ -489,10 +471,9 @@ func Linregress[D Data](x, y D, o *CorrelationOptions) (LinregressResult, error)
 	const tiny = 1.0e-20
 	n := float64(len(a))
 	xmean, ymean := mean(a), mean(b)
-	xm, ym := deviations(a), deviations(b)
-	ssxm := dotDD(xm, xm) / n
-	ssym := dotDD(ym, ym) / n
-	ssxym := dotDD(xm, ym) / n
+	ssxm := devDot(a, a, xmean, xmean) / n
+	ssym := devDot(b, b, ymean, ymean) / n
+	ssxym := devDot(a, b, xmean, ymean) / n
 	var r float64
 	switch {
 	case ssxm == 0 || ssym == 0:

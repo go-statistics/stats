@@ -48,14 +48,26 @@ func (s tStd) pdf(t float64) float64 {
 	if math.IsInf(s.df, 1) {
 		return normalStd{}.pdf(t)
 	}
-	return expScaled(tLogKernel(t, s.df), tConst(s.df))
+	r := shapeMemo(tagTConst, s.df, 0, tConstMemo)
+	return expScaled(tLogKernel(t, s.df), dd.DD{Hi: r[0], Lo: r[1]})
+}
+
+func tConstMemo(nu, _ float64) [4]float64 {
+	c := tConst(nu)
+	return [4]float64{c.Hi, c.Lo}
+}
+
+func tLogConstMemo(nu, _ float64) [4]float64 {
+	c := logDD(tConst(nu))
+	return [4]float64{c.Hi, c.Lo}
 }
 
 func (s tStd) logpdf(t float64) float64 {
 	if math.IsInf(s.df, 1) {
 		return normalStd{}.logpdf(t)
 	}
-	return dd.Add(tLogKernel(t, s.df), logDD(tConst(s.df))).Float()
+	r := shapeMemo(tagTLogConst, s.df, 0, tLogConstMemo)
+	return dd.Add(tLogKernel(t, s.df), dd.DD{Hi: r[0], Lo: r[1]}).Float()
 }
 
 // tail returns P(T < -|t|) (Boost's students_t cdf): with z = t²/(ν+t²),

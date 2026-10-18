@@ -87,7 +87,7 @@ func FitNormal[D Data](x D, o *FitOptions) (Normal, error) {
 		loc = mean(v)
 	}
 	if !haveScale {
-		scale = math.Sqrt(mean(sqDev(v, loc)))
+		scale = math.Sqrt(sumSqDev(v, loc) / float64(len(v)))
 	}
 	d := Normal{Loc: loc, Scale: scale}
 	return d, d.Validate()

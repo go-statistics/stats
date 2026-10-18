@@ -214,7 +214,7 @@ func fitBetaShapes(v []float64, loc, scale float64, fx map[string]float64) (Beta
 			da := (f1*j22 - f2*j12) / det
 			db := (j11*f2 - j21*f1) / det
 			// a Newton step may not leave the domain: at most an 8-fold shrink
-			na, nb := math.Max(a-da, a/8), math.Max(b-db, b/8)
+			na, nb := max(a-da, a/8), max(b-db, b/8)
 			done := math.Abs(na-a) <= 4e-16*a && math.Abs(nb-b) <= 4e-16*b
 			a, b = na, nb
 			if done {
@@ -238,7 +238,7 @@ func solveDigammaDiff(c, s, u float64) float64 {
 	for i, done := 0, false; i < 200 && !done; i++ {
 		f := special.Digamma(u) - special.Digamma(u+c) - s
 		fp := special.Polygamma(1, u) - special.Polygamma(1, u+c)
-		nu := math.Max(u-f/fp, u/8)
+		nu := max(u-f/fp, u/8)
 		done = math.Abs(nu-u) <= 4e-16*u
 		u = nu
 	}

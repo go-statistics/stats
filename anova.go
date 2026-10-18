@@ -65,20 +65,12 @@ func FOneway[D Data](o *FOnewayOptions, samples ...D) (TestResult, error) {
 	var f, dfn, dfd float64
 	if !o.Welch {
 		offset := mean(all)
-		ad := make([]float64, len(all))
-		for i, v := range all {
-			ad[i] = v - offset
-		}
-		s := sum(ad)
+		s := sumSub(all, offset)
 		normSS := s * s / bign
-		sstot := dotDD(ad, ad) - normSS
+		sstot := devDot(all, all, offset, offset) - normSS
 		ssbn := 0.0
 		for _, g := range groups {
-			d := make([]float64, len(g))
-			for i, v := range g {
-				d[i] = v - offset
-			}
-			t := sum(d)
+			t := sumSub(g, offset)
 			ssbn += t * t / float64(len(g))
 		}
 		ssbn -= normSS
@@ -145,7 +137,7 @@ func Bartlett[D Data](samples ...D) (TestResult, error) {
 	denom := 1 + 1/(3*(k-1))*(sum(inv)-1/(ntot-k))
 	t := numer / denom
 	p := chi2SF(k-1, t)
-	return TestResult{math.Max(t, 0), p}, nil
+	return TestResult{max(t, 0), p}, nil
 }
 
 // LeveneCenter is the center of Levene's test (SciPy's center=). The
@@ -199,7 +191,7 @@ func Levene[D Data](o *LeveneOptions, samples ...D) (TestResult, error) {
 			c = meanDD(g) // correctly rounded (data far from 0 are ill-conditioned)
 		case CenterTrimmed:
 			s := slices.Clone(g)
-			slices.Sort(s)
+			sortFloats(s)
 			lc := int(cut * float64(len(s)))
 			if lc > len(s)-lc {
 				return TestResult{qnan, qnan}, fmt.Errorf("%w: proportion to cut %v too big", ErrParam, cut)

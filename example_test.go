@@ -24,7 +24,7 @@ func Example_array() {
 	q := stats.Map(p, stats.Beta{A: 2.5, B: 7, Scale: 1}.PPF)
 	fmt.Println(q)
 	// Output:
-	// Array(shape=[3], data=[0.07152999268253016 0.24603732885541796 0.51374106221438])
+	// Array(shape=[3], data=[0.07152999268253016 0.24603732885541799 0.51374106221438])
 }
 
 // scipy.stats.norm.rvs(loc=10, scale=2, size=3, random_state=np.random.default_rng(42))

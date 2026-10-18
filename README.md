@@ -104,15 +104,17 @@ von Mises wraps). Counts: [docs/rvs-table.md](docs/rvs-table.md).
 
 ## Speed
 
-Against SciPy's vectorised calls on the same data
-([docs/perf.md](docs/perf.md)): faster for norm.pdf/cdf (1.3–1.7x), the
-gamma and beta densities and gamma.cdf on arrays, describe (3.1x), percentiles
-(1.5x), Spearman (2.3x) and the Gaussian KDE (8x); at parity for t-tests;
-slower for t and beta cdf/ppf (the incomplete beta function and its inverse
-in go-numerics/special are 10x slower than Boost's), norm.ppf (1.6x) and
-Pearson (16x: exact double-double sums of products against BLAS). Single
-core, the scalar functions cost 2–15x SciPy's C loops: that is the price of
-the accuracy, recovered by `Map` on a multi-core machine.
+Every public operation against SciPy on the same data, core for core
+([docs/perf.md](docs/perf.md), 355 cases): faster on one core for the
+variances, moments, ranks, rank tests, KS, histograms and frequencies,
+Spearman (2.2x), the 1-D Gaussian KDE, the closed-form fits and the small
+tests; slower where the accuracy costs (double-double densities and
+distribution functions, correctly rounded logarithms and powers per element,
+exact inner products: Pearson 0.6x), where the time is in
+go-numerics/special (the incomplete beta and gamma functions and their
+inverses: t, beta and F quantiles at 0.005–0.04x), and in the numerical fits,
+polished to about 1e-10 where SciPy stops at four digits. `Map` spreads the
+elementwise functions over every core.
 
 ## Design
 

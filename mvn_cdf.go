@@ -178,7 +178,7 @@ func bvnRect(a, b, c []float64) float64 {
 		r = -r
 	}
 	p := bvnl(xu, yu, r) - bvnl(xl, yu, r) - bvnl(xu, yl, r) + bvnl(xl, yl, r)
-	return math.Max(0, math.Min(p, 1))
+	return max(0, min(p, 1))
 }
 
 // bvnl is the lower orthant probability P(X ≤ h, Y ≤ k) of a standard
@@ -191,8 +191,8 @@ func bvnl(h, k, r float64) float64 {
 		return special.Ndtr(k)
 	case k == math.Inf(1):
 		return special.Ndtr(h)
-	case math.Min(h, k) < -1 && math.Abs(r) < 1:
-		return bvnlTail(math.Min(h, k), math.Max(h, k), r)
+	case min(h, k) < -1 && math.Abs(r) < 1:
+		return bvnlTail(min(h, k), max(h, k), r)
 	}
 	return bvnu(-h, -k, r)
 }
@@ -369,9 +369,9 @@ func bvnu(h, k, r float64) float64 {
 		bvn = -bvn / twoPi
 	}
 	if r > 0 {
-		return bvn + special.Ndtr(-math.Max(h, k))
+		return bvn + special.Ndtr(-max(h, k))
 	}
-	return -bvn + math.Max(0, special.Ndtr(-h)-special.Ndtr(-k))
+	return -bvn + max(0, special.Ndtr(-h)-special.Ndtr(-k))
 }
 
 // qauto is SciPy's _qauto with _qmvn: rerun the randomized lattice rule
@@ -450,7 +450,7 @@ func permutedCholesky(cov, low, high []float64) (cho, lo, hi []float64) {
 	hi = append([]float64(nil), high...)
 	dc := make([]float64, n)
 	for i := range n {
-		dc[i] = math.Sqrt(math.Max(cho[i*n+i], 0))
+		dc[i] = math.Sqrt(max(cho[i*n+i], 0))
 		if dc[i] == 0 {
 			dc[i] = 1
 		}
@@ -593,7 +593,7 @@ func cbcLattice(dim, m int) (q []float64, nq int) {
 		// everywhere.
 		lo := real(conv[0])
 		for _, v := range conv {
-			lo = math.Min(lo, real(v))
+			lo = min(lo, real(v))
 		}
 		w = 0
 		for real(conv[w]) > lo+1e-10*math.Abs(lo) {

@@ -62,7 +62,7 @@ func KSTest1Samp[D Data](x D, cdf func(float64) float64, o *KSOptions) (KSResult
 		return nanKS, nil
 	}
 	s := slices.Clone(v)
-	slices.Sort(s)
+	sortFloats(s)
 	n := float64(len(s))
 	dplus, lplus := math.Inf(-1), qnan
 	dminus, lminus := math.Inf(-1), qnan
@@ -125,8 +125,8 @@ func KSTest2Samp[D Data](a, b D, o *KSOptions) (KSResult, error) {
 		return nanKS, nil
 	}
 	s1, s2 := slices.Clone(x), slices.Clone(y)
-	slices.Sort(s1)
-	slices.Sort(s2)
+	sortFloats(s1)
+	sortFloats(s2)
 	n1, n2 := len(s1), len(s2)
 	// The ECDF values as np.linspace(0, 1, n+1) forms them: k·(1/n), the
 	// last one exactly 1.

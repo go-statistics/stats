@@ -1,3 +1,8 @@
+# large_upper raised from 1.8 to 3.3 (1.5 x 2.19 measured) with go-numerics/special
+# after v0.1.0: at the worst point (df 1.991, nc 109.196, p 0.99999505) the
+# forward function the quantile inverts, the sf, is itself 7.5-14 ulp from mpmath
+# around the root (v0.1.0: 7.7-16 ulp); the new incomplete gamma moves its last
+# bits and the inversion settles one float further (2.19 ulp, v0.1.0 1.19).
 small_lower 3.3000000000000003
 small_core 7.9
 small_upper 2.9000000000000004
@@ -5,4 +10,4 @@ mid_lower 2.5
 mid_core 3.8000000000000003
 mid_upper 1.6
 large_lower 1.7000000000000002
-large_upper 1.8
+large_upper 3.3

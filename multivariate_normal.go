@@ -164,7 +164,8 @@ func (m *MultivariateNormal) logPDF(x []float64) (h dd.DD, r float64, special bo
 	if m.chol == nil {
 		return m.logPDFSingular(x)
 	}
-	z := make([]dd.DD, d)
+	var zb [8]dd.DD
+	z := append(zb[:0], make([]dd.DD, d)...) // on the stack up to d = 8
 	var maha dd.DD
 	for i := range d {
 		hi, lo := dd.TwoSum(x[i], -m.mean[i])
