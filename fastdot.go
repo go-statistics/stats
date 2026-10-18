@@ -11,7 +11,7 @@ import (
 // floating-point operations per term in one dependency chain. dotDev
 // computes the same rounded value with a compensated inner product
 // (Ogita, Rump and Oishi's Dot2: TwoProd and TwoSum per term, the errors
-// summed in float64) on two independent accumulators, and a running bound
+// summed in float64) on four independent accumulators, and a running bound
 // on its own error. When the bound shows that every value within it rounds
 // to the same float64 — and that the double-double sum, whose error is
 // bounded by 3u²·n·Σ|p| (AccurateDWPlusDW, Joldes, Muller and Popescu
@@ -29,28 +29,38 @@ const u53 = 0x1p-53
 func dotDev(a, b []float64, ma, mb float64) (float64, bool) {
 	n := len(a)
 	b = b[:n]
-	var s0, c0, s1, c1, ea, pa float64
+	// four independent lanes (j = 0..3): s the running sum, c the running
+	// sum of the TwoProd and TwoSum errors
+	var s0, s1, s2, s3, c0, c1, c2, c3, ea, pa float64
 	i := 0
-	for ; i+1 < n; i += 2 {
+	for ; i+3 < n; i += 4 {
 		x0, y0 := a[i]-ma, b[i]-mb
 		x1, y1 := a[i+1]-ma, b[i+1]-mb
+		x2, y2 := a[i+2]-ma, b[i+2]-mb
+		x3, y3 := a[i+3]-ma, b[i+3]-mb
 		p0 := float64(x0 * y0)
 		p1 := float64(x1 * y1)
+		p2 := float64(x2 * y2)
+		p3 := float64(x3 * y3)
 		q0 := math.FMA(x0, y0, -p0)
 		q1 := math.FMA(x1, y1, -p1)
-		t0 := s0 + p0
-		t1 := s1 + p1
-		v0 := t0 - s0
-		v1 := t1 - s1
+		q2 := math.FMA(x2, y2, -p2)
+		q3 := math.FMA(x3, y3, -p3)
+		t0, t1, t2, t3 := s0+p0, s1+p1, s2+p2, s3+p3
+		v0, v1, v2, v3 := t0-s0, t1-s1, t2-s2, t3-s3
 		f0 := (s0 - (t0 - v0)) + (p0 - v0)
 		f1 := (s1 - (t1 - v1)) + (p1 - v1)
-		s0, s1 = t0, t1
+		f2 := (s2 - (t2 - v2)) + (p2 - v2)
+		f3 := (s3 - (t3 - v3)) + (p3 - v3)
+		s0, s1, s2, s3 = t0, t1, t2, t3
 		c0 += q0 + f0
 		c1 += q1 + f1
-		ea += (math.Abs(q0) + math.Abs(f0)) + (math.Abs(q1) + math.Abs(f1))
-		pa += math.Abs(p0) + math.Abs(p1)
+		c2 += q2 + f2
+		c3 += q3 + f3
+		ea += ((math.Abs(q0) + math.Abs(f0)) + (math.Abs(q1) + math.Abs(f1))) + ((math.Abs(q2) + math.Abs(f2)) + (math.Abs(q3) + math.Abs(f3)))
+		pa += (math.Abs(p0) + math.Abs(p1)) + (math.Abs(p2) + math.Abs(p3))
 	}
-	if i < n {
+	for ; i < n; i++ {
 		x0, y0 := a[i]-ma, b[i]-mb
 		p0 := float64(x0 * y0)
 		q0 := math.FMA(x0, y0, -p0)
@@ -65,19 +75,24 @@ func dotDev(a, b []float64, ma, mb float64) (float64, bool) {
 	// Σ|p| beyond 2^1000 may have overflowed somewhere; below 2^-900 the
 	// products may have lost bits to underflow; NaN: let the exact path
 	// say what it says.
-	// The exact sum is h + l + Σ(q+f). The float64 sums c0, c1 err by at
-	// most γ_2n·Σ(|q|+|f|) together; ea, pa (float64 sums of nonnegative
-	// terms) are below their exact values by at most a factor 1-γ_n, which
-	// the constants absorb (n·u < 2^-20 is required).
+	// The exact sum is Σs_j + Σ(q+f). The float64 sums c_j err by at most
+	// γ_2n·Σ(|q|+|f|) together; ea, pa (float64 sums of nonnegative terms)
+	// are below their exact values by at most a factor 1-γ_n, which the
+	// constants absorb (n·u < 2^-20 is required).
 	fn := float64(n)
 	if !(pa < 0x1p1000 && pa > 0x1p-900) || fn*u53 > 0x1p-20 {
 		return 0, false
 	}
-	h, l := dd.TwoSum(s0, s1)
-	l2 := l + c0 + c1
-	errFast := 4.4*fn*u53*ea + 2.2*u53*(math.Abs(l)+math.Abs(c0)+math.Abs(c1))
+	// the lanes combined: the s_j exactly (TwoSum), the seven small terms
+	// in float64 (error at most γ_7 times the sum of their sizes)
+	h01, l01 := dd.TwoSum(s0, s1)
+	h23, l23 := dd.TwoSum(s2, s3)
+	h, l := dd.TwoSum(h01, h23)
+	small := (((l + l01) + l23) + ((c0 + c1) + (c2 + c3)))
+	mags := math.Abs(l) + math.Abs(l01) + math.Abs(l23) + math.Abs(c0) + math.Abs(c1) + math.Abs(c2) + math.Abs(c3)
+	errFast := 4.4*fn*u53*ea + 8*u53*mags
 	errDD := 3.3 * fn * u53 * u53 * pa
-	y, rem := dd.TwoSum(h, l2)
+	y, rem := dd.TwoSum(h, small)
 	return y, decidedAbs(y, rem, errFast+errDD)
 }
 

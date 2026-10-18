@@ -93,11 +93,14 @@ func Pearsonr[D Data](x, y D, o *CorrelationOptions) (PearsonResult, error) {
 	}
 	n := float64(len(a))
 	res := PearsonResult{n: n, alt: o.Alternative}
-	if anyNaN(a, b) || isConstant(a) || isConstant(b) {
+	// a NaN makes the pairwise mean NaN, so only a NaN mean needs the scan
+	// (a NaN mean without one comes from +Inf and -Inf)
+	ma, mb := mean(a), mean(b)
+	if (ma != ma && anyNaN(a)) || (mb != mb && anyNaN(b)) || isConstant(a) || isConstant(b) {
 		res.Statistic, res.PValue = qnan, qnan
 		return res, nil
 	}
-	r := clipTo(correlate(a, b), -1, 1)
+	r := clipTo(correlateMeans(a, b, ma, mb), -1, 1)
 	if len(a) == 2 {
 		res.Statistic, res.PValue = math.RoundToEven(r), 1
 		return res, nil
@@ -115,11 +118,11 @@ func Pearsonr[D Data](x, y D, o *CorrelationOptions) (PearsonResult, error) {
 	return res, nil
 }
 
-// correlate is the sample correlation of a and b, the deviations from
-// the means scaled by their norms before the inner product, as SciPy's
-// pearsonr forms it (with a double-double inner product).
-func correlate(a, b []float64) float64 {
-	ma, mb := mean(a), mean(b)
+// correlateMeans is the sample correlation of a and b (means ma and mb),
+// the deviations from the means scaled by their norms before the inner
+// product, as SciPy's pearsonr forms it (with a double-double inner
+// product).
+func correlateMeans(a, b []float64, ma, mb float64) float64 {
 	return devDot(a, b, ma, mb) / math.Sqrt(devDot(a, a, ma, ma)) / math.Sqrt(devDot(b, b, mb, mb))
 }
 
