@@ -180,7 +180,10 @@ func log1mexpDD(a dd.DD) float64 {
 func ratioSum(j, step, end float64, max int, r func(j float64) dd.DD) (dd.DD, bool) {
 	s, t := dd.F(1), dd.F(1)
 	for i := 0; j != end; i++ {
-		if max > 0 && i >= max {
+		// out of budget, or j no longer moving (|j| >= 2^53: the walk
+		// from k = MaxFloat64 spun through the whole budget, 4·10^6
+		// terms), or a term that is not a number: not converged
+		if max > 0 && i >= max || j+step == j || t.Hi != t.Hi {
 			return s, false
 		}
 		t = dd.Mul(t, r(j))
@@ -225,33 +228,92 @@ func logCDFFrom(p, q float64, tail func() (logm float64, s dd.DD, ok bool)) floa
 // logarithm below the normal range.
 const tailBudget = 1 << 22
 
-// entropyTerm is -p log p for a mass p = c·exp(e).
+// entropyTerm is -p log p for a mass p = c·exp(e) (0 for a zero mass, and
+// for a mass the term function cannot form, NaN: the sums stop there).
 func entropyTerm(e, c dd.DD) (p float64, t dd.DD) {
-	lp := dd.Add(e, logDD(c))
 	p = expScaled(e, c)
-	return p, dd.MulF(lp, -p)
+	if !(p > 0) {
+		return 0, dd.DD{}
+	}
+	return p, dd.MulF(dd.Add(e, logDD(c)), -p)
 }
+
+// entropyMaxTerms bounds each direction of entropySum: the callers sum at
+// most some 10^7 terms (they take entropyLargeVar or entropyIntegral for
+// wider distributions), and the bound guarantees that a sum ends whatever
+// its terms do.
+const entropyMaxTerms = 1 << 26
 
 // entropySum returns -Σ p_k log p_k over the integers of [lo, hi] (hi may
 // be +Inf), from the mode outwards in both directions, each direction
 // stopping where the masses have fallen below 1/e and their terms below
-// 2^-60 of the sum (the masses summed here decrease away from the mode).
-// term(k) returns the mass at k as c·exp(e).
+// 2^-60 of the sum (the masses summed here decrease away from the mode),
+// at a zero mass, or after entropyMaxTerms terms. term(k) returns the mass
+// at k as c·exp(e).
 func entropySum(mode, lo, hi float64, term func(k float64) (e, c dd.DD)) float64 {
 	s := dd.F(0)
-	for k := mode; k <= hi; k++ {
+	n := 0
+	for k := mode; k <= hi && n < entropyMaxTerms; k, n = k+1, n+1 {
 		p, t := entropyTerm(term(k))
 		s = dd.Add(s, t)
-		if p < 1/math.E && t.Hi <= s.Hi*0x1p-60 {
+		if p < 1/math.E && (p == 0 || t.Hi <= s.Hi*0x1p-60) {
 			break
 		}
 	}
-	for k := mode - 1; k >= lo; k-- {
+	n = 0
+	for k := mode - 1; k >= lo && n < entropyMaxTerms; k, n = k-1, n+1 {
 		p, t := entropyTerm(term(k))
 		s = dd.Add(s, t)
-		if p < 1/math.E && t.Hi <= s.Hi*0x1p-60 {
+		if p < 1/math.E && (p == 0 || t.Hi <= s.Hi*0x1p-60) {
 			break
 		}
+	}
+	return s.Float()
+}
+
+// entropyIntegralMinSD is the standard deviation from which entropyIntegral
+// replaces entropySum for the distributions whose Edgeworth expansion does
+// not apply (skewed, very wide): the sum would take more than 10^6 terms.
+const entropyIntegralMinSD = 2e4
+
+// entropyIntegral returns -Σ_{k >= lo} p_k log p_k for a mass function
+// whose term(k) continues smoothly to real k (Loader's saddle-point form,
+// as nbinomStd.term does), with mode m and standard deviation sd >=
+// entropyIntegralMinSD: the first 1024 terms summed, the rest by the
+// Euler-Maclaurin formula, ∫_K^∞ g + g(K)/2 - g'(K)/12 with g(k) =
+// -p(k) log p(k) and K = lo + 1024 (the next correction, g'''(K)/720, is
+// below 10^-11 g(K) there), the integral by tanh-sinh quadrature over
+// pieces of width sd/2 from the mode outwards in both directions, each
+// direction ending where a piece falls below 2^-60 of the sum (or, below
+// the mode, at K, where the sum and the corrections take over). Its
+// relative error is about 1e-15 (the quadrature's), not the last-bit
+// accuracy of entropySum; SciPy, which sums 1000 terms, is far off there.
+func entropyIntegral(lo, mode, sd float64, term func(k float64) (e, c dd.DD)) float64 {
+	k0 := lo + 1024
+	g := func(k float64) float64 { _, t := entropyTerm(term(k)); return t.Float() }
+	w := sd / 2
+	s := dd.F(0)
+	a := max(mode, k0)
+	for i := 0; i < 400; i++ {
+		v := tanhSinh(g, a, w, 1)
+		s = dd.AddF(s, v)
+		a += w
+		if !(v > s.Hi*0x1p-60) {
+			break
+		}
+	}
+	b := max(mode, k0)
+	for i := 0; i < 400 && b > k0; i++ {
+		l := max(k0, b-w)
+		v := tanhSinh(g, l, b-l, 1)
+		s = dd.AddF(s, v)
+		b = l
+		if !(v > s.Hi*0x1p-60) {
+			break
+		}
+	}
+	if b <= k0 {
+		s = dd.AddF(s, entropySum(lo, lo, k0-1, term)+g(k0)/2-(g(k0+1)-g(k0-1))/24)
 	}
 	return s.Float()
 }

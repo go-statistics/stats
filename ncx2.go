@@ -24,6 +24,12 @@ import (
 // cancellation). The largest term is evaluated in double-double and the
 // others by the exact ratios between neighbours. PPF and ISF invert the cdf
 // and sf (invertCDF).
+//
+// Limit: for Nc above 2·10^10 the mixture would need more than 2·10^6
+// incomplete gamma functions per evaluation (and beyond 2^53 its indices
+// are no longer exact), so PDF, CDF, SF, their logarithms, PPF, ISF and
+// Median return NaN there; the moments and Entropy (by the Edgeworth
+// expansion) are still given.
 type NoncentralChiSquared struct {
 	Df, Nc, Loc, Scale float64
 }
@@ -100,9 +106,33 @@ func (s ncx2Std) poissonLog(j float64) dd.DD {
 	return gammaLogDensity(j+1, dd.F(s.mu)) // μ > 0 here: μ = 0 is the central case
 }
 
+// ncx2MaxMu is the largest μ = Nc/2 for which the distribution functions
+// are computed: the mixture's terms that matter span some 10·sqrt(μ)
+// indices around μ, 2·10^6 incomplete gamma functions at 10^10 (about a
+// second), and beyond 2^53 the indices themselves are no longer exact.
+// Above it the density, distribution and quantile functions return NaN
+// (they used to run for minutes or never return).
+const ncx2MaxMu = 1e10
+
+// mixtureMode returns the root j >= 0 of (j+1)(k+j) = c, c = μy, where
+// the terms of a mixture whose consecutive ratio is c/((j+1)(k+j)) peak,
+// in the form that does not cancel when c is small against k² and does
+// not overflow when c is large (the root is then about sqrt(c), up to
+// 1e154; beyond the float64 range of c, sqrt(μ)·sqrt(y)).
+func mixtureMode(k, mu, y float64) float64 {
+	c := mu * y
+	if math.IsInf(c, 1) {
+		return math.Sqrt(mu) * math.Sqrt(y)
+	}
+	return max(0, (c-k)/((k+1+math.Hypot(k-1, 2*math.Sqrt(c)))/2))
+}
+
 func (s ncx2Std) pdf(x float64) float64 {
 	if s.mu == 0 {
 		return s.central().pdf(x)
+	}
+	if s.mu > ncx2MaxMu {
+		return math.NaN()
 	}
 	if x == 0 {
 		// only the j = 0 term can be nonzero at 0
@@ -111,8 +141,7 @@ func (s ncx2Std) pdf(x float64) float64 {
 	y := x / 2
 	// t_j = w_j · g_{k+j}(y)/2, t_{j+1}/t_j = μ y / ((j+1)(k+j)): the
 	// largest term is near the root of (j+1)(k+j) = μy
-	b := s.k + 1
-	start := (-b + math.Sqrt(b*b-4*(s.k-s.mu*y))) / 2
+	start := mixtureMode(s.k, s.mu, y)
 	return s.mixture(start, func(j float64) dd.DD {
 		// the shape k+j is rounded; d/da log g_a(y) = log y - ψ(a)
 		// corrects the rounding to first order
@@ -143,7 +172,12 @@ func (s ncx2Std) tailSum(y float64, upper bool) float64 {
 	for j := j0; j >= 0; j-- {
 		t := term(j)
 		sum += t
-		if sum > 0 && t <= sum*0x1p-60 && t <= prev && j < s.mu-10*math.Sqrt(s.mu+1) {
+		// past 10 standard deviations below the mode: stop once the terms
+		// are negligible, or, for the upper tail, all zero (Q(k+j, y)
+		// increases with j, so every term below a zero one is zero too: a
+		// far tail, where logSFDeep takes over; P decreases with j, and
+		// the lower tail's terms can reappear below)
+		if (sum > 0 && t <= sum*0x1p-60 || upper && sum == 0 && t == 0) && t <= prev && j < s.mu-10*math.Sqrt(s.mu+1) {
 			break
 		}
 		prev = t
@@ -163,6 +197,9 @@ func (s ncx2Std) tailSum(y float64, upper bool) float64 {
 func (s ncx2Std) cdf(x float64) float64 {
 	if s.mu == 0 {
 		return s.central().cdf(x)
+	}
+	if s.mu > ncx2MaxMu {
+		return math.NaN()
 	}
 	if x < ncx2Tiny {
 		return expDD(s.logCDFTiny(x))
@@ -187,6 +224,9 @@ func (s ncx2Std) sf(x float64) float64 {
 	if s.mu == 0 {
 		return s.central().sf(x)
 	}
+	if s.mu > ncx2MaxMu {
+		return math.NaN()
+	}
 	if x <= s.mean() {
 		// the lower tail is the small one
 		return 1 - s.cdf(x)
@@ -201,6 +241,9 @@ func (s ncx2Std) sf(x float64) float64 {
 func (s ncx2Std) logcdf(x float64) float64 { return logPQ(s.cdf(x), s.sf(x)) }
 
 func (s ncx2Std) logsf(x float64) float64 {
+	if s.mu > ncx2MaxMu {
+		return math.NaN()
+	}
 	if s.mu != 0 {
 		if v := s.tailSum(x/2, true); !(v >= 1e-280) {
 			return s.logSFDeep(x / 2).Float()
@@ -210,24 +253,48 @@ func (s ncx2Std) logsf(x float64) float64 {
 }
 
 // logSFDeep is log Σ w_j Q(k+j, y) in the far upper tail, where the
-// terms underflow: each term in logarithms (logUpperGamma), summed by
-// log-sum-exp from j = 0 until the Poisson weights end it.
+// terms underflow: each term in logarithms (logUpperGamma), summed by a
+// running log-sum-exp from the largest term outwards until the terms fall
+// e^-40 below it. In the far tail Q(a+1, y)/Q(a, y) ~ y/a, so the terms
+// peak near the root of (j+1)(k+j) = μy (mixtureMode), which can be far
+// above μ (about sqrt(μy)); beyond 10^6 the sum is Laplace's
+// approximation l* + log(2π/|l''|)/2 at the peak, l'' = -(1/(j+1) +
+// 1/(k+j)) (relative error of order 1/j in the sum, against a logarithm
+// of size y). (The former sum from j = 0 stored every term: 5·10^7 of
+// them for Nc = 10^8, and it never ended beyond 2^53.)
 func (s ncx2Std) logSFDeep(y float64) dd.DD {
-	var terms []dd.DD
-	best := math.Inf(-1)
-	for j := 0.0; ; j++ {
-		l := dd.Add(s.poissonLog(j), logUpperGamma(s.k+j, y))
-		terms = append(terms, l)
-		best = max(best, l.Hi)
-		if (l.Hi < best-40 && j > s.mu) || l.Hi != l.Hi || j > s.mu+60*math.Sqrt(s.mu+1)+500 {
+	l := func(j float64) dd.DD { return dd.Add(s.poissonLog(j), logUpperGamma(s.k+j, y)) }
+	jm := math.Floor(mixtureMode(s.k, s.mu, y))
+	if jm > 1e6 {
+		d2 := 1/(jm+1) + 1/(s.k+jm)
+		return dd.AddF(l(jm), 0.5*math.Log(2*math.Pi/d2))
+	}
+	best := l(jm)
+	sum := 1.0 // Σ exp(l_j - best)
+	add := func(v dd.DD) bool {
+		if !(v.Hi >= best.Hi-40) { // negligible, or NaN
+			return false
+		}
+		if v.Hi > best.Hi {
+			sum = sum*expDD(dd.Sub(best, v)) + 1
+			best = v
+		} else {
+			sum += expDD(dd.Sub(v, best))
+		}
+		return true
+	}
+	budget := 60*math.Sqrt(jm+1) + 500
+	for j := jm + 1; j <= jm+budget; j++ {
+		if !add(l(j)) {
 			break
 		}
 	}
-	sum := 0.0
-	for _, l := range terms {
-		sum += expDD(dd.AddF(l, -best))
+	for j := jm - 1; j >= 0 && j >= jm-budget; j-- {
+		if !add(l(j)) {
+			break
+		}
 	}
-	return dd.Add(dd.F(best), logDD(dd.F(sum)))
+	return dd.Add(best, logDD(dd.F(sum)))
 }
 
 // guess is the normal approximation to the quantile with lower tail p and
@@ -245,6 +312,9 @@ func (s ncx2Std) ppf(p float64) float64 {
 	if s.mu == 0 {
 		return s.central().ppf(p)
 	}
+	if s.mu > ncx2MaxMu {
+		return math.NaN()
+	}
 	if p > 0.5 {
 		return invertCDF(1-p, true, s.sf, s.pdf, s.guess(p, 1-p), 0, math.Inf(1))
 	}
@@ -254,6 +324,9 @@ func (s ncx2Std) ppf(p float64) float64 {
 func (s ncx2Std) isf(q float64) float64 {
 	if s.mu == 0 {
 		return s.central().isf(q)
+	}
+	if s.mu > ncx2MaxMu {
+		return math.NaN()
 	}
 	if q > 0.5 {
 		return invertCDF(1-q, false, s.cdf, s.pdf, s.guess(1-q, q), 0, math.Inf(1))
@@ -274,10 +347,17 @@ func (s ncx2Std) kurtosis() float64 {
 func (s ncx2Std) median() float64 { return s.ppf(0.5) }
 
 // entropy is -∫ f log f by exp-sinh quadrature (SciPy integrates
-// numerically too).
+// numerically too), or, where the distribution is close to normal (skew
+// below 1e-4: Df + Nc beyond about 10^9, where the density's relative
+// width is too narrow for the quadrature in log x and its evaluations
+// slow), the Edgeworth negentropy expansion of entropyLargeVar (the
+// omitted terms are of order skew⁴, below 10^-16).
 func (s ncx2Std) entropy() float64 {
 	if s.mu == 0 {
 		return s.central().entropy()
+	}
+	if g1 := s.skew(); g1 < 1e-4 {
+		return entropyLargeVar(s.variance(), g1, s.kurtosis())
 	}
 	return entropyPositive(s.pdf, s.logpdf, s.mean())
 }

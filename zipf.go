@@ -271,8 +271,20 @@ func zetaTail(a, q float64) dd.DD {
 // they fall below 2^-64 of the sum (for large a, a few) or j reaches
 // max(20, 4(a+11)), then Euler-Maclaurin from there, where the first
 // omitted correction (B_12 f^(11)) is below 2^-55 of the tail.
+//
+// From q = 2^52 on, j + 1 is no longer exact (beyond 2^53 it does not move
+// at all, and the loop below would not end): the terms are then summed as
+// (1 + i/q)^-a over the offsets i where they decrease fast (a >= q/64, a
+// few thousand terms at most), and Euler-Maclaurin starts at q itself
+// otherwise (its corrections are then powers of a/q < 1/64).
 func zetaTailScaled(a, q float64) dd.DD {
 	jm := max(emStart, 4*(a+11))
+	if q >= 0x1p52 {
+		if a >= q/64 {
+			return zetaTailOffsets(a, q)
+		}
+		jm = q
+	}
 	lq := dd.Log(q)
 	s := dd.F(0)
 	j := q
@@ -299,6 +311,21 @@ func zetaTailScaled(a, q float64) dd.DD {
 		corr -= w * d
 	}
 	return dd.Add(s, dd.Mul(fj, dd.AddF(tail, corr)))
+}
+
+// zetaTailOffsets returns Σ_{i>=0} (1 + i/q)^-a for q >= 2^52 and
+// a >= q/64, where the terms fall below 2^-64 of the sum within some 3000
+// offsets (the ratio of two terms is at most about e^(-a/q)).
+func zetaTailOffsets(a, q float64) dd.DD {
+	s := dd.F(0)
+	for i := 0.0; i < 4096; i++ {
+		t := expDD2(dd.MulF(log1pDD(dd.DivF(dd.F(i), q)), -a))
+		s = dd.Add(s, t)
+		if t.Hi < s.Hi*0x1p-64 {
+			break
+		}
+	}
+	return s
 }
 
 // zetaLogSum returns Σ_{j>=2} log j / j^a = -ζ'(a): the first terms one by

@@ -106,7 +106,9 @@ func (s nbinomStd) kurtosis() float64 { return (6 - s.p*(6-s.p)) / s.nq() }
 
 // entropy sums -p log p from the mode outwards (SciPy sums it too, at
 // most 1000 terms), or uses the Edgeworth expansion where the distribution
-// is close to normal (variance above 1e6, skewness below 1e-3).
+// is close to normal (variance above 1e6, skewness below 1e-3), or, where
+// it is skewed and too wide to sum (standard deviation above
+// entropyIntegralMinSD: small P), entropyIntegral.
 func (s nbinomStd) entropy() float64 {
 	if s.p == 1 {
 		return 0
@@ -117,6 +119,16 @@ func (s nbinomStd) entropy() float64 {
 	mode := 0.0
 	if s.n > 1 {
 		mode = math.Floor((s.n - 1) * s.q.Float() / s.p)
+	}
+	if s.p < 0x1p-53 {
+		// P·X/(1-P) is Gamma(N, 1) to O(P): the entropy is that of the
+		// gamma density, N + log Γ(N) + (1-N)ψ(N), plus log((1-P)/P),
+		// the lattice's own correction being of order 1/variance
+		lg, _ := math.Lgamma(s.n)
+		return s.n + lg + (1-s.n)*special.Digamma(s.n) + math.Log(s.q.Float()) - math.Log(s.p)
+	}
+	if sd := math.Sqrt(s.variance()); sd > entropyIntegralMinSD {
+		return entropyIntegral(0, mode, sd, s.term)
 	}
 	return entropySum(mode, 0, math.Inf(1), s.term)
 }

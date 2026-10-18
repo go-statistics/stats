@@ -72,7 +72,13 @@ func logRatio(x, y float64) dd.DD {
 // at j/128 combined with the Taylor series of r, whose r³ and r⁴ terms
 // onward (below 2^-18 of the leading term) are in float64.
 func sincosSmall(y dd.DD) (s, c dd.DD) {
-	j := int(y.Hi*128 + 0.5)
+	t := y.Hi*128 + 0.5
+	if !(t >= 0 && t < float64(len(sinTable))) {
+		// outside the table (only an unreduced or NaN argument): NaN
+		// rather than an index out of range.
+		return dd.F(math.NaN()), dd.F(math.NaN())
+	}
+	j := int(t)
 	r := dd.AddF(y, -float64(j)/128) // the leading difference is exact
 	x := r.Hi
 	x2 := x * x
@@ -99,7 +105,11 @@ func sincosD(y dd.DD) (s, c dd.DD) {
 // d = (u - c)/(1 + u c), |d| <= 1/256, whose series from d³ on is in
 // float64.
 func atanD(u dd.DD) dd.DD {
-	j := int(u.Hi*128 + 0.5)
+	tj := u.Hi*128 + 0.5
+	if !(tj >= 0 && tj < float64(len(atanTable))) {
+		return dd.F(math.NaN()) // outside [0, 1]: NaN, not an index out of range
+	}
+	j := int(tj)
 	c := float64(j) / 128
 	d := dd.Div(dd.AddF(u, -c), dd.AddF(dd.MulF(u, c), 1))
 	x := d.Hi
