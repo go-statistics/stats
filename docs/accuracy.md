@@ -59,8 +59,8 @@ go test -run TestAccuracyTable -accuracy.table=docs/accuracy-table.md
 
 Over 256 fixtures (33 distributions × 8 functions, 1479 regions, about
 212 000 points), the maximum error of this package is at or below SciPy's
-in **1473 of 1479 regions**. The six exceptions are all in the beta
-distribution and all below 4.5 ulp (next section). In hundreds of regions
+in **1477 of 1479 regions**. The two exceptions are in the beta survival
+function, below 0.75 ulp (next section). In hundreds of regions
 SciPy's error is in the thousands to 10^16 ulp, or its result is "wrong"
 (NaN, 0 or ±Inf where the true value is finite): deep tails, large shapes,
 log forms beyond underflow.
@@ -80,10 +80,10 @@ Typical worst cases per family, ours against SciPy's:
 | gamma family: cdf, sf | ≤ 2.1 ulp | up to 4e4 ulp |
 | gamma family: ppf, isf | ≤ 1.9 ulp | up to 5e6 ulp |
 | beta: pdf, logpdf | ≤ 1.1 / 3.9 ulp | 948 / 23375 ulp |
-| beta: cdf, sf | ≤ 5.6 / 4.4 ulp | 7334 / 2.9 ulp (see below) |
+| beta: cdf, sf | ≤ 2.6 / 1.6 ulp | 7334 / 2.9 ulp (see below) |
 | Student t: pdf, logpdf | ≤ 0.5 ulp | 5.6e4 / 3.0e4 ulp |
 | Student t: cdf, sf, ppf, isf | ≤ 2.4 ulp, quantiles ≤ 9.4 ulp below 1e-20 | 1067 ulp, wrong (NaN/0) in far tails |
-| F: pdf, cdf, sf, ppf, isf | ≤ 1.2 / 4.8 / 2.8 / 2.2 / 2.6 ulp | 7e4 / 1971 / 389 / wrong / wrong |
+| F: pdf, cdf, sf, ppf, isf | ≤ 1.2 / 1.9 / 2.3 / 1.5 / 1.6 ulp | 7e4 / 1971 / 389 / wrong / wrong |
 | noncentral chi-squared | pdf ≤ 9.8, cdf ≤ 116, sf ≤ 151 ulp (deep tails summed term by term) | up to 1e15–1e16 ulp, wrong |
 | closed-form families (exponential … von Mises) | ≤ 0.5–4 ulp, every region ≤ SciPy | up to 1e15 ulp, wrong (see the table) |
 
@@ -91,19 +91,23 @@ Typical worst cases per family, ours against SciPy's:
 
 | fixture | region | ours max | SciPy max |
 |---|---|--:|--:|
-| beta_sf | small_mid | 1.93 | 0.50 |
-| beta_sf | mid_mid | 0.81 | 0.49 |
-| beta_sf | mid_hi | 0.70 | 0.50 |
-| beta_sf | large_mid | 2.11 | 2.11 (equal to 3 digits) |
-| beta_sf | large_hi | 4.42 | 2.45 |
-| beta_ppf | large_core | 1.03 | 0.79 |
+| beta_sf | small_mid | 0.74 | 0.50 |
+| beta_sf | mid_mid | 0.73 | 0.49 |
 
-The beta survival function and quantile are go-numerics/special's
-`BetaIncC` and `BetaIncInv` called directly; Boost's (SciPy's) are a little
-more accurate on these points. Reformulating (`I_{1-x}(b, a)` for x ≥ 1/2,
-where 1-x is exact) gave the same errors, so the fix belongs in the
-incomplete beta function itself. The same function is why the binomial and
-negative binomial cdf/sf reach 6–11 ulp (SciPy: 10^6–10^7 ulp there).
+The beta survival function is go-numerics/special's `BetaIncC` called
+directly; Boost's (SciPy's) rounds a little better on these points. With
+special after v0.1.0 (faster and more accurate incomplete gamma and beta
+functions and inverses) four former exceptions are gone: beta_ppf
+large_core 1.03 → 0.57 ulp (SciPy 0.79), beta_sf mid_hi 0.70 → 0.50 (0.50),
+large_mid 2.11 → 1.30 (2.11), large_hi 4.42 → 0.49 (2.45). The binomial and
+negative binomial cdf/sf, built on the same function, are now within 3.5 ulp
+(they reached 6–11; SciPy 10^6–10^7 ulp there).
+
+Two budgets were raised with that version, each explained in its budget file
+and checked against mpmath: f_isf large_upper (1.56 ulp: the new
+`BetaIncCInv` returns a root 0.74 ulp from the exact one where v0.1.0
+returned the correctly rounded one) and ncx2_ppf large_upper (2.19 ulp: the
+survival function it inverts is itself 7–14 ulp from the exact value there).
 
 Other limits stated plainly:
 

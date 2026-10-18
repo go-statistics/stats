@@ -28,7 +28,8 @@ var fixtureFS embed.FS
 //go:embed testdata/budgets
 var budgetFS embed.FS
 
-// measuredBudgets reads testdata/budgets/<fixture>.txt: lines "region budget".
+// measuredBudgets reads testdata/budgets/<fixture>.txt: lines "region budget"
+// (lines starting with # are comments, kept by TestAccuracyBudgets).
 func measuredBudget(name, region string) (float64, bool) {
 	b, err := budgetFS.ReadFile("testdata/budgets/" + name + ".txt")
 	if err != nil {
@@ -36,7 +37,7 @@ func measuredBudget(name, region string) (float64, bool) {
 	}
 	for _, line := range strings.Split(string(b), "\n") {
 		f := strings.Fields(line)
-		if len(f) == 2 && f[0] == region {
+		if len(f) == 2 && f[0] == region && !strings.HasPrefix(f[0], "#") {
 			v, err := strconv.ParseFloat(f[1], 64)
 			return v, err == nil
 		}
@@ -380,6 +381,19 @@ func budgetOf(max float64) float64 {
 	return math.Ceil(b/e) * e
 }
 
+// budgetComments returns the comment lines of a budget file, which a
+// rewrite keeps (they explain budgets raised by hand).
+func budgetComments(name string) string {
+	b, _ := budgetFS.ReadFile("testdata/budgets/" + name + ".txt")
+	var out strings.Builder
+	for _, line := range strings.Split(string(b), "\n") {
+		if strings.HasPrefix(line, "#") {
+			out.WriteString(line + "\n")
+		}
+	}
+	return out.String()
+}
+
 // TestAccuracyBudgets writes the measured budgets with -accuracy.budgets.
 func TestAccuracyBudgets(t *testing.T) {
 	if !*accuracyBudgets {
@@ -390,6 +404,7 @@ func TestAccuracyBudgets(t *testing.T) {
 			continue
 		}
 		var b strings.Builder
+		b.WriteString(budgetComments(c.name))
 		for _, r := range measureAcc(c, loadFixture(t, c.name)) {
 			v := budgetOf(r.ours.max)
 			if math.IsInf(v, 0) {
