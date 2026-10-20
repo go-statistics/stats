@@ -1,6 +1,6 @@
-github.com/go-ndarray/ndarray v0.12.0 h1:4xfl9ZQo1m0UXopo06KypELg1wUYgQb5kdKaJPZAZus=
-github.com/go-ndarray/ndarray v0.12.0/go.mod h1:ZcgNCBVLXt1FxeZjQWI5Z+k0SSWAT0/wR8slfat/gRA=
-github.com/go-numerics/optimize v0.1.0 h1:SOA+QxTuIjeZSAsd5Dyj433lItnOKWyprCbHQoLxg/c=
-github.com/go-numerics/optimize v0.1.0/go.mod h1:ieZ+/EsbBw/EfHl4W8JryPyCBB8n5a8xKk6lu/xh7zk=
-github.com/go-numerics/special v0.1.1-0.20261018131519-1839669023b1 h1:r22dko2nNGA4YVar+/ATyDm45Ctp65IzMBKTYqpLJFo=
-github.com/go-numerics/special v0.1.1-0.20261018131519-1839669023b1/go.mod h1:N9ak9g1RCdRFk5FsFe/fkq7ITdo3gkF6NflbMkcypOo=
+github.com/go-ndarray/ndarray v0.18.0 h1:EE4IDUCAZ0e7DYBs4OrftMG+GGp+jsnvojhDdGh6k5A=
+github.com/go-ndarray/ndarray v0.18.0/go.mod h1:TTobL0ZK6yCvPClMmnT98WUYEtaxoo2B+n0Q/Vc/s0E=
+github.com/go-numerics/optimize v0.2.0 h1:7OO7HlQBCzT4hIMsgmI7T1PQveUwoQJ70xBP84aN7dc=
+github.com/go-numerics/optimize v0.2.0/go.mod h1:EJZo6XNRjuAQcV22re4/kJYr+bYkpKx4IVT2aiG97Pk=
+github.com/go-numerics/special v0.2.0 h1:22oGd7LCe+383Udacg6WTbgbZJg0Z//GuOyUaeJSThY=
+github.com/go-numerics/special v0.2.0/go.mod h1:N9ak9g1RCdRFk5FsFe/fkq7ITdo3gkF6NflbMkcypOo=
