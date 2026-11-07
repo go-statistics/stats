@@ -63,6 +63,7 @@ is fine); results are structs; errors wrap `ErrParam`, `ErrData` or
 | Multivariate | MultivariateNormal (pdf, logpdf, cdf/logcdf by SciPy's lattice rule, exact bivariate, rvs, entropy, fit), Dirichlet, Multinomial |
 | Descriptive | Describe, Mean/Var/Std/Average (weights), Median, Quantile(s)/Percentile(s) (NumPy's 13 methods, weights), Mode, Skew, Kurtosis, Moment, ZScore, ZMap, IQR, SEM, Variation, GMean, HMean, PMean, MedianAbsDeviation, TMean/TVar/TStd/TSem/TMin/TMax, TrimMean, TrimBoth, Trim1, Entropy (and relative entropy), DifferentialEntropy, Histogram, HistogramBinEdges (all bin rules), CumFreq, RelFreq, BinnedStatistic |
 | Tests | TTest1Samp, TTestInd (Student, Welch, trimmed), TTestRel, ChiSquare, PowerDivergence, Chi2Contingency, FisherExact, Pearsonr, Spearmanr, Kendalltau, Linregress, RankData, KSTest1Samp, KSTest2Samp, MannWhitneyU, Wilcoxon, KruskalWallis, ShapiroWilk, AndersonDarling, Normaltest, SkewTest, KurtosisTest, JarqueBera, FOneway, Levene, Bartlett |
+| Multiple testing | MultipleTests (statsmodels `multipletests` 0.15.0: bonferroni, sidak, holm-sidak, holm, simes-hochberg, hommel, fdr_bh, fdr_by, fdr_tsbh, fdr_tsbky; adjusted p-values bit-identical on 9 680 recorded cases, sidak family within one ulp on 7), FalseDiscoveryControl (SciPy `false_discovery_control`, bh and by) |
 | Estimation | GaussianKDE (Scott/Silverman/scalar/function bandwidth, weights, evaluate, logpdf, integrals, resample), Bootstrap (percentile, basic, BCa) |
 
 ## Accuracy

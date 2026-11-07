@@ -35,7 +35,7 @@ Counted by `go run` over the tables below (rows, not names).
 
 | | done | partial | missing | rows |
 |---|---|---|---|---|
-| SciPy v1.18.1 (sections 1-12) | 68 | 8 | 172 | 248 |
+| SciPy v1.18.1 (sections 1-12) | 69 | 8 | 171 | 248 |
 | MATLAB-only (section 13) | 0 | 0 | 13 | 13 |
 
 ## 1. Continuous distributions
@@ -298,7 +298,7 @@ Done means pdf, logpdf, cdf, logcdf, sf, logsf, ppf, isf, moments, entropy,
 | 216 | `power` | `sampsizepwr` | | missing | `monte_carlo_test` |
 | 217 | `MonteCarloMethod`, `PermutationMethod`, `BootstrapMethod` as the `method=` of the tests | | `Method` (auto/exact/asymptotic) and `BootstrapMethod` (interval kind only) | partial | resampling `method=` objects accepted by each test |
 | 218 | `combine_pvalues` | | | missing | none (Fisher, Pearson, Stouffer, Tippett, Mudholkar-George) |
-| 219 | `false_discovery_control` | `mafdr` | | missing | none |
+| 219 | `false_discovery_control` | `mafdr` | `FalseDiscoveryControl` (bh, by); also statsmodels `multipletests`: `MultipleTests` (bonferroni, sidak, holm-sidak, holm, simes-hochberg, hommel, fdr_bh, fdr_by, fdr_tsbh, fdr_tsbky) | done | `mafdr` (storey/bootstrap) is not covered |
 
 ## 9. Transformations, distances, survival, directional
 
