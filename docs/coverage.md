@@ -319,8 +319,10 @@ Done means pdf, logpdf, cdf, logcdf, sf, logsf, ppf, isf, moments, entropy,
 
 ## 10. Quasi-Monte Carlo (`scipy.stats.qmc`)
 
-The go-ndarray `random` package is NumPy's `Generator`; the engines would
-live in this package or in `random`, to be decided at design time.
+The go-ndarray `random` package is NumPy's `Generator`. The engines will
+live in a `qmc` sub-package of this module. The API, the exact-path decision
+for each engine, validation, performance and the task order are in
+[design-qmc.md](design-qmc.md).
 
 | # | SciPy | MATLAB | Go | Status | Missing / dep |
 |---|---|---|---|---|---|
