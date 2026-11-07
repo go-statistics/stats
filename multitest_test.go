@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"compress/gzip"
 	_ "embed"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"hash/fnv"
 	"math"
 	"math/rand"
 	"os"
@@ -267,6 +269,10 @@ func TestMultipleTestsDocs(t *testing.T) {
 	}
 }
 
+// mtPortsGolden is the FNV-1a hash of the bits of log1pFD and expm1FD over the
+// inputs of TestMultiTestHelpers (measured on arm64 and on a native s390x).
+const mtPortsGolden = 0x4feeada2411be2db
+
 func TestMultiTestHelpers(t *testing.T) {
 	if powCR(0, 0.5) != 0 || powCR(0.3, 1) != 0.3 || powCR(1, 0.5) != 1 {
 		t.Fatal("powCR special")
@@ -283,19 +289,35 @@ func TestMultiTestHelpers(t *testing.T) {
 	xs := []float64{-1e-30, -1e-8, -1e-17, -1e-5, -0.1, -0.2, -0.3, -0.5, -0.75, -0.999, math.Copysign(0, -1), -1e-300,
 		-0.3, -0.4, -0.35, -0.7, -1 + 0x1p-52, -40, -2, -1.2, -0.6, -0.5, -0.3466, -0.35, -1.03, -1.05, -80, math.Inf(-1)}
 	for i := 0; i < 4000; i++ {
-		xs = append(xs, -rng.Float64(), -math.Exp(rng.NormFloat64()*3), -math.Exp(-rng.Float64()*60))
+		// math.Exp is assembly on s390x, so the inputs use only exact Ldexp
+		// scalings: they must be the same bits on every architecture.
+		xs = append(xs, -rng.Float64(), -math.Ldexp(rng.Float64()+0.5, rng.Intn(14)-8), -math.Ldexp(rng.Float64()+0.5, -rng.Intn(87)))
 	}
+	// On s390x math.Log1p and math.Expm1 are assembly routines (not the msun
+	// code the ports follow) that differ from msun by 2 ulp, measured on a
+	// native z17 and under qemu: they are no oracle there. The golden hash
+	// below pins the ports' own output on every architecture instead.
+	stdlibIsMsun := runtime.GOARCH != "s390x"
+	h := fnv.New64a()
+	var bits [8]byte
 	for _, x := range xs {
 		if x >= -1 {
 			g, w := log1pFD(x), math.Log1p(x)
-			if d := mtUlp(g, w); d > 1 || (d != 0 && runtime.GOARCH == "amd64") {
+			if d := mtUlp(g, w); stdlibIsMsun && (d > 1 || (d != 0 && runtime.GOARCH == "amd64")) {
 				t.Fatalf("log1pFD(%g) = %v want %v", x, g, w)
 			}
+			binary.LittleEndian.PutUint64(bits[:], math.Float64bits(g))
+			h.Write(bits[:])
 		}
 		g, w := expm1FD(x), math.Expm1(x)
-		if d := mtUlp(g, w); d > 1 || (d != 0 && runtime.GOARCH == "amd64") {
+		if d := mtUlp(g, w); stdlibIsMsun && (d > 1 || (d != 0 && runtime.GOARCH == "amd64")) {
 			t.Fatalf("expm1FD(%g) = %v want %v", x, g, w)
 		}
+		binary.LittleEndian.PutUint64(bits[:], math.Float64bits(g))
+		h.Write(bits[:])
+	}
+	if got := h.Sum64(); got != mtPortsGolden {
+		t.Fatalf("log1pFD/expm1FD output hash %#x on %s, want %#x", got, runtime.GOARCH, uint64(mtPortsGolden))
 	}
 	if npSum(nil) != 0 || npSum([]float64{2}) != 2 {
 		t.Fatal("npSum small")
