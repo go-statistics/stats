@@ -5,7 +5,7 @@ import (
 	"math"
 	"slices"
 
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // EntropyOptions are the options of Entropy.

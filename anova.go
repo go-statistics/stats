@@ -5,7 +5,7 @@ import (
 	"math"
 	"slices"
 
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // FOnewayOptions are the options of FOneway. The zero value (or nil) is

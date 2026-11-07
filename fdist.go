@@ -6,7 +6,7 @@ import (
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
 	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 //stats:continuous F f dfn=Dfn dfd=Dfd

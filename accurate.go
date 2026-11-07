@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // Double-double constants (hi + lo), from mpmath at 300 bits.

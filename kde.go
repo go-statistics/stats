@@ -10,7 +10,7 @@ import (
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/linalg"
 	"github.com/go-ndarray/ndarray/random"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // BandwidthRule is a rule of thumb for the bandwidth factor of a

@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // Dirichlet is the Dirichlet distribution on the (K-1)-simplex with

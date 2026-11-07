@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // Multiple-testing corrections: statsmodels.stats.multitest.multipletests

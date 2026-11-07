@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-ndarray/ndarray"
 	"github.com/go-ndarray/ndarray/random"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // hypergeometricDraws reproduces numpy's Generator.hypergeometric(good,
