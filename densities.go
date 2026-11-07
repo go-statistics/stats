@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // The densities of the gamma and beta families, shared by Gamma,

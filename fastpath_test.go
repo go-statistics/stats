@@ -7,7 +7,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // The fast paths added for speed must return, bit for bit, what the

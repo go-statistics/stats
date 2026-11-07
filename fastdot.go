@@ -3,7 +3,7 @@ package stats
 import (
 	"math"
 
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // The inner products of the correlation functions are double-double sums

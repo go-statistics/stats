@@ -126,7 +126,7 @@ Other limits stated plainly:
 ## Techniques
 
 - The exponent of every density is carried in double-double and
-  exponentiated once (internal/dd's ExpMant is accurate to about 2^-76);
+  exponentiated once (go-numerics/special/dd's ExpMant is accurate to about 2^-76);
   for large shapes the gamma and beta densities take Stirling's factors out
   analytically, and Γ(x+½)/Γ(x) has its own double-double series.
 - Rounded arguments are corrected: the t, F, chi and inverse-gamma

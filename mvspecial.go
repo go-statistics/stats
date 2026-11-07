@@ -2,7 +2,7 @@ package stats
 
 import (
 	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // Double-double log-gamma and digamma for the Dirichlet distribution, whose

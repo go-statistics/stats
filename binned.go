@@ -6,7 +6,7 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // BinStatistic is the statistic BinnedStatistic computes in each bin.

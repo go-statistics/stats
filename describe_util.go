@@ -5,7 +5,7 @@ import (
 	"math/bits"
 	"slices"
 
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // Helpers shared by the descriptive statistics: correctly rounded powers and

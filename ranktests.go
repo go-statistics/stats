@@ -5,7 +5,7 @@ import (
 	"math"
 
 	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // MannWhitneyUOptions are the options of MannWhitneyU. The zero value

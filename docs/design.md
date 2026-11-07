@@ -53,7 +53,7 @@ distribution is one file of formulas.
 
 - **Double-double where a formula cancels or amplifies**: the exponent of a
   density (`(a-1)·log x - x - log Γ(a)` loses log2 of its terms' size) is
-  carried in double-double (`internal/dd`, a copy of go-numerics/special's)
+  carried in double-double (`go-numerics/special/dd`, the single implementation)
   and exponentiated by an exponential accurate to about 2^-70 with the
   scale factors multiplied in before the one final rounding.
 - **No large terms that cancel**: for large shapes the gamma and beta

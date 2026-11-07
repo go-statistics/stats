@@ -2,7 +2,7 @@
 
 package stats
 
-import "github.com/go-statistics/stats/internal/dd"
+import "github.com/go-numerics/special/dd"
 
 // sinTable[j] is sin(j/128), j/128 up to just past π/4.
 var sinTable = [102]dd.DD{

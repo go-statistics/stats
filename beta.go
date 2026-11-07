@@ -8,7 +8,7 @@ import (
 	"github.com/go-ndarray/ndarray/random"
 	"github.com/go-numerics/optimize"
 	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 //stats:continuous Beta beta a=A b=B

@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/go-numerics/special"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // The edges of the closed-form families that the fixtures do not reach:

@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/go-numerics/optimize"
-	"github.com/go-statistics/stats/internal/dd"
+	"github.com/go-numerics/special/dd"
 )
 
 // Elementary functions in double-double for the closed-form distributions:
