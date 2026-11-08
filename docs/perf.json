@@ -217,7 +217,7 @@
       "func": "FitBeta",
       "reference": "scipy.stats.beta.fit",
       "parity": "none",
-      "allocs": 3569,
+      "allocs": 3506,
       "go": {
         "median": 0,
         "q1": 0,
@@ -649,7 +649,7 @@
       "func": "FitChi",
       "reference": "scipy.stats.chi.fit",
       "parity": "none",
-      "allocs": 5437,
+      "allocs": 5422,
       "go": {
         "median": 0,
         "q1": 0,
@@ -865,7 +865,7 @@
       "func": "FitChiSquared",
       "reference": "scipy.stats.chi2.fit",
       "parity": "none",
-      "allocs": 42278,
+      "allocs": 42295,
       "go": {
         "median": 0,
         "q1": 0,
@@ -1297,7 +1297,7 @@
       "func": "FitF",
       "reference": "scipy.stats.f.fit",
       "parity": "none",
-      "allocs": 82059,
+      "allocs": 82055,
       "go": {
         "median": 0,
         "q1": 0,
@@ -1513,7 +1513,7 @@
       "func": "FitGamma",
       "reference": "scipy.stats.gamma.fit",
       "parity": "none",
-      "allocs": 1966,
+      "allocs": 1960,
       "go": {
         "median": 0,
         "q1": 0,
@@ -2161,7 +2161,7 @@
       "func": "FitInverseGamma",
       "reference": "scipy.stats.invgamma.fit",
       "parity": "none",
-      "allocs": 2650,
+      "allocs": 2655,
       "go": {
         "median": 0,
         "q1": 0,
@@ -3025,7 +3025,7 @@
       "func": "FitLomax",
       "reference": "scipy.stats.lomax.fit",
       "parity": "none",
-      "allocs": 4371,
+      "allocs": 4286,
       "go": {
         "median": 0,
         "q1": 0,
@@ -4303,7 +4303,7 @@
       "func": "FitStudentT",
       "reference": "scipy.stats.t.fit",
       "parity": "none",
-      "allocs": 2224,
+      "allocs": 2220,
       "go": {
         "median": 0,
         "q1": 0,
@@ -5167,7 +5167,7 @@
       "func": "FitWeibull",
       "reference": "scipy.stats.weibull_min.fit",
       "parity": "none",
-      "allocs": 1667,
+      "allocs": 1638,
       "go": {
         "median": 0,
         "q1": 0,

@@ -23,7 +23,7 @@ ns/call, median [first quartile, third quartile]; ratio = Go / reference.
 | beta.logsf | `Beta.LogSF` | scipy.stats.beta.logsf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | beta.rvs | `Beta.Rvs` | scipy.stats.beta.rvs (size=n) | — | — | — | deferred | none | 14 |
 | beta.entropy | `Beta.Entropy` | scipy.stats.beta(...).entropy() (100 calls) | — | — | — | deferred | none | 0 |
-| beta.fit | `FitBeta` | scipy.stats.beta.fit | — | — | — | deferred | none | 3569 |
+| beta.fit | `FitBeta` | scipy.stats.beta.fit | — | — | — | deferred | none | 3506 |
 | cauchy.pdf | `Cauchy.PDF` | scipy.stats.cauchy.pdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | cauchy.logpdf | `Cauchy.LogPDF` | scipy.stats.cauchy.logpdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | cauchy.cdf | `Cauchy.CDF` | scipy.stats.cauchy.cdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
@@ -47,7 +47,7 @@ ns/call, median [first quartile, third quartile]; ratio = Go / reference.
 | chi.logsf | `Chi.LogSF` | scipy.stats.chi.logsf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | chi.rvs | `Chi.Rvs` | scipy.stats.chi.rvs (size=n) | — | — | — | deferred | none | 19 |
 | chi.entropy | `Chi.Entropy` | scipy.stats.chi(...).entropy() (100 calls) | — | — | — | deferred | none | 0 |
-| chi.fit | `FitChi` | scipy.stats.chi.fit | — | — | — | deferred | none | 5437 |
+| chi.fit | `FitChi` | scipy.stats.chi.fit | — | — | — | deferred | none | 5422 |
 | chi2.pdf | `ChiSquared.PDF` | scipy.stats.chi2.pdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | chi2.logpdf | `ChiSquared.LogPDF` | scipy.stats.chi2.logpdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | chi2.cdf | `ChiSquared.CDF` | scipy.stats.chi2.cdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
@@ -59,7 +59,7 @@ ns/call, median [first quartile, third quartile]; ratio = Go / reference.
 | chi2.logsf | `ChiSquared.LogSF` | scipy.stats.chi2.logsf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | chi2.rvs | `ChiSquared.Rvs` | scipy.stats.chi2.rvs (size=n) | — | — | — | deferred | none | 14 |
 | chi2.entropy | `ChiSquared.Entropy` | scipy.stats.chi2(...).entropy() (100 calls) | — | — | — | deferred | none | 0 |
-| chi2.fit | `FitChiSquared` | scipy.stats.chi2.fit | — | — | — | deferred | none | 42278 |
+| chi2.fit | `FitChiSquared` | scipy.stats.chi2.fit | — | — | — | deferred | none | 42295 |
 | expon.pdf | `Exponential.PDF` | scipy.stats.expon.pdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | expon.logpdf | `Exponential.LogPDF` | scipy.stats.expon.logpdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | expon.cdf | `Exponential.CDF` | scipy.stats.expon.cdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
@@ -83,7 +83,7 @@ ns/call, median [first quartile, third quartile]; ratio = Go / reference.
 | f.logsf | `F.LogSF` | scipy.stats.f.logsf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | f.rvs | `F.Rvs` | scipy.stats.f.rvs (size=n) | — | — | — | deferred | none | 14 |
 | f.entropy | `F.Entropy` | scipy.stats.f(...).entropy() (100 calls) | — | — | — | deferred | none | 0 |
-| f.fit | `FitF` | scipy.stats.f.fit | — | — | — | deferred | none | 82059 |
+| f.fit | `FitF` | scipy.stats.f.fit | — | — | — | deferred | none | 82055 |
 | gamma.pdf | `Gamma.PDF` | scipy.stats.gamma.pdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | gamma.logpdf | `Gamma.LogPDF` | scipy.stats.gamma.logpdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | gamma.cdf | `Gamma.CDF` | scipy.stats.gamma.cdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
@@ -95,7 +95,7 @@ ns/call, median [first quartile, third quartile]; ratio = Go / reference.
 | gamma.logsf | `Gamma.LogSF` | scipy.stats.gamma.logsf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | gamma.rvs | `Gamma.Rvs` | scipy.stats.gamma.rvs (size=n) | — | — | — | deferred | none | 14 |
 | gamma.entropy | `Gamma.Entropy` | scipy.stats.gamma(...).entropy() (100 calls) | — | — | — | deferred | none | 0 |
-| gamma.fit | `FitGamma` | scipy.stats.gamma.fit | — | — | — | deferred | none | 1966 |
+| gamma.fit | `FitGamma` | scipy.stats.gamma.fit | — | — | — | deferred | none | 1960 |
 | gumbel_r.pdf | `Gumbel.PDF` | scipy.stats.gumbel_r.pdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | gumbel_r.logpdf | `Gumbel.LogPDF` | scipy.stats.gumbel_r.logpdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | gumbel_r.cdf | `Gumbel.CDF` | scipy.stats.gumbel_r.cdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
@@ -131,7 +131,7 @@ ns/call, median [first quartile, third quartile]; ratio = Go / reference.
 | invgamma.logsf | `InverseGamma.LogSF` | scipy.stats.invgamma.logsf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | invgamma.rvs | `InverseGamma.Rvs` | scipy.stats.invgamma.rvs (size=n) | — | — | — | deferred | none | 19 |
 | invgamma.entropy | `InverseGamma.Entropy` | scipy.stats.invgamma(...).entropy() (100 calls) | — | — | — | deferred | none | 0 |
-| invgamma.fit | `FitInverseGamma` | scipy.stats.invgamma.fit | — | — | — | deferred | none | 2650 |
+| invgamma.fit | `FitInverseGamma` | scipy.stats.invgamma.fit | — | — | — | deferred | none | 2655 |
 | laplace.pdf | `Laplace.PDF` | scipy.stats.laplace.pdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | laplace.logpdf | `Laplace.LogPDF` | scipy.stats.laplace.logpdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | laplace.cdf | `Laplace.CDF` | scipy.stats.laplace.cdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
@@ -179,7 +179,7 @@ ns/call, median [first quartile, third quartile]; ratio = Go / reference.
 | lomax.logsf | `Lomax.LogSF` | scipy.stats.lomax.logsf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | lomax.rvs | `Lomax.Rvs` | scipy.stats.lomax.rvs (size=n) | — | — | — | deferred | none | 15 |
 | lomax.entropy | `Lomax.Entropy` | scipy.stats.lomax(...).entropy() (100 calls) | — | — | — | deferred | none | 0 |
-| lomax.fit | `FitLomax` | scipy.stats.lomax.fit | — | — | — | deferred | none | 4371 |
+| lomax.fit | `FitLomax` | scipy.stats.lomax.fit | — | — | — | deferred | none | 4286 |
 | ncx2.pdf | `NoncentralChiSquared.PDF` | scipy.stats.ncx2.pdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | ncx2.logpdf | `NoncentralChiSquared.LogPDF` | scipy.stats.ncx2.logpdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | ncx2.cdf | `NoncentralChiSquared.CDF` | scipy.stats.ncx2.cdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
@@ -250,7 +250,7 @@ ns/call, median [first quartile, third quartile]; ratio = Go / reference.
 | t.logsf | `StudentT.LogSF` | scipy.stats.t.logsf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | t.rvs | `StudentT.Rvs` | scipy.stats.t.rvs (size=n) | — | — | — | deferred | none | 14 |
 | t.entropy | `StudentT.Entropy` | scipy.stats.t(...).entropy() (100 calls) | — | — | — | deferred | none | 0 |
-| t.fit | `FitStudentT` | scipy.stats.t.fit | — | — | — | deferred | none | 2224 |
+| t.fit | `FitStudentT` | scipy.stats.t.fit | — | — | — | deferred | none | 2220 |
 | triang.pdf | `Triangular.PDF` | scipy.stats.triang.pdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | triang.logpdf | `Triangular.LogPDF` | scipy.stats.triang.logpdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | triang.cdf | `Triangular.CDF` | scipy.stats.triang.cdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
@@ -298,7 +298,7 @@ ns/call, median [first quartile, third quartile]; ratio = Go / reference.
 | weibull_min.logsf | `Weibull.LogSF` | scipy.stats.weibull_min.logsf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | weibull_min.rvs | `Weibull.Rvs` | scipy.stats.weibull_min.rvs (size=n) | — | — | — | deferred | none | 15 |
 | weibull_min.entropy | `Weibull.Entropy` | scipy.stats.weibull_min(...).entropy() (100 calls) | — | — | — | deferred | none | 0 |
-| weibull_min.fit | `FitWeibull` | scipy.stats.weibull_min.fit | — | — | — | deferred | none | 1667 |
+| weibull_min.fit | `FitWeibull` | scipy.stats.weibull_min.fit | — | — | — | deferred | none | 1638 |
 | bernoulli.pmf | `Bernoulli.PMF` | scipy.stats.bernoulli.pmf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | bernoulli.logpmf | `Bernoulli.LogPMF` | scipy.stats.bernoulli.logpmf (one ufunc call over n points) | — | — | — | deferred | none | 0 |
 | bernoulli.cdf | `Bernoulli.CDF` | scipy.stats.bernoulli.cdf (one ufunc call over n points) | — | — | — | deferred | none | 0 |

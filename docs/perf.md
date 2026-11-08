@@ -65,6 +65,12 @@ test pass unchanged; package coverage stays 100.0%).
 | `f.ppf`, `f.isf` | 1291, 1292 | 0 | the same |
 | `beta.ppf`, `beta.isf` | 1060, 1058 | 0 | the same |
 
+Architecture: every count is equal on arm64 and amd64 except nine `*.fit` rows
+(the optimiser takes slightly different paths with and without fused
+multiply-add); `perf.json` holds the amd64 counts of those nine, the CI
+architecture, so `TestPerf` on arm64 reports them (refbench has no per-GOARCH
+record yet).
+
 Still allocating, filed (#19): the `*.fit` rows (`f.fit` 82 059 per call,
 `chi2.fit` 42 278), one boxing of the standard form per likelihood evaluation
 and, from go-numerics/optimize v0.6.0, two slices and a reflect swapper per
