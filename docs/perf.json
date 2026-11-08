@@ -1,0 +1,8154 @@
+{
+  "schema": 1,
+  "status": "deferred",
+  "date": "2026-11-08T15:30:05+01:00",
+  "commit": "",
+  "repo": "go-statistics/stats",
+  "go_version": "go1.27.3",
+  "machine": "darwin/arm64, 16 CPUs",
+  "max_load": 8,
+  "load": {
+    "min": 0,
+    "median": 0,
+    "max": 0
+  },
+  "valid": true,
+  "rows": [
+    {
+      "name": "beta.pdf",
+      "func": "Beta.PDF",
+      "reference": "scipy.stats.beta.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.logpdf",
+      "func": "Beta.LogPDF",
+      "reference": "scipy.stats.beta.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.cdf",
+      "func": "Beta.CDF",
+      "reference": "scipy.stats.beta.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/beta.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.beta.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.sf",
+      "func": "Beta.SF",
+      "reference": "scipy.stats.beta.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.ppf",
+      "func": "Beta.PPF",
+      "reference": "scipy.stats.beta.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.isf",
+      "func": "Beta.ISF",
+      "reference": "scipy.stats.beta.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.logcdf",
+      "func": "Beta.LogCDF",
+      "reference": "scipy.stats.beta.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.logsf",
+      "func": "Beta.LogSF",
+      "reference": "scipy.stats.beta.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.rvs",
+      "func": "Beta.Rvs",
+      "reference": "scipy.stats.beta.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.entropy",
+      "func": "Beta.Entropy",
+      "reference": "scipy.stats.beta(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "beta.fit",
+      "func": "FitBeta",
+      "reference": "scipy.stats.beta.fit",
+      "parity": "none",
+      "allocs": 3506,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.pdf",
+      "func": "Cauchy.PDF",
+      "reference": "scipy.stats.cauchy.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.logpdf",
+      "func": "Cauchy.LogPDF",
+      "reference": "scipy.stats.cauchy.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.cdf",
+      "func": "Cauchy.CDF",
+      "reference": "scipy.stats.cauchy.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/cauchy.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.cauchy.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.sf",
+      "func": "Cauchy.SF",
+      "reference": "scipy.stats.cauchy.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.ppf",
+      "func": "Cauchy.PPF",
+      "reference": "scipy.stats.cauchy.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.isf",
+      "func": "Cauchy.ISF",
+      "reference": "scipy.stats.cauchy.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.logcdf",
+      "func": "Cauchy.LogCDF",
+      "reference": "scipy.stats.cauchy.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.logsf",
+      "func": "Cauchy.LogSF",
+      "reference": "scipy.stats.cauchy.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.rvs",
+      "func": "Cauchy.Rvs",
+      "reference": "scipy.stats.cauchy.rvs (size=n)",
+      "parity": "none",
+      "allocs": 15,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.entropy",
+      "func": "Cauchy.Entropy",
+      "reference": "scipy.stats.cauchy(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cauchy.fit",
+      "func": "FitCauchy",
+      "reference": "scipy.stats.cauchy.fit",
+      "parity": "none",
+      "allocs": 460,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.pdf",
+      "func": "Chi.PDF",
+      "reference": "scipy.stats.chi.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.logpdf",
+      "func": "Chi.LogPDF",
+      "reference": "scipy.stats.chi.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.cdf",
+      "func": "Chi.CDF",
+      "reference": "scipy.stats.chi.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/chi.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.chi.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.sf",
+      "func": "Chi.SF",
+      "reference": "scipy.stats.chi.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.ppf",
+      "func": "Chi.PPF",
+      "reference": "scipy.stats.chi.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.isf",
+      "func": "Chi.ISF",
+      "reference": "scipy.stats.chi.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.logcdf",
+      "func": "Chi.LogCDF",
+      "reference": "scipy.stats.chi.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.logsf",
+      "func": "Chi.LogSF",
+      "reference": "scipy.stats.chi.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.rvs",
+      "func": "Chi.Rvs",
+      "reference": "scipy.stats.chi.rvs (size=n)",
+      "parity": "none",
+      "allocs": 19,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.entropy",
+      "func": "Chi.Entropy",
+      "reference": "scipy.stats.chi(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi.fit",
+      "func": "FitChi",
+      "reference": "scipy.stats.chi.fit",
+      "parity": "none",
+      "allocs": 5422,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.pdf",
+      "func": "ChiSquared.PDF",
+      "reference": "scipy.stats.chi2.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.logpdf",
+      "func": "ChiSquared.LogPDF",
+      "reference": "scipy.stats.chi2.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.cdf",
+      "func": "ChiSquared.CDF",
+      "reference": "scipy.stats.chi2.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/chi2.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.chi2.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.sf",
+      "func": "ChiSquared.SF",
+      "reference": "scipy.stats.chi2.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.ppf",
+      "func": "ChiSquared.PPF",
+      "reference": "scipy.stats.chi2.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.isf",
+      "func": "ChiSquared.ISF",
+      "reference": "scipy.stats.chi2.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.logcdf",
+      "func": "ChiSquared.LogCDF",
+      "reference": "scipy.stats.chi2.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.logsf",
+      "func": "ChiSquared.LogSF",
+      "reference": "scipy.stats.chi2.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.rvs",
+      "func": "ChiSquared.Rvs",
+      "reference": "scipy.stats.chi2.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.entropy",
+      "func": "ChiSquared.Entropy",
+      "reference": "scipy.stats.chi2(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2.fit",
+      "func": "FitChiSquared",
+      "reference": "scipy.stats.chi2.fit",
+      "parity": "none",
+      "allocs": 42295,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.pdf",
+      "func": "Exponential.PDF",
+      "reference": "scipy.stats.expon.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.logpdf",
+      "func": "Exponential.LogPDF",
+      "reference": "scipy.stats.expon.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.cdf",
+      "func": "Exponential.CDF",
+      "reference": "scipy.stats.expon.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/expon.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.expon.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.sf",
+      "func": "Exponential.SF",
+      "reference": "scipy.stats.expon.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.ppf",
+      "func": "Exponential.PPF",
+      "reference": "scipy.stats.expon.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.isf",
+      "func": "Exponential.ISF",
+      "reference": "scipy.stats.expon.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.logcdf",
+      "func": "Exponential.LogCDF",
+      "reference": "scipy.stats.expon.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.logsf",
+      "func": "Exponential.LogSF",
+      "reference": "scipy.stats.expon.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.rvs",
+      "func": "Exponential.Rvs",
+      "reference": "scipy.stats.expon.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.entropy",
+      "func": "Exponential.Entropy",
+      "reference": "scipy.stats.expon(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "expon.fit",
+      "func": "FitExponential",
+      "reference": "scipy.stats.expon.fit",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.pdf",
+      "func": "F.PDF",
+      "reference": "scipy.stats.f.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.logpdf",
+      "func": "F.LogPDF",
+      "reference": "scipy.stats.f.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.cdf",
+      "func": "F.CDF",
+      "reference": "scipy.stats.f.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/f.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.f.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.sf",
+      "func": "F.SF",
+      "reference": "scipy.stats.f.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.ppf",
+      "func": "F.PPF",
+      "reference": "scipy.stats.f.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.isf",
+      "func": "F.ISF",
+      "reference": "scipy.stats.f.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.logcdf",
+      "func": "F.LogCDF",
+      "reference": "scipy.stats.f.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.logsf",
+      "func": "F.LogSF",
+      "reference": "scipy.stats.f.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.rvs",
+      "func": "F.Rvs",
+      "reference": "scipy.stats.f.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.entropy",
+      "func": "F.Entropy",
+      "reference": "scipy.stats.f(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f.fit",
+      "func": "FitF",
+      "reference": "scipy.stats.f.fit",
+      "parity": "none",
+      "allocs": 82055,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.pdf",
+      "func": "Gamma.PDF",
+      "reference": "scipy.stats.gamma.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.logpdf",
+      "func": "Gamma.LogPDF",
+      "reference": "scipy.stats.gamma.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.cdf",
+      "func": "Gamma.CDF",
+      "reference": "scipy.stats.gamma.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/gamma.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.gamma.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.sf",
+      "func": "Gamma.SF",
+      "reference": "scipy.stats.gamma.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.ppf",
+      "func": "Gamma.PPF",
+      "reference": "scipy.stats.gamma.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.isf",
+      "func": "Gamma.ISF",
+      "reference": "scipy.stats.gamma.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.logcdf",
+      "func": "Gamma.LogCDF",
+      "reference": "scipy.stats.gamma.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.logsf",
+      "func": "Gamma.LogSF",
+      "reference": "scipy.stats.gamma.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.rvs",
+      "func": "Gamma.Rvs",
+      "reference": "scipy.stats.gamma.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.entropy",
+      "func": "Gamma.Entropy",
+      "reference": "scipy.stats.gamma(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gamma.fit",
+      "func": "FitGamma",
+      "reference": "scipy.stats.gamma.fit",
+      "parity": "none",
+      "allocs": 1960,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.pdf",
+      "func": "Gumbel.PDF",
+      "reference": "scipy.stats.gumbel_r.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.logpdf",
+      "func": "Gumbel.LogPDF",
+      "reference": "scipy.stats.gumbel_r.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.cdf",
+      "func": "Gumbel.CDF",
+      "reference": "scipy.stats.gumbel_r.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/gumbel_r.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.gumbel_r.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.sf",
+      "func": "Gumbel.SF",
+      "reference": "scipy.stats.gumbel_r.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.ppf",
+      "func": "Gumbel.PPF",
+      "reference": "scipy.stats.gumbel_r.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.isf",
+      "func": "Gumbel.ISF",
+      "reference": "scipy.stats.gumbel_r.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.logcdf",
+      "func": "Gumbel.LogCDF",
+      "reference": "scipy.stats.gumbel_r.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.logsf",
+      "func": "Gumbel.LogSF",
+      "reference": "scipy.stats.gumbel_r.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.rvs",
+      "func": "Gumbel.Rvs",
+      "reference": "scipy.stats.gumbel_r.rvs (size=n)",
+      "parity": "none",
+      "allocs": 15,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.entropy",
+      "func": "Gumbel.Entropy",
+      "reference": "scipy.stats.gumbel_r(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gumbel_r.fit",
+      "func": "FitGumbel",
+      "reference": "scipy.stats.gumbel_r.fit",
+      "parity": "none",
+      "allocs": 9,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.pdf",
+      "func": "HalfNormal.PDF",
+      "reference": "scipy.stats.halfnorm.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.logpdf",
+      "func": "HalfNormal.LogPDF",
+      "reference": "scipy.stats.halfnorm.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.cdf",
+      "func": "HalfNormal.CDF",
+      "reference": "scipy.stats.halfnorm.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/halfnorm.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.halfnorm.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.sf",
+      "func": "HalfNormal.SF",
+      "reference": "scipy.stats.halfnorm.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.ppf",
+      "func": "HalfNormal.PPF",
+      "reference": "scipy.stats.halfnorm.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.isf",
+      "func": "HalfNormal.ISF",
+      "reference": "scipy.stats.halfnorm.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.logcdf",
+      "func": "HalfNormal.LogCDF",
+      "reference": "scipy.stats.halfnorm.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.logsf",
+      "func": "HalfNormal.LogSF",
+      "reference": "scipy.stats.halfnorm.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.rvs",
+      "func": "HalfNormal.Rvs",
+      "reference": "scipy.stats.halfnorm.rvs (size=n)",
+      "parity": "none",
+      "allocs": 19,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.entropy",
+      "func": "HalfNormal.Entropy",
+      "reference": "scipy.stats.halfnorm(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "halfnorm.fit",
+      "func": "FitHalfNormal",
+      "reference": "scipy.stats.halfnorm.fit",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.pdf",
+      "func": "InverseGamma.PDF",
+      "reference": "scipy.stats.invgamma.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.logpdf",
+      "func": "InverseGamma.LogPDF",
+      "reference": "scipy.stats.invgamma.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.cdf",
+      "func": "InverseGamma.CDF",
+      "reference": "scipy.stats.invgamma.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/invgamma.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.invgamma.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.sf",
+      "func": "InverseGamma.SF",
+      "reference": "scipy.stats.invgamma.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.ppf",
+      "func": "InverseGamma.PPF",
+      "reference": "scipy.stats.invgamma.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.isf",
+      "func": "InverseGamma.ISF",
+      "reference": "scipy.stats.invgamma.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.logcdf",
+      "func": "InverseGamma.LogCDF",
+      "reference": "scipy.stats.invgamma.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.logsf",
+      "func": "InverseGamma.LogSF",
+      "reference": "scipy.stats.invgamma.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.rvs",
+      "func": "InverseGamma.Rvs",
+      "reference": "scipy.stats.invgamma.rvs (size=n)",
+      "parity": "none",
+      "allocs": 19,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.entropy",
+      "func": "InverseGamma.Entropy",
+      "reference": "scipy.stats.invgamma(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "invgamma.fit",
+      "func": "FitInverseGamma",
+      "reference": "scipy.stats.invgamma.fit",
+      "parity": "none",
+      "allocs": 2655,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.pdf",
+      "func": "Laplace.PDF",
+      "reference": "scipy.stats.laplace.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.logpdf",
+      "func": "Laplace.LogPDF",
+      "reference": "scipy.stats.laplace.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.cdf",
+      "func": "Laplace.CDF",
+      "reference": "scipy.stats.laplace.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/laplace.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.laplace.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.sf",
+      "func": "Laplace.SF",
+      "reference": "scipy.stats.laplace.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.ppf",
+      "func": "Laplace.PPF",
+      "reference": "scipy.stats.laplace.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.isf",
+      "func": "Laplace.ISF",
+      "reference": "scipy.stats.laplace.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.logcdf",
+      "func": "Laplace.LogCDF",
+      "reference": "scipy.stats.laplace.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.logsf",
+      "func": "Laplace.LogSF",
+      "reference": "scipy.stats.laplace.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.rvs",
+      "func": "Laplace.Rvs",
+      "reference": "scipy.stats.laplace.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.entropy",
+      "func": "Laplace.Entropy",
+      "reference": "scipy.stats.laplace(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "laplace.fit",
+      "func": "FitLaplace",
+      "reference": "scipy.stats.laplace.fit",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.pdf",
+      "func": "Logistic.PDF",
+      "reference": "scipy.stats.logistic.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.logpdf",
+      "func": "Logistic.LogPDF",
+      "reference": "scipy.stats.logistic.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.cdf",
+      "func": "Logistic.CDF",
+      "reference": "scipy.stats.logistic.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/logistic.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.logistic.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.sf",
+      "func": "Logistic.SF",
+      "reference": "scipy.stats.logistic.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.ppf",
+      "func": "Logistic.PPF",
+      "reference": "scipy.stats.logistic.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.isf",
+      "func": "Logistic.ISF",
+      "reference": "scipy.stats.logistic.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.logcdf",
+      "func": "Logistic.LogCDF",
+      "reference": "scipy.stats.logistic.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.logsf",
+      "func": "Logistic.LogSF",
+      "reference": "scipy.stats.logistic.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.rvs",
+      "func": "Logistic.Rvs",
+      "reference": "scipy.stats.logistic.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.entropy",
+      "func": "Logistic.Entropy",
+      "reference": "scipy.stats.logistic(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "logistic.fit",
+      "func": "FitLogistic",
+      "reference": "scipy.stats.logistic.fit",
+      "parity": "none",
+      "allocs": 70,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.pdf",
+      "func": "LogNormal.PDF",
+      "reference": "scipy.stats.lognorm.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.logpdf",
+      "func": "LogNormal.LogPDF",
+      "reference": "scipy.stats.lognorm.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.cdf",
+      "func": "LogNormal.CDF",
+      "reference": "scipy.stats.lognorm.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/lognorm.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.lognorm.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.sf",
+      "func": "LogNormal.SF",
+      "reference": "scipy.stats.lognorm.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.ppf",
+      "func": "LogNormal.PPF",
+      "reference": "scipy.stats.lognorm.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.isf",
+      "func": "LogNormal.ISF",
+      "reference": "scipy.stats.lognorm.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.logcdf",
+      "func": "LogNormal.LogCDF",
+      "reference": "scipy.stats.lognorm.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.logsf",
+      "func": "LogNormal.LogSF",
+      "reference": "scipy.stats.lognorm.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.rvs",
+      "func": "LogNormal.Rvs",
+      "reference": "scipy.stats.lognorm.rvs (size=n)",
+      "parity": "none",
+      "allocs": 15,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.entropy",
+      "func": "LogNormal.Entropy",
+      "reference": "scipy.stats.lognorm(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lognorm.fit",
+      "func": "FitLogNormal",
+      "reference": "scipy.stats.lognorm.fit",
+      "parity": "none",
+      "allocs": 54,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.pdf",
+      "func": "Lomax.PDF",
+      "reference": "scipy.stats.lomax.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.logpdf",
+      "func": "Lomax.LogPDF",
+      "reference": "scipy.stats.lomax.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.cdf",
+      "func": "Lomax.CDF",
+      "reference": "scipy.stats.lomax.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/lomax.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.lomax.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.sf",
+      "func": "Lomax.SF",
+      "reference": "scipy.stats.lomax.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.ppf",
+      "func": "Lomax.PPF",
+      "reference": "scipy.stats.lomax.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.isf",
+      "func": "Lomax.ISF",
+      "reference": "scipy.stats.lomax.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.logcdf",
+      "func": "Lomax.LogCDF",
+      "reference": "scipy.stats.lomax.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.logsf",
+      "func": "Lomax.LogSF",
+      "reference": "scipy.stats.lomax.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.rvs",
+      "func": "Lomax.Rvs",
+      "reference": "scipy.stats.lomax.rvs (size=n)",
+      "parity": "none",
+      "allocs": 15,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.entropy",
+      "func": "Lomax.Entropy",
+      "reference": "scipy.stats.lomax(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "lomax.fit",
+      "func": "FitLomax",
+      "reference": "scipy.stats.lomax.fit",
+      "parity": "none",
+      "allocs": 4286,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.pdf",
+      "func": "NoncentralChiSquared.PDF",
+      "reference": "scipy.stats.ncx2.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.logpdf",
+      "func": "NoncentralChiSquared.LogPDF",
+      "reference": "scipy.stats.ncx2.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.cdf",
+      "func": "NoncentralChiSquared.CDF",
+      "reference": "scipy.stats.ncx2.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/ncx2.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.ncx2.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.sf",
+      "func": "NoncentralChiSquared.SF",
+      "reference": "scipy.stats.ncx2.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.ppf",
+      "func": "NoncentralChiSquared.PPF",
+      "reference": "scipy.stats.ncx2.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.isf",
+      "func": "NoncentralChiSquared.ISF",
+      "reference": "scipy.stats.ncx2.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.logcdf",
+      "func": "NoncentralChiSquared.LogCDF",
+      "reference": "scipy.stats.ncx2.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.logsf",
+      "func": "NoncentralChiSquared.LogSF",
+      "reference": "scipy.stats.ncx2.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.rvs",
+      "func": "NoncentralChiSquared.Rvs",
+      "reference": "scipy.stats.ncx2.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ncx2.entropy",
+      "func": "NoncentralChiSquared.Entropy",
+      "reference": "scipy.stats.ncx2(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.pdf",
+      "func": "Normal.PDF",
+      "reference": "scipy.stats.norm.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.logpdf",
+      "func": "Normal.LogPDF",
+      "reference": "scipy.stats.norm.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.cdf",
+      "func": "Normal.CDF",
+      "reference": "scipy.stats.norm.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/norm.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.norm.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.sf",
+      "func": "Normal.SF",
+      "reference": "scipy.stats.norm.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.ppf",
+      "func": "Normal.PPF",
+      "reference": "scipy.stats.norm.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.isf",
+      "func": "Normal.ISF",
+      "reference": "scipy.stats.norm.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.logcdf",
+      "func": "Normal.LogCDF",
+      "reference": "scipy.stats.norm.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.logsf",
+      "func": "Normal.LogSF",
+      "reference": "scipy.stats.norm.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.rvs",
+      "func": "Normal.Rvs",
+      "reference": "scipy.stats.norm.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.entropy",
+      "func": "Normal.Entropy",
+      "reference": "scipy.stats.norm(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "norm.fit",
+      "func": "FitNormal",
+      "reference": "scipy.stats.norm.fit",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.pdf",
+      "func": "Pareto.PDF",
+      "reference": "scipy.stats.pareto.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.logpdf",
+      "func": "Pareto.LogPDF",
+      "reference": "scipy.stats.pareto.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.cdf",
+      "func": "Pareto.CDF",
+      "reference": "scipy.stats.pareto.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/pareto.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.pareto.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.sf",
+      "func": "Pareto.SF",
+      "reference": "scipy.stats.pareto.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.ppf",
+      "func": "Pareto.PPF",
+      "reference": "scipy.stats.pareto.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.isf",
+      "func": "Pareto.ISF",
+      "reference": "scipy.stats.pareto.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.logcdf",
+      "func": "Pareto.LogCDF",
+      "reference": "scipy.stats.pareto.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.logsf",
+      "func": "Pareto.LogSF",
+      "reference": "scipy.stats.pareto.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.rvs",
+      "func": "Pareto.Rvs",
+      "reference": "scipy.stats.pareto.rvs (size=n)",
+      "parity": "none",
+      "allocs": 15,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.entropy",
+      "func": "Pareto.Entropy",
+      "reference": "scipy.stats.pareto(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pareto.fit",
+      "func": "FitPareto",
+      "reference": "scipy.stats.pareto.fit",
+      "parity": "none",
+      "allocs": 8,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.pdf",
+      "func": "Rayleigh.PDF",
+      "reference": "scipy.stats.rayleigh.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.logpdf",
+      "func": "Rayleigh.LogPDF",
+      "reference": "scipy.stats.rayleigh.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.cdf",
+      "func": "Rayleigh.CDF",
+      "reference": "scipy.stats.rayleigh.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/rayleigh.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.rayleigh.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.sf",
+      "func": "Rayleigh.SF",
+      "reference": "scipy.stats.rayleigh.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.ppf",
+      "func": "Rayleigh.PPF",
+      "reference": "scipy.stats.rayleigh.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.isf",
+      "func": "Rayleigh.ISF",
+      "reference": "scipy.stats.rayleigh.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.logcdf",
+      "func": "Rayleigh.LogCDF",
+      "reference": "scipy.stats.rayleigh.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.logsf",
+      "func": "Rayleigh.LogSF",
+      "reference": "scipy.stats.rayleigh.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.rvs",
+      "func": "Rayleigh.Rvs",
+      "reference": "scipy.stats.rayleigh.rvs (size=n)",
+      "parity": "none",
+      "allocs": 19,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.entropy",
+      "func": "Rayleigh.Entropy",
+      "reference": "scipy.stats.rayleigh(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rayleigh.fit",
+      "func": "FitRayleigh",
+      "reference": "scipy.stats.rayleigh.fit",
+      "parity": "none",
+      "allocs": 9,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.pdf",
+      "func": "Reciprocal.PDF",
+      "reference": "scipy.stats.reciprocal.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.logpdf",
+      "func": "Reciprocal.LogPDF",
+      "reference": "scipy.stats.reciprocal.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.cdf",
+      "func": "Reciprocal.CDF",
+      "reference": "scipy.stats.reciprocal.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/reciprocal.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.reciprocal.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.sf",
+      "func": "Reciprocal.SF",
+      "reference": "scipy.stats.reciprocal.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.ppf",
+      "func": "Reciprocal.PPF",
+      "reference": "scipy.stats.reciprocal.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.isf",
+      "func": "Reciprocal.ISF",
+      "reference": "scipy.stats.reciprocal.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.logcdf",
+      "func": "Reciprocal.LogCDF",
+      "reference": "scipy.stats.reciprocal.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.logsf",
+      "func": "Reciprocal.LogSF",
+      "reference": "scipy.stats.reciprocal.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.rvs",
+      "func": "Reciprocal.Rvs",
+      "reference": "scipy.stats.reciprocal.rvs (size=n)",
+      "parity": "none",
+      "allocs": 15,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.entropy",
+      "func": "Reciprocal.Entropy",
+      "reference": "scipy.stats.reciprocal(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "reciprocal.fit",
+      "func": "FitReciprocal",
+      "reference": "scipy.stats.reciprocal.fit",
+      "parity": "none",
+      "allocs": 659,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.pdf",
+      "func": "StudentT.PDF",
+      "reference": "scipy.stats.t.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.logpdf",
+      "func": "StudentT.LogPDF",
+      "reference": "scipy.stats.t.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.cdf",
+      "func": "StudentT.CDF",
+      "reference": "scipy.stats.t.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/t.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.t.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.sf",
+      "func": "StudentT.SF",
+      "reference": "scipy.stats.t.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.ppf",
+      "func": "StudentT.PPF",
+      "reference": "scipy.stats.t.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.isf",
+      "func": "StudentT.ISF",
+      "reference": "scipy.stats.t.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.logcdf",
+      "func": "StudentT.LogCDF",
+      "reference": "scipy.stats.t.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.logsf",
+      "func": "StudentT.LogSF",
+      "reference": "scipy.stats.t.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.rvs",
+      "func": "StudentT.Rvs",
+      "reference": "scipy.stats.t.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.entropy",
+      "func": "StudentT.Entropy",
+      "reference": "scipy.stats.t(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "t.fit",
+      "func": "FitStudentT",
+      "reference": "scipy.stats.t.fit",
+      "parity": "none",
+      "allocs": 2220,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.pdf",
+      "func": "Triangular.PDF",
+      "reference": "scipy.stats.triang.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.logpdf",
+      "func": "Triangular.LogPDF",
+      "reference": "scipy.stats.triang.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.cdf",
+      "func": "Triangular.CDF",
+      "reference": "scipy.stats.triang.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/triang.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.triang.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.sf",
+      "func": "Triangular.SF",
+      "reference": "scipy.stats.triang.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.ppf",
+      "func": "Triangular.PPF",
+      "reference": "scipy.stats.triang.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.isf",
+      "func": "Triangular.ISF",
+      "reference": "scipy.stats.triang.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.logcdf",
+      "func": "Triangular.LogCDF",
+      "reference": "scipy.stats.triang.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.logsf",
+      "func": "Triangular.LogSF",
+      "reference": "scipy.stats.triang.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.rvs",
+      "func": "Triangular.Rvs",
+      "reference": "scipy.stats.triang.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.entropy",
+      "func": "Triangular.Entropy",
+      "reference": "scipy.stats.triang(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "triang.fit",
+      "func": "FitTriangular",
+      "reference": "scipy.stats.triang.fit",
+      "parity": "none",
+      "allocs": 3066,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.pdf",
+      "func": "Uniform.PDF",
+      "reference": "scipy.stats.uniform.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.logpdf",
+      "func": "Uniform.LogPDF",
+      "reference": "scipy.stats.uniform.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.cdf",
+      "func": "Uniform.CDF",
+      "reference": "scipy.stats.uniform.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/uniform.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.uniform.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.sf",
+      "func": "Uniform.SF",
+      "reference": "scipy.stats.uniform.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.ppf",
+      "func": "Uniform.PPF",
+      "reference": "scipy.stats.uniform.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.isf",
+      "func": "Uniform.ISF",
+      "reference": "scipy.stats.uniform.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.logcdf",
+      "func": "Uniform.LogCDF",
+      "reference": "scipy.stats.uniform.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.logsf",
+      "func": "Uniform.LogSF",
+      "reference": "scipy.stats.uniform.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.rvs",
+      "func": "Uniform.Rvs",
+      "reference": "scipy.stats.uniform.rvs (size=n)",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.entropy",
+      "func": "Uniform.Entropy",
+      "reference": "scipy.stats.uniform(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "uniform.fit",
+      "func": "FitUniform",
+      "reference": "scipy.stats.uniform.fit",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.pdf",
+      "func": "VonMises.PDF",
+      "reference": "scipy.stats.vonmises.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.logpdf",
+      "func": "VonMises.LogPDF",
+      "reference": "scipy.stats.vonmises.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.cdf",
+      "func": "VonMises.CDF",
+      "reference": "scipy.stats.vonmises.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/vonmises.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.vonmises.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.sf",
+      "func": "VonMises.SF",
+      "reference": "scipy.stats.vonmises.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.ppf",
+      "func": "VonMises.PPF",
+      "reference": "scipy.stats.vonmises.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.isf",
+      "func": "VonMises.ISF",
+      "reference": "scipy.stats.vonmises.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.logcdf",
+      "func": "VonMises.LogCDF",
+      "reference": "scipy.stats.vonmises.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.logsf",
+      "func": "VonMises.LogSF",
+      "reference": "scipy.stats.vonmises.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.rvs",
+      "func": "VonMises.Rvs",
+      "reference": "scipy.stats.vonmises.rvs (size=n)",
+      "parity": "none",
+      "allocs": 15,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.entropy",
+      "func": "VonMises.Entropy",
+      "reference": "scipy.stats.vonmises(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "vonmises.fit",
+      "func": "FitVonMises",
+      "reference": "scipy.stats.vonmises.fit",
+      "parity": "none",
+      "allocs": 9,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.pdf",
+      "func": "Weibull.PDF",
+      "reference": "scipy.stats.weibull_min.pdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.logpdf",
+      "func": "Weibull.LogPDF",
+      "reference": "scipy.stats.weibull_min.logpdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.cdf",
+      "func": "Weibull.CDF",
+      "reference": "scipy.stats.weibull_min.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/weibull_min.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.weibull_min.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.sf",
+      "func": "Weibull.SF",
+      "reference": "scipy.stats.weibull_min.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.ppf",
+      "func": "Weibull.PPF",
+      "reference": "scipy.stats.weibull_min.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.isf",
+      "func": "Weibull.ISF",
+      "reference": "scipy.stats.weibull_min.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.logcdf",
+      "func": "Weibull.LogCDF",
+      "reference": "scipy.stats.weibull_min.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.logsf",
+      "func": "Weibull.LogSF",
+      "reference": "scipy.stats.weibull_min.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.rvs",
+      "func": "Weibull.Rvs",
+      "reference": "scipy.stats.weibull_min.rvs (size=n)",
+      "parity": "none",
+      "allocs": 15,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.entropy",
+      "func": "Weibull.Entropy",
+      "reference": "scipy.stats.weibull_min(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "weibull_min.fit",
+      "func": "FitWeibull",
+      "reference": "scipy.stats.weibull_min.fit",
+      "parity": "none",
+      "allocs": 1638,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.pmf",
+      "func": "Bernoulli.PMF",
+      "reference": "scipy.stats.bernoulli.pmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.logpmf",
+      "func": "Bernoulli.LogPMF",
+      "reference": "scipy.stats.bernoulli.logpmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.cdf",
+      "func": "Bernoulli.CDF",
+      "reference": "scipy.stats.bernoulli.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/bernoulli.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.bernoulli.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.sf",
+      "func": "Bernoulli.SF",
+      "reference": "scipy.stats.bernoulli.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.ppf",
+      "func": "Bernoulli.PPF",
+      "reference": "scipy.stats.bernoulli.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.isf",
+      "func": "Bernoulli.ISF",
+      "reference": "scipy.stats.bernoulli.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.logcdf",
+      "func": "Bernoulli.LogCDF",
+      "reference": "scipy.stats.bernoulli.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.logsf",
+      "func": "Bernoulli.LogSF",
+      "reference": "scipy.stats.bernoulli.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.rvs",
+      "func": "Bernoulli.Rvs",
+      "reference": "scipy.stats.bernoulli.rvs (size=n)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bernoulli.entropy",
+      "func": "Bernoulli.Entropy",
+      "reference": "scipy.stats.bernoulli(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.pmf",
+      "func": "Binomial.PMF",
+      "reference": "scipy.stats.binom.pmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.logpmf",
+      "func": "Binomial.LogPMF",
+      "reference": "scipy.stats.binom.logpmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.cdf",
+      "func": "Binomial.CDF",
+      "reference": "scipy.stats.binom.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/binom.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.binom.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.sf",
+      "func": "Binomial.SF",
+      "reference": "scipy.stats.binom.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.ppf",
+      "func": "Binomial.PPF",
+      "reference": "scipy.stats.binom.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.isf",
+      "func": "Binomial.ISF",
+      "reference": "scipy.stats.binom.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.logcdf",
+      "func": "Binomial.LogCDF",
+      "reference": "scipy.stats.binom.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.logsf",
+      "func": "Binomial.LogSF",
+      "reference": "scipy.stats.binom.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.rvs",
+      "func": "Binomial.Rvs",
+      "reference": "scipy.stats.binom.rvs (size=n)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binom.entropy",
+      "func": "Binomial.Entropy",
+      "reference": "scipy.stats.binom(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.pmf",
+      "func": "DiscreteUniform.PMF",
+      "reference": "scipy.stats.randint.pmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.logpmf",
+      "func": "DiscreteUniform.LogPMF",
+      "reference": "scipy.stats.randint.logpmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.cdf",
+      "func": "DiscreteUniform.CDF",
+      "reference": "scipy.stats.randint.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/randint.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.randint.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.sf",
+      "func": "DiscreteUniform.SF",
+      "reference": "scipy.stats.randint.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.ppf",
+      "func": "DiscreteUniform.PPF",
+      "reference": "scipy.stats.randint.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.isf",
+      "func": "DiscreteUniform.ISF",
+      "reference": "scipy.stats.randint.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.logcdf",
+      "func": "DiscreteUniform.LogCDF",
+      "reference": "scipy.stats.randint.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.logsf",
+      "func": "DiscreteUniform.LogSF",
+      "reference": "scipy.stats.randint.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.rvs",
+      "func": "DiscreteUniform.Rvs",
+      "reference": "scipy.stats.randint.rvs (size=n)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "randint.entropy",
+      "func": "DiscreteUniform.Entropy",
+      "reference": "scipy.stats.randint(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.pmf",
+      "func": "Geometric.PMF",
+      "reference": "scipy.stats.geom.pmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.logpmf",
+      "func": "Geometric.LogPMF",
+      "reference": "scipy.stats.geom.logpmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.cdf",
+      "func": "Geometric.CDF",
+      "reference": "scipy.stats.geom.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/geom.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.geom.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.sf",
+      "func": "Geometric.SF",
+      "reference": "scipy.stats.geom.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.ppf",
+      "func": "Geometric.PPF",
+      "reference": "scipy.stats.geom.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.isf",
+      "func": "Geometric.ISF",
+      "reference": "scipy.stats.geom.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.logcdf",
+      "func": "Geometric.LogCDF",
+      "reference": "scipy.stats.geom.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.logsf",
+      "func": "Geometric.LogSF",
+      "reference": "scipy.stats.geom.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.rvs",
+      "func": "Geometric.Rvs",
+      "reference": "scipy.stats.geom.rvs (size=n)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "geom.entropy",
+      "func": "Geometric.Entropy",
+      "reference": "scipy.stats.geom(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.pmf",
+      "func": "Hypergeometric.PMF",
+      "reference": "scipy.stats.hypergeom.pmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.logpmf",
+      "func": "Hypergeometric.LogPMF",
+      "reference": "scipy.stats.hypergeom.logpmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.cdf",
+      "func": "Hypergeometric.CDF",
+      "reference": "scipy.stats.hypergeom.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/hypergeom.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.hypergeom.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.sf",
+      "func": "Hypergeometric.SF",
+      "reference": "scipy.stats.hypergeom.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.ppf",
+      "func": "Hypergeometric.PPF",
+      "reference": "scipy.stats.hypergeom.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.isf",
+      "func": "Hypergeometric.ISF",
+      "reference": "scipy.stats.hypergeom.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.logcdf",
+      "func": "Hypergeometric.LogCDF",
+      "reference": "scipy.stats.hypergeom.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.logsf",
+      "func": "Hypergeometric.LogSF",
+      "reference": "scipy.stats.hypergeom.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.rvs",
+      "func": "Hypergeometric.Rvs",
+      "reference": "scipy.stats.hypergeom.rvs (size=n)",
+      "parity": "none",
+      "allocs": 18,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hypergeom.entropy",
+      "func": "Hypergeometric.Entropy",
+      "reference": "scipy.stats.hypergeom(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.pmf",
+      "func": "NegativeBinomial.PMF",
+      "reference": "scipy.stats.nbinom.pmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.logpmf",
+      "func": "NegativeBinomial.LogPMF",
+      "reference": "scipy.stats.nbinom.logpmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.cdf",
+      "func": "NegativeBinomial.CDF",
+      "reference": "scipy.stats.nbinom.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/nbinom.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.nbinom.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.sf",
+      "func": "NegativeBinomial.SF",
+      "reference": "scipy.stats.nbinom.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.ppf",
+      "func": "NegativeBinomial.PPF",
+      "reference": "scipy.stats.nbinom.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.isf",
+      "func": "NegativeBinomial.ISF",
+      "reference": "scipy.stats.nbinom.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.logcdf",
+      "func": "NegativeBinomial.LogCDF",
+      "reference": "scipy.stats.nbinom.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.logsf",
+      "func": "NegativeBinomial.LogSF",
+      "reference": "scipy.stats.nbinom.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.rvs",
+      "func": "NegativeBinomial.Rvs",
+      "reference": "scipy.stats.nbinom.rvs (size=n)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "nbinom.entropy",
+      "func": "NegativeBinomial.Entropy",
+      "reference": "scipy.stats.nbinom(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.pmf",
+      "func": "Poisson.PMF",
+      "reference": "scipy.stats.poisson.pmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.logpmf",
+      "func": "Poisson.LogPMF",
+      "reference": "scipy.stats.poisson.logpmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.cdf",
+      "func": "Poisson.CDF",
+      "reference": "scipy.stats.poisson.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/poisson.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.poisson.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.sf",
+      "func": "Poisson.SF",
+      "reference": "scipy.stats.poisson.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.ppf",
+      "func": "Poisson.PPF",
+      "reference": "scipy.stats.poisson.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.isf",
+      "func": "Poisson.ISF",
+      "reference": "scipy.stats.poisson.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.logcdf",
+      "func": "Poisson.LogCDF",
+      "reference": "scipy.stats.poisson.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.logsf",
+      "func": "Poisson.LogSF",
+      "reference": "scipy.stats.poisson.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.rvs",
+      "func": "Poisson.Rvs",
+      "reference": "scipy.stats.poisson.rvs (size=n)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "poisson.entropy",
+      "func": "Poisson.Entropy",
+      "reference": "scipy.stats.poisson(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.pmf",
+      "func": "Zipf.PMF",
+      "reference": "scipy.stats.zipf.pmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.logpmf",
+      "func": "Zipf.LogPMF",
+      "reference": "scipy.stats.zipf.logpmf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.cdf",
+      "func": "Zipf.CDF",
+      "reference": "scipy.stats.zipf.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "Map/zipf.cdf",
+      "func": "Map",
+      "reference": "scipy.stats.zipf.cdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.sf",
+      "func": "Zipf.SF",
+      "reference": "scipy.stats.zipf.sf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.ppf",
+      "func": "Zipf.PPF",
+      "reference": "scipy.stats.zipf.ppf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.isf",
+      "func": "Zipf.ISF",
+      "reference": "scipy.stats.zipf.isf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.logcdf",
+      "func": "Zipf.LogCDF",
+      "reference": "scipy.stats.zipf.logcdf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.logsf",
+      "func": "Zipf.LogSF",
+      "reference": "scipy.stats.zipf.logsf (one ufunc call over n points)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.rvs",
+      "func": "Zipf.Rvs",
+      "reference": "scipy.stats.zipf.rvs (size=n)",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zipf.entropy",
+      "func": "Zipf.Entropy",
+      "reference": "scipy.stats.zipf(...).entropy() (100 calls)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "mean",
+      "func": "Mean",
+      "reference": "scipy.stats / numpy: np.mean",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "var",
+      "func": "Var",
+      "reference": "scipy.stats / numpy: np.var",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "std",
+      "func": "Std",
+      "reference": "scipy.stats / numpy: np.std",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "median",
+      "func": "Median",
+      "reference": "scipy.stats / numpy: np.median",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "quantile",
+      "func": "Quantile",
+      "reference": "scipy.stats / numpy: lambda a: np.quantile(a, 0.3)",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "average",
+      "func": "Average",
+      "reference": "scipy.stats / numpy: lambda a, w: np.average(a, weights=w)",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "moment",
+      "func": "Moment",
+      "reference": "scipy.stats / numpy: lambda a: st.moment(a, 3)",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "skew",
+      "func": "Skew",
+      "reference": "scipy.stats / numpy: st.skew",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "kurtosis",
+      "func": "Kurtosis",
+      "reference": "scipy.stats / numpy: st.kurtosis",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "sem",
+      "func": "SEM",
+      "reference": "scipy.stats / numpy: st.sem",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "variation",
+      "func": "Variation",
+      "reference": "scipy.stats / numpy: st.variation",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zscore",
+      "func": "ZScore",
+      "reference": "scipy.stats / numpy: st.zscore",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "zmap",
+      "func": "ZMap",
+      "reference": "scipy.stats / numpy: st.zmap",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "gmean",
+      "func": "GMean",
+      "reference": "scipy.stats / numpy: st.gmean",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "hmean",
+      "func": "HMean",
+      "reference": "scipy.stats / numpy: st.hmean",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pmean",
+      "func": "PMean",
+      "reference": "scipy.stats / numpy: lambda a: st.pmean(a, 2.5)",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "iqr",
+      "func": "IQR",
+      "reference": "scipy.stats / numpy: st.iqr",
+      "parity": "none",
+      "allocs": 3,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "mad",
+      "func": "MedianAbsDeviation",
+      "reference": "scipy.stats / numpy: st.median_abs_deviation",
+      "parity": "none",
+      "allocs": 3,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "mode",
+      "func": "Mode",
+      "reference": "scipy.stats / numpy: st.mode",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "tmean",
+      "func": "TMean",
+      "reference": "scipy.stats / numpy: lambda a: st.tmean(a, (-1, 1))",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "tvar",
+      "func": "TVar",
+      "reference": "scipy.stats / numpy: lambda a: st.tvar(a, (-1, 1))",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "tstd",
+      "func": "TStd",
+      "reference": "scipy.stats / numpy: lambda a: st.tstd(a, (-1, 1))",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "tsem",
+      "func": "TSem",
+      "reference": "scipy.stats / numpy: lambda a: st.tsem(a, (-1, 1))",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "tmin",
+      "func": "TMin",
+      "reference": "scipy.stats / numpy: lambda a: st.tmin(a, -1)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "tmax",
+      "func": "TMax",
+      "reference": "scipy.stats / numpy: lambda a: st.tmax(a, 1)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "trim_mean",
+      "func": "TrimMean",
+      "reference": "scipy.stats / numpy: lambda a: st.trim_mean(a, 0.1)",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "trimboth",
+      "func": "TrimBoth",
+      "reference": "scipy.stats / numpy: lambda a: st.trimboth(a, 0.1)",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "trim1",
+      "func": "Trim1",
+      "reference": "scipy.stats / numpy: lambda a: st.trim1(a, 0.1, 'right')",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "rankdata",
+      "func": "RankData",
+      "reference": "scipy.stats / numpy: st.rankdata",
+      "parity": "none",
+      "allocs": 3,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "histogram",
+      "func": "Histogram",
+      "reference": "scipy.stats / numpy: lambda a: np.histogram(a, 100)",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "histogram_bin_edges",
+      "func": "HistogramBinEdges",
+      "reference": "scipy.stats / numpy: lambda a: np.histogram_bin_edges(a, 'auto')",
+      "parity": "none",
+      "allocs": 5,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "cumfreq",
+      "func": "CumFreq",
+      "reference": "scipy.stats / numpy: lambda a: st.cumfreq(a, 100)",
+      "parity": "none",
+      "allocs": 6,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "relfreq",
+      "func": "RelFreq",
+      "reference": "scipy.stats / numpy: lambda a: st.relfreq(a, 100)",
+      "parity": "none",
+      "allocs": 6,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "binned_statistic",
+      "func": "BinnedStatistic",
+      "reference": "scipy.stats / numpy: lambda a, b: st.binned_statistic(a, b, 'mean', 50)",
+      "parity": "none",
+      "allocs": 5,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "entropy",
+      "func": "Entropy",
+      "reference": "scipy.stats / numpy: st.entropy",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "differential_entropy",
+      "func": "DifferentialEntropy",
+      "reference": "scipy.stats / numpy: st.differential_entropy",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "describe",
+      "func": "Describe",
+      "reference": "scipy.stats / numpy: st.describe",
+      "parity": "none",
+      "allocs": 3,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "percentile",
+      "func": "Percentiles",
+      "reference": "scipy.stats / numpy: lambda a: np.percentile(a, [5, 25, 50, 75, 95])",
+      "parity": "none",
+      "allocs": 5,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ttest_rel",
+      "func": "TTestRel",
+      "reference": "scipy.stats / numpy: st.ttest_rel",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ttest_ind",
+      "func": "TTestInd",
+      "reference": "scipy.stats / numpy: st.ttest_ind",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ttest_1samp",
+      "func": "TTest1Samp",
+      "reference": "scipy.stats / numpy: lambda a: st.ttest_1samp(a, 0.0)",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "spearmanr",
+      "func": "Spearmanr",
+      "reference": "scipy.stats / numpy: st.spearmanr",
+      "parity": "none",
+      "allocs": 9,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "pearsonr",
+      "func": "Pearsonr",
+      "reference": "scipy.stats / numpy: st.pearsonr",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "linregress",
+      "func": "Linregress",
+      "reference": "scipy.stats / numpy: st.linregress",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "kendalltau",
+      "func": "Kendalltau",
+      "reference": "scipy.stats / numpy: st.kendalltau",
+      "parity": "none",
+      "allocs": 14,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "mannwhitneyu",
+      "func": "MannWhitneyU",
+      "reference": "scipy.stats / numpy: st.mannwhitneyu",
+      "parity": "none",
+      "allocs": 6,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "wilcoxon",
+      "func": "Wilcoxon",
+      "reference": "scipy.stats / numpy: st.wilcoxon",
+      "parity": "none",
+      "allocs": 10,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "kruskal",
+      "func": "KruskalWallis",
+      "reference": "scipy.stats / numpy: st.kruskal",
+      "parity": "none",
+      "allocs": 7,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "f_oneway",
+      "func": "FOneway",
+      "reference": "scipy.stats / numpy: st.f_oneway",
+      "parity": "none",
+      "allocs": 8,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bartlett",
+      "func": "Bartlett",
+      "reference": "scipy.stats / numpy: st.bartlett",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "levene",
+      "func": "Levene",
+      "reference": "scipy.stats / numpy: st.levene",
+      "parity": "none",
+      "allocs": 11,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ks_1samp",
+      "func": "KSTest1Samp",
+      "reference": "scipy.stats / numpy: lambda a: st.ks_1samp(a, st.norm.cdf)",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "ks_2samp",
+      "func": "KSTest2Samp",
+      "reference": "scipy.stats / numpy: st.ks_2samp",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "shapiro",
+      "func": "ShapiroWilk",
+      "reference": "scipy.stats / numpy: st.shapiro",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "anderson",
+      "func": "AndersonDarling",
+      "reference": "scipy.stats / numpy: lambda a: st.anderson(a, 'norm')",
+      "parity": "none",
+      "allocs": 9,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "skewtest",
+      "func": "SkewTest",
+      "reference": "scipy.stats / numpy: st.skewtest",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "kurtosistest",
+      "func": "KurtosisTest",
+      "reference": "scipy.stats / numpy: st.kurtosistest",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "normaltest",
+      "func": "Normaltest",
+      "reference": "scipy.stats / numpy: st.normaltest",
+      "parity": "none",
+      "allocs": 2,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "jarque_bera",
+      "func": "JarqueBera",
+      "reference": "scipy.stats / numpy: st.jarque_bera",
+      "parity": "none",
+      "allocs": 3,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chisquare",
+      "func": "ChiSquare",
+      "reference": "scipy.stats / numpy: st.chisquare",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "power_divergence",
+      "func": "PowerDivergence",
+      "reference": "scipy.stats / numpy: lambda a: st.power_divergence(a, lambda_='cressie-read')",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "chi2_contingency",
+      "func": "Chi2Contingency",
+      "reference": "scipy.stats / numpy: st.chi2_contingency",
+      "parity": "none",
+      "allocs": 12,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "fisher_exact",
+      "func": "FisherExact",
+      "reference": "scipy.stats / numpy: lambda: st.fisher_exact([[1200, 800], [900, 1100]])",
+      "parity": "none",
+      "allocs": 0,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "bootstrap",
+      "func": "Bootstrap",
+      "reference": "scipy.stats / numpy: lambda a: st.bootstrap((a,), np.mean, n_resamples=9999, rng=np.random.default_rng(3))",
+      "parity": "none",
+      "allocs": 231,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "kde.evaluate",
+      "func": "GaussianKDE.EvaluateSlice",
+      "reference": "scipy.stats / numpy: lambda d, x: st.gaussian_kde(d)(x)",
+      "parity": "none",
+      "allocs": 42,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "kde.logpdf",
+      "func": "GaussianKDE.LogPDFSlice",
+      "reference": "scipy.stats / numpy: lambda d, x: st.gaussian_kde(d).logpdf(x)",
+      "parity": "none",
+      "allocs": 42,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "kde.evaluate2d",
+      "func": "GaussianKDE.Evaluate",
+      "reference": "scipy.stats / numpy: lambda d, x: st.gaussian_kde(d)(x)",
+      "parity": "none",
+      "allocs": 39,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "kde.resample",
+      "func": "GaussianKDE.Resample",
+      "reference": "scipy.stats / numpy: lambda k, n: k.resample(n, seed=np.random.default_rng(4))",
+      "parity": "none",
+      "allocs": 75,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "kde.integrate_box_1d",
+      "func": "GaussianKDE.IntegrateBox1D",
+      "reference": "scipy.stats / numpy: lambda k: k.integrate_box_1d(-1, 0.5)",
+      "parity": "none",
+      "allocs": 1,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "mvn.logpdf",
+      "func": "MultivariateNormal.LogPDFPoints",
+      "reference": "scipy.stats / numpy: lambda d, x: d.logpdf(x)",
+      "parity": "none",
+      "allocs": 3,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "mvn.rvs",
+      "func": "MultivariateNormal.Rvs",
+      "reference": "scipy.stats / numpy: lambda d, n: d.rvs(size=n, random_state=np.random.default_rng(5))",
+      "parity": "none",
+      "allocs": 80,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "mvn.cdf",
+      "func": "MultivariateNormal.CDF",
+      "reference": "scipy.stats / numpy: lambda d: d.cdf([0.5, 0.2, 1, -0.3, 0.8])",
+      "parity": "none",
+      "allocs": 61,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "mvn.fit",
+      "func": "FitMultivariateNormal",
+      "reference": "scipy.stats / numpy: st.multivariate_normal.fit",
+      "parity": "none",
+      "allocs": 12,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "dirichlet.logpdf",
+      "func": "Dirichlet.LogPDFPoints",
+      "reference": "scipy.stats / numpy: lambda x: st.dirichlet.logpdf(x, np.array([1.5, 2, 3.5, 0.8, 4]))",
+      "parity": "none",
+      "allocs": 4,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "dirichlet.rvs",
+      "func": "Dirichlet.Rvs",
+      "reference": "scipy.stats / numpy: lambda n: st.dirichlet.rvs(np.array([1.5, 2, 3.5, 0.8, 4]), size=n, random_state=np.random.default_rng(6))",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "multinomial.logpmf",
+      "func": "Multinomial.LogPMFPoints",
+      "reference": "scipy.stats / numpy: lambda x: st.multinomial.logpmf(x, 20, np.array([0.1, 0.2, 0.3, 0.15, 0.25]))",
+      "parity": "none",
+      "allocs": 8,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    },
+    {
+      "name": "multinomial.rvs",
+      "func": "Multinomial.Rvs",
+      "reference": "scipy.stats / numpy: lambda n: st.multinomial.rvs(20, np.array([0.1, 0.2, 0.3, 0.15, 0.25]), size=n, random_state=np.random.default_rng(6))",
+      "parity": "none",
+      "allocs": 13,
+      "go": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ref": {
+        "median": 0,
+        "q1": 0,
+        "q3": 0
+      },
+      "ratio": 0
+    }
+  ]
+}
