@@ -46,15 +46,18 @@ func NewDirichlet(alpha []float64) (*Dirichlet, error) {
 // Alpha returns the concentration parameters (a copy).
 func (d *Dirichlet) Alpha() []float64 { return append([]float64(nil), d.alpha...) }
 
-// point completes x (K or K-1 coordinates) and checks it as SciPy's
+// pointInto completes x (K or K-1 coordinates) and checks it as SciPy's
 // _dirichlet_check_input does.
-func (d *Dirichlet) point(x []float64) ([]float64, error) {
+//
+// The completed copy of x is built in buf (a batch keeps one buffer instead of
+// allocating a copy per point); a nil buf allocates.
+func (d *Dirichlet) pointInto(buf, x []float64) ([]float64, error) {
 	k := len(d.alpha)
 	switch len(x) {
 	case k:
-		x = append([]float64(nil), x...)
+		x = append(buf[:0], x...)
 	case k - 1:
-		x = append(append([]float64(nil), x...), 1-sum(x))
+		x = append(append(buf[:0], x...), 1-sum(x))
 	default:
 		return nil, fmt.Errorf("%w: a point needs %d or %d coordinates, it has %d", ErrData, k, k-1, len(x))
 	}
@@ -96,8 +99,10 @@ func (d *Dirichlet) logPDF(x []float64) dd.DD {
 // first K-1 (the last is then 1 minus their sum):
 // scipy.stats.dirichlet.logpdf. A point off the simplex is an error
 // wrapping ErrData, as SciPy raises.
-func (d *Dirichlet) LogPDF(x []float64) (float64, error) {
-	x, err := d.point(x)
+func (d *Dirichlet) LogPDF(x []float64) (float64, error) { return d.logPDFBuf(x, nil) }
+
+func (d *Dirichlet) logPDFBuf(x, buf []float64) (float64, error) {
+	x, err := d.pointInto(buf, x)
 	if err != nil {
 		return math.NaN(), err
 	}
@@ -136,8 +141,10 @@ func (d *Dirichlet) logPDFFast(x []float64) (float64, bool) {
 }
 
 // PDF returns the density at x (see LogPDF): scipy.stats.dirichlet.pdf.
-func (d *Dirichlet) PDF(x []float64) (float64, error) {
-	x, err := d.point(x)
+func (d *Dirichlet) PDF(x []float64) (float64, error) { return d.pdfBuf(x, nil) }
+
+func (d *Dirichlet) pdfBuf(x, buf []float64) (float64, error) {
+	x, err := d.pointInto(buf, x)
 	if err != nil {
 		return math.NaN(), err
 	}
@@ -153,15 +160,15 @@ func (d *Dirichlet) PDF(x []float64) (float64, error) {
 // components along the first axis; here points are rows as everywhere in
 // this package.
 func (d *Dirichlet) LogPDFPoints(x *ndarray.Array) ([]float64, error) {
-	return d.rows(x, d.LogPDF)
+	return d.rows(x, d.logPDFBuf)
 }
 
 // PDFPoints is PDF at each row of x (see LogPDFPoints).
 func (d *Dirichlet) PDFPoints(x *ndarray.Array) ([]float64, error) {
-	return d.rows(x, d.PDF)
+	return d.rows(x, d.pdfBuf)
 }
 
-func (d *Dirichlet) rows(x *ndarray.Array, f func([]float64) (float64, error)) ([]float64, error) {
+func (d *Dirichlet) rows(x *ndarray.Array, f func(x, buf []float64) (float64, error)) ([]float64, error) {
 	if x == nil {
 		return nil, fmt.Errorf("%w: no points", ErrData)
 	}
@@ -173,8 +180,9 @@ func (d *Dirichlet) rows(x *ndarray.Array, f func([]float64) (float64, error)) (
 	w := s[len(s)-1]
 	n := len(v) / w
 	out := make([]float64, n)
+	buf := make([]float64, 0, len(d.alpha))
 	for i := range n {
-		r, err := f(v[i*w : (i+1)*w])
+		r, err := f(v[i*w:(i+1)*w], buf)
 		if err != nil {
 			return nil, err
 		}

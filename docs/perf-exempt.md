@@ -1,0 +1,448 @@
+# Public functions without a performance case
+
+Written by `cd bench && go test -run TestGenExempt -perf.exempt .` and read by `refbench` in the CI mode
+(`go test -run TestPerf .`): every public function of the module has a case in `bench/perf_test.go` or is
+named here with its reason. The method and the table are in [perf.md](perf.md). A row here is a debt or a
+deliberate absence, not a verdict.
+
+Counted from the module's own registry: 830 public functions and methods, 421 with a row, 409 named below.
+
+## Distribution attributes (one scalar per call)
+
+- `Bernoulli.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Bernoulli.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Bernoulli.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Bernoulli.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Bernoulli.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Bernoulli.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Bernoulli.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Beta.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Beta.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Beta.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Beta.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Beta.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Beta.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Beta.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Binomial.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Binomial.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Binomial.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Binomial.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Binomial.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Binomial.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Binomial.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Cauchy.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Cauchy.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Cauchy.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Cauchy.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Cauchy.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Cauchy.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Cauchy.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Chi.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Chi.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Chi.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Chi.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Chi.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Chi.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Chi.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `ChiSquared.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `ChiSquared.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `ChiSquared.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `ChiSquared.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `ChiSquared.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `ChiSquared.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `ChiSquared.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `DiscreteUniform.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `DiscreteUniform.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `DiscreteUniform.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `DiscreteUniform.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `DiscreteUniform.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `DiscreteUniform.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `DiscreteUniform.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Exponential.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Exponential.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Exponential.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Exponential.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Exponential.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Exponential.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Exponential.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `F.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `F.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `F.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `F.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `F.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `F.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `F.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gamma.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gamma.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gamma.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gamma.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gamma.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gamma.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gamma.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Geometric.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Geometric.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Geometric.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Geometric.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Geometric.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Geometric.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Geometric.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gumbel.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gumbel.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gumbel.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gumbel.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gumbel.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gumbel.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Gumbel.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `HalfNormal.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `HalfNormal.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `HalfNormal.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `HalfNormal.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `HalfNormal.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `HalfNormal.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `HalfNormal.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Hypergeometric.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Hypergeometric.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Hypergeometric.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Hypergeometric.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Hypergeometric.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Hypergeometric.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Hypergeometric.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `InverseGamma.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `InverseGamma.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `InverseGamma.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `InverseGamma.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `InverseGamma.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `InverseGamma.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `InverseGamma.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Laplace.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Laplace.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Laplace.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Laplace.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Laplace.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Laplace.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Laplace.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `LogNormal.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `LogNormal.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `LogNormal.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `LogNormal.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `LogNormal.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `LogNormal.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `LogNormal.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Logistic.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Logistic.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Logistic.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Logistic.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Logistic.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Logistic.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Logistic.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Lomax.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Lomax.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Lomax.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Lomax.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Lomax.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Lomax.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Lomax.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NegativeBinomial.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NegativeBinomial.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NegativeBinomial.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NegativeBinomial.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NegativeBinomial.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NegativeBinomial.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NegativeBinomial.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NoncentralChiSquared.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NoncentralChiSquared.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NoncentralChiSquared.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NoncentralChiSquared.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NoncentralChiSquared.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NoncentralChiSquared.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `NoncentralChiSquared.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Normal.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Normal.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Normal.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Normal.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Normal.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Normal.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Normal.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Pareto.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Pareto.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Pareto.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Pareto.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Pareto.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Pareto.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Pareto.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Poisson.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Poisson.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Poisson.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Poisson.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Poisson.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Poisson.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Poisson.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Rayleigh.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Rayleigh.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Rayleigh.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Rayleigh.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Rayleigh.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Rayleigh.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Rayleigh.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Reciprocal.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Reciprocal.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Reciprocal.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Reciprocal.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Reciprocal.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Reciprocal.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Reciprocal.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `StudentT.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `StudentT.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `StudentT.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `StudentT.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `StudentT.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `StudentT.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `StudentT.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Triangular.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Triangular.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Triangular.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Triangular.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Triangular.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Triangular.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Triangular.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Uniform.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Uniform.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Uniform.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Uniform.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Uniform.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Uniform.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Uniform.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `VonMises.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `VonMises.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `VonMises.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `VonMises.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `VonMises.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `VonMises.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `VonMises.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Weibull.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Weibull.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Weibull.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Weibull.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Weibull.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Weibull.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Weibull.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Zipf.Kurtosis`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Zipf.Mean`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Zipf.Moment`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Zipf.Skew`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Zipf.Std`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Zipf.Support`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+- `Zipf.Var`: closed-form scalar of the frozen distribution; SciPy's counterpart is a Python method call (`rv.mean()`, `rv.support()`), not an array operation, so there is no ufunc to time against and the measurement would be Python call overhead.
+
+## Distribution quantile helpers (one scalar per call)
+
+- `Bernoulli.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Bernoulli.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Beta.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Beta.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Binomial.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Binomial.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Cauchy.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Cauchy.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Chi.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Chi.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `ChiSquared.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `ChiSquared.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `DiscreteUniform.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `DiscreteUniform.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Exponential.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Exponential.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `F.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `F.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Gamma.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Gamma.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Geometric.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Geometric.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Gumbel.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Gumbel.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `HalfNormal.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `HalfNormal.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Hypergeometric.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Hypergeometric.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `InverseGamma.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `InverseGamma.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Laplace.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Laplace.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `LogNormal.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `LogNormal.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Logistic.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Logistic.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Lomax.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Lomax.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `NegativeBinomial.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `NegativeBinomial.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `NoncentralChiSquared.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `NoncentralChiSquared.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Normal.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Normal.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Pareto.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Pareto.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Poisson.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Poisson.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Rayleigh.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Rayleigh.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Reciprocal.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Reciprocal.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `StudentT.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `StudentT.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Triangular.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Triangular.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Uniform.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Uniform.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `VonMises.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `VonMises.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Weibull.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Weibull.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Zipf.Interval`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+- `Zipf.Median`: a scalar call of PPF, which is measured as the `ppf` row of the distribution (`rv.median()` and `rv.interval()` are Python method calls).
+
+## Parameter validation
+
+- `Bernoulli.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Beta.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Binomial.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Cauchy.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Chi.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `ChiSquared.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `DiscreteUniform.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Exponential.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `F.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Gamma.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Geometric.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Gumbel.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `HalfNormal.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Hypergeometric.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `InverseGamma.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Laplace.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `LogNormal.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Logistic.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Lomax.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `NegativeBinomial.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `NoncentralChiSquared.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Normal.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Pareto.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Poisson.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Rayleigh.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Reciprocal.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `StudentT.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Triangular.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Uniform.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `VonMises.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Weibull.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+- `Zipf.Validate`: checks the parameters of the value; no SciPy counterpart (SciPy checks inside each call).
+
+## Constructors
+
+- `NewBernoulli`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewBeta`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewBinomial`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewCauchy`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewChi`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewChiSquared`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewDirichlet`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewDiscreteUniform`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewExponential`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewF`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewGamma`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewGaussianKDE`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewGeometric`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewGumbel`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewHalfNormal`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewHypergeometric`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewInverseGamma`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewLaplace`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewLogNormal`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewLogistic`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewLomax`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewMultinomial`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewMultivariateNormal`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewNegativeBinomial`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewNoncentralChiSquared`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewNormal`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewPareto`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewPoisson`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewRayleigh`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewReciprocal`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewStudentT`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewTriangular`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewUniform`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewVonMises`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewWeibull`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+- `NewZipf`: validates and stores the parameters in constant time, no array work; SciPy freezes a distribution with a Python call.
+
+## Kernel density estimate: attributes and factors
+
+- `GaussianKDE.ChoCov`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.Covariance`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.D`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.Dataset`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.Factor`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.InvCov`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.LogDet`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.N`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.Neff`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.ScottsFactor`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.SetBandwidth`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.SilvermanFactor`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+- `GaussianKDE.Weights`: attribute or bandwidth factor of the fitted estimate, computed at construction (the `kde.*` rows time the construction).
+
+## Kernel density estimate: variants of a measured operation
+
+- `GaussianKDE.IntegrateBox`: a variant of `kde.evaluate`, `kde.logpdf` or `kde.integrate_box_1d` (same kernel sums); follow-up row.
+- `GaussianKDE.IntegrateGaussian`: a variant of `kde.evaluate`, `kde.logpdf` or `kde.integrate_box_1d` (same kernel sums); follow-up row.
+- `GaussianKDE.IntegrateKDE`: a variant of `kde.evaluate`, `kde.logpdf` or `kde.integrate_box_1d` (same kernel sums); follow-up row.
+- `GaussianKDE.LogPDF`: a variant of `kde.evaluate`, `kde.logpdf` or `kde.integrate_box_1d` (same kernel sums); follow-up row.
+- `GaussianKDE.Marginal`: a variant of `kde.evaluate`, `kde.logpdf` or `kde.integrate_box_1d` (same kernel sums); follow-up row.
+
+## Multivariate families: attributes and single-point calls
+
+- `Dirichlet.Alpha`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Dirichlet.Cov`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Dirichlet.Entropy`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Dirichlet.LogPDF`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Dirichlet.Mean`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Dirichlet.PDF`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Dirichlet.PDFPoints`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Dirichlet.Var`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Multinomial.Cov`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Multinomial.Entropy`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Multinomial.LogPMF`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Multinomial.Mean`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Multinomial.N`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Multinomial.P`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Multinomial.PMF`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `Multinomial.PMFPoints`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `MultivariateNormal.Cov`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `MultivariateNormal.Dim`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `MultivariateNormal.Entropy`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `MultivariateNormal.LogPDF`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `MultivariateNormal.LogPDet`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `MultivariateNormal.Mean`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `MultivariateNormal.PDF`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `MultivariateNormal.PDFPoints`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+- `MultivariateNormal.Rank`: an attribute of the frozen family or one point per call; the batch methods (`LogPDFPoints`, `LogPMFPoints`, `Rvs`) are the rows `mvn.*`, `dirichlet.*`, `multinomial.*`.
+
+## Multivariate normal: variants of the cdf
+
+- `MultivariateNormal.CDFEstimate`: a variant of `mvn.cdf` (the randomised lattice rule); follow-up row.
+- `MultivariateNormal.CDFPoints`: a variant of `mvn.cdf` (the randomised lattice rule); follow-up row.
+- `MultivariateNormal.LogCDF`: a variant of `mvn.cdf` (the randomised lattice rule); follow-up row.
+
+## Variants of a measured function
+
+- `MapSlice`: a variant of a function that has a row (`percentile`, `quantile`, `ttest_*`, `pearsonr`, `Map/*`).
+- `PearsonResult.ConfidenceInterval`: a variant of a function that has a row (`percentile`, `quantile`, `ttest_*`, `pearsonr`, `Map/*`).
+- `Percentile`: a variant of a function that has a row (`percentile`, `quantile`, `ttest_*`, `pearsonr`, `Map/*`).
+- `Quantiles`: a variant of a function that has a row (`percentile`, `quantile`, `ttest_*`, `pearsonr`, `Map/*`).
+- `TTestResult.ConfidenceInterval`: a variant of a function that has a row (`percentile`, `quantile`, `ttest_*`, `pearsonr`, `Map/*`).
+
+## Multiple testing (follow-up rows)
+
+- `FalseDiscoveryControl`: scipy.stats.false_discovery_control and statsmodels' multipletests are the references; no row yet.
+- `MultipleTests`: scipy.stats.false_discovery_control and statsmodels' multipletests are the references; no row yet.
+

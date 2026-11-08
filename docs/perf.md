@@ -3,14 +3,78 @@
 The comparison is with SciPy 1.18.1 / NumPy 2.5.4 (native arm64 wheels, the
 build a user of this machine runs), on the same data, **core for core**.
 
-## Method
+## The harness (refbench, `bench/`)
 
-- `go test -run TestPerfReport -perf.report=docs/perf-table.md -timeout 180m`
-  starts SciPy through `uv` (one `python -c` process, fed one JSON request
-  per line; every case's SciPy arguments and call are Python expressions
-  defined in Go, `perf_scipy_test.go`) and, case by case and round by round,
-  times back to back the SciPy call, the Go call on one core and the Go call
-  a user makes (all cores).
+`bench/` is a module of its own on [go-scikit/refbench](https://github.com/go-scikit/refbench)
+v0.1.2: one core on both sides, interleaved rounds, a gate on the host's 1-minute
+load, verdict on the median. It replaces the earlier `TestPerfReport` harness
+(its cases, SciPy expressions and data are the same, in `bench/perf_test.go`).
+
+```sh
+cd bench
+go test -run TestPerf -cpu 1 .                    # CI: allocations, table, inventory (no Python, about 4 min)
+go test -run TestPerf -cpu 1 -perf.run .          # measure; writes docs/perf.json, docs/perf-table.md
+go test -run TestPerf -perf.record .              # allocation counts only (status: deferred)
+go test -run TestDataParity -perf.parity .        # the same bytes on both sides (needs uv)
+go test -run TestGenExempt -perf.exempt .         # rewrite docs/perf-exempt.md
+```
+
+What is compared, and what was checked before trusting a row:
+
+- **Array calls on both sides.** A distribution's elementwise row (`norm.pdf`)
+  times a Go loop over n points calling the scalar function against one SciPy
+  ufunc call over the same n points (result allocated by the call on both
+  sides); the package's array API is the `Map/...` rows. Every other row is the
+  call a user makes.
+- **Same data**, SHA-256 checked: `TestDataParity` hashes the arguments of the
+  377 rows whose SciPy arguments are arrays on both sides and finds them byte
+  identical. The fit rows read one committed sample (`bench/testdata/fit_*.f64`)
+  on both sides: for 16 of the 23 families SciPy's `rvs` and this package's
+  differ in the last bit of a transcendental function (the Go side uses
+  correctly rounded ones), and a fit timed on two different samples is not a
+  comparison. The rows whose SciPy argument is an object (a frozen
+  distribution, a fitted KDE) or nothing say so in their definition.
+- **Sizes.** n is the size of the earlier harness, capped (`bench/ncap_test.go`)
+  at 100 000 and so that one Go call takes at most 8 ms (the CI mode makes 51
+  calls to count allocations); both sides use the same n. The timings in
+  [perf-table-legacy.md](perf-table-legacy.md) are at the earlier, larger sizes.
+- **Parity** is `none`: the oracle of the values is the ulp fixtures
+  ([accuracy.md](accuracy.md)); SciPy's own errors reach 1e15 ulp on some
+  functions.
+- **Allocations.** `perf.json` records the exact allocation count per call of
+  every row; CI fails on any difference. The registry is counted from the
+  module's own public functions ([perf-exempt.md](perf-exempt.md): 830 public
+  functions and methods, 421 with a row, 409 named with a reason, none
+  silently absent).
+- **No timing verdict in this version of the document.** The 1-minute load of
+  the host was above 8 while the harness was written, and refbench refuses to
+  time above it: `perf.json` holds allocation counts (`deferred`). The tables
+  below are the earlier harness's, kept as history; `refbench` writes the new
+  one when a window opens (#18).
+
+## Allocations found by the harness (2026-11-08)
+
+The exact allocation counts of the first `perf.json` showed work that no timing
+had flagged. Results are unchanged to the last bit (the ulp fixtures and every
+test pass unchanged; package coverage stays 100.0%).
+
+| Row | allocations per call before | after | cause |
+|---|---:|---:|---|
+| `dirichlet.logpdf` (n = 100 000 points) | 50 003 | 4 | `LogPDFPoints` and `PDFPoints` copied every row into a fresh slice to complete and check it; they keep one buffer (`TestDirichletPointsDoNotAllocatePerPoint`: the count does not grow with n; `TestDirichletPointsMatchOnePointAtATime`: bit-identical to one point at a time, K and K-1 coordinates) |
+| `t.ppf`, `t.isf` | 1998 | 0 | go-numerics/special v0.5.0 allocated in `ibetaInvEval` per call; v0.5.3 does not (special#36); this module now requires v0.5.3 |
+| `f.ppf`, `f.isf` | 1291, 1292 | 0 | the same |
+| `beta.ppf`, `beta.isf` | 1060, 1058 | 0 | the same |
+
+Still allocating, filed (#19): the `*.fit` rows (`f.fit` 82 059 per call,
+`chi2.fit` 42 278), one boxing of the standard form per likelihood evaluation
+and, from go-numerics/optimize v0.6.0, two slices and a reflect swapper per
+Nelder-Mead iteration (fixed in optimize v0.6.1, pending the bump).
+
+## Method of the earlier measurement (legacy harness, removed)
+
+- It started SciPy through `uv` (one `python -c` process, fed one JSON request
+  per line) and, case by case and round by round, timed back to back the SciPy
+  call, the Go call on one core and the Go call a user makes (all cores).
 - **One core on both sides.** SciPy runs with one BLAS/OpenMP thread. The
   Go one-core column is a single-goroutine loop for the elementwise
   functions, and the function itself under `GOMAXPROCS=1` (set outside the
@@ -29,14 +93,17 @@ build a user of this machine runs), on the same data, **core for core**.
 - Rounds are interleaved case by case so that the load of the shared host
   hits both sides alike; medians of 7 rounds (3 for calls over 2 s, 1 over
   20 s). The host is shared (16 cores): its load is in each table's header.
-- `go test -run TestPerfCompare -perf.compare=BEFORE,AFTER,OUT` writes
-  [perf-compare.md](perf-compare.md) from two tables.
+- (`TestPerfCompare` wrote [perf-compare.md](perf-compare.md) from two tables;
+  the test was removed with the harness.)
 
 ## Results
 
-[perf-table.md](perf-table.md) is this version, [perf-table-before.md](perf-table-before.md)
-v0.1.0 measured with the same harness, [perf-compare.md](perf-compare.md)
-the two side by side with the cause of every row still slower than SciPy.
+[perf-table-legacy.md](perf-table-legacy.md) is the earlier harness's table of
+the previous version (before the move to refbench, at the larger sizes),
+[perf-table-before.md](perf-table-before.md) v0.1.0 measured with the same
+harness, [perf-compare.md](perf-compare.md) the two side by side with the cause
+of every row still slower than SciPy. The new `perf-table.md` is generated by
+refbench from `perf.json` and has no timings until a quiet window.
 
 Of 355 operations, **267 were slower than SciPy on one core in v0.1.0, 236
 are now**. 160 of those remain slower for reasons in this package, all of

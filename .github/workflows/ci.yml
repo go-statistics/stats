@@ -164,6 +164,23 @@ jobs:
           done
           exit $fail
 
+  # The performance harness (bench/, a module of its own): the allocation count
+  # of every case equals docs/perf.json (exact, per call), docs/perf-table.md is
+  # what perf.json generates, and every public function has a case or an entry in
+  # docs/perf-exempt.md. No Python and no timing here: timing runs by hand at a
+  # 1-minute load below 8 (cd bench && go test -run TestPerf -cpu 1 -perf.run .).
+  perf:
+    name: perf (refbench CI mode)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.27.3
+      - name: Allocation counts, table, public-function inventory
+        working-directory: bench
+        run: go test -count=1 -timeout 30m -run 'TestPerf$|TestRows' -cpu 1 .
+
   govulncheck:
     name: govulncheck
     runs-on: ubuntu-latest
