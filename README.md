@@ -4,7 +4,7 @@ Probability distributions, descriptive statistics and statistical tests in
 pure Go (no cgo), for the go-ndarray notebook ecosystem: the results of
 `scipy.stats` (and NumPy's statistics), with every distribution function
 measured in ULPs against [mpmath](https://mpmath.org), at least as accurate as
-SciPy in 1473 of 1479 measured regions, and random draws that reproduce
+SciPy in 1477 of 1479 measured regions, and random draws that reproduce
 SciPy's for the same seed.
 
 ```
@@ -75,9 +75,10 @@ SciPy 1.18.1's value at the same arguments (x86-64 build). Per-region budgets
 are enforced by `go test` on amd64, arm64, 386, arm, riscv64, loong64,
 ppc64le and s390x.
 
-- 256 fixtures, 1479 regions, ~212 000 points: ours ≤ SciPy in **1473**; the
-  six exceptions are the beta sf/ppf, by at most 2 ulp more than SciPy (both
-  under 4.5 ulp), from the incomplete beta function of go-numerics/special.
+- 256 fixtures, 1479 regions, ~212 000 points: ours ≤ SciPy in **1477**; the
+  two exceptions are the beta survival function (small_mid 0.74 ulp against
+  SciPy's 0.50, mid_mid 0.73 against 0.49), from `BetaIncC` of
+  go-numerics/special. See [docs/accuracy.md](docs/accuracy.md).
 - Normal: every function ≤ 0.55 ulp. Gamma, chi, chi-squared, inverse gamma,
   beta and t densities ≤ 1.3 ulp where SciPy loses up to 10^7 ulp at large
   shapes; binomial, Poisson, negative binomial masses ≤ 0.5 ulp (SciPy up to
